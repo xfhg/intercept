@@ -1,0 +1,61 @@
+Banner: |
+
+  INTERCEPT
+
+  POLICY AS CODE AUDIT SCAN
+
+  RIPGREP WEAPONISED
+
+Exit_Critical: "Critical irregularities found in your code"
+Exit_Warning: "Irregularities found in your code"
+Exit_Clean: "Clean report"
+
+Rules:
+  - id: 1
+    name: NAME_TEXT
+    description: DESCRIPTION_TEXT
+    solution: SOLUTION_TEXT
+    error: ERROR_TEXT
+    environment:
+    type: scan
+    fatal: true
+    patterns:
+      - regex_1
+      - regex_2
+      - regex_3
+
+  - id: 2
+    name: NAME_TEXT
+    description: DESCRIPTION_TEXT
+    error: ERROR_TEXT
+    solution: SOLUTION_TEXT
+    environment: ENVIRONMENT_ID
+    type: scan
+    fatal: true
+    patterns:
+      - regex_4
+      - regex_5
+      - regex_6
+
+  - id: 666
+    name: NAME_TEXT
+    description: DESCRIPTION_TEXT
+    error: ERROR_TEXT
+    solution: SOLUTION_TEXT
+    environment: ENVIRONMENT_ID
+    type: scan
+    fatal: true
+    patterns:
+      - regex_666
+
+  - name: Endpoints
+    description: Endpoints need to be validated on an environment scope
+    type: collect
+    patterns:
+      - (http|https)
+
+  - name: Resources
+    description: Endpoints need to be validated on an environment scope
+    type: collect
+    patterns:
+      - regex
