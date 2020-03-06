@@ -17,12 +17,13 @@ import (
 
 var (
 	scanPath string
+	fatal    = false
+	warning  = false
 )
 
 // AllRules : internal struct of the rules yaml file
 type allRules struct {
-	Rules_Deactivated []int `yaml:"rules_deactivated"`
-	Exceptions        []struct {
+	Exceptions []struct {
 		Id   int    `yaml:"id"`
 		Auth string `yaml:"auth"`
 	} `yaml:"Exceptions"`
@@ -41,15 +42,15 @@ type allRules struct {
 		Fatal       bool     `yaml:"fatal"`
 		Patterns    []string `yaml:"patterns"`
 	} `yaml:"Rules"`
+	Rules_Deactivated []int `yaml:"rules_deactivated"`
 }
 
 var (
 	rules *allRules
 
-	colorRedBold   = color.New(color.Red, color.OpBold)
-	colorGreenBold = color.New(color.Green, color.OpBold)
-	colorRed       = color.New(color.Red)
-	colorGreen     = color.New(color.Green)
+	colorRedBold    = color.New(color.Red, color.OpBold)
+	colorGreenBold  = color.New(color.Green, color.OpBold)
+	colorYellowBold = color.New(color.Yellow, color.OpBold)
 )
 
 func getRuleStruct() *allRules {
@@ -113,8 +114,8 @@ var auditCmd = &cobra.Command{
 			case "scan":
 
 				fmt.Println("| ")
-				fmt.Println("| ------------------------------------------------------------")
-				fmt.Println("| Rule #", index)
+				fmt.Println("| ------------------------------------------------------------ ", index)
+				fmt.Println("| Rule #", value.Id)
 				fmt.Println("| Rule name : ", value.Name)
 				fmt.Println("| Rule description : ", value.Description)
 				fmt.Println("| ")
@@ -122,10 +123,13 @@ var auditCmd = &cobra.Command{
 				exception := sort.SearchInts(rules.Rules_Deactivated, value.Id)
 
 				if exception < len(rules.Rules_Deactivated) && rules.Rules_Deactivated[exception] == value.Id {
+
 					colorRedBold.Println("|")
 					colorRedBold.Println("| THIS RULE CHECK IS DEACTIVATED BY AN EXCEPTION REQUEST ")
 					colorRedBold.Println("|")
+
 				} else {
+
 					codePatternScan := []string{"--pcre2", "-p", "-i", "-C2", "-U", "-f", searchPatternFile, scanPath}
 					xcmd := exec.Command(rgbin, codePatternScan...)
 
@@ -144,24 +148,29 @@ var auditCmd = &cobra.Command{
 						}
 					} else {
 
-						if value.Environment == "non-prod" {
+						if value.Environment == cfgEnv || value.Environment == "" {
 							if value.Fatal {
+
 								colorRedBold.Println("|")
-								colorRedBold.Println("|")
+								colorRedBold.Println("| FATAL : ")
 								colorRedBold.Println(value.Error)
 								colorRedBold.Println("|")
+								fatal = true
 
 							}
 						} else {
-							if value.Fatal {
+
+							if value.Environment != cfgEnv && value.Environment != "" {
+
 								colorRedBold.Println("|")
 								colorRedBold.Println("|")
 								colorRedBold.Println(value.Error)
 								colorRedBold.Println("|")
+								warning = true
+
 							}
 						}
 
-						colorRedBold.Println("|")
 						colorRedBold.Println("|")
 						colorRedBold.Println("| Rule : ", value.Name)
 						colorRedBold.Println("| Target Environment : ", value.Environment)
@@ -205,36 +214,35 @@ var auditCmd = &cobra.Command{
 
 		}
 
-		fmt.Println("|")
-		fmt.Println("|")
-
 		_ = os.Remove(searchPatternFile)
 
 		fmt.Println("|")
+		fmt.Println("|")
+		fmt.Println("|")
 
-		// if opaReport.Prodfatal || opaReport.Nonprodfatal {
+		if fatal {
 
-		// 	fmt.Println(color.Bold(color.Red("| ")), color.Bold(color.Red(rules.Exit_Critical)))
-		// 	fmt.Println("|")
-		// 	fmt.Println("| INTERCEPT")
-		// 	fmt.Println("")
-		// 	log.Fatalln("- break signal - ")
-		// }
+			colorRedBold.Println("| ", rules.Exit_Critical)
+			fmt.Println("|")
+			fmt.Println("| INTERCEPT")
+			fmt.Println("")
+			colorRedBold.Println("- break signal - ")
+			os.Exit(1)
+		}
 
-		// if opaReport.Nonprod > 0 || opaReport.Prod > 0 {
+		if warning {
 
-		// 	fmt.Println(color.Bold(color.Yellow("| ")), color.Bold(color.Yellow(rules.Exit_Warning)))
-		// 	fmt.Println("|")
-		// 	fmt.Println("| INTERCEPT")
-		// 	fmt.Println("")
+			colorYellowBold.Println("| ", rules.Exit_Warning)
 
-		// } else {
+		} else {
 
-		// 	fmt.Println(color.Bold(color.Green("| ")), color.Bold(color.Green(rules.Exit_Clean)))
-		// 	fmt.Println("|")
-		// 	fmt.Println("| INTERCEPT")
-		// 	fmt.Println("")
-		// }
+			colorGreenBold.Println("| ", rules.Exit_Clean)
+
+		}
+
+		fmt.Println("|")
+		fmt.Println("| INTERCEPT")
+		fmt.Println("")
 	},
 }
 
