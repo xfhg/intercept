@@ -68,12 +68,13 @@ func initConfig() {
 
 	viper.AutomaticEnv() // read in environment variables that match
 
+	fmt.Println("")
+	fmt.Println("| INTERCEPT")
+	fmt.Println("|")
+
 	// If a config file is found, read it in.
 	if err := viper.ReadInConfig(); err == nil {
 
-		fmt.Println("")
-		fmt.Println("| INTERCEPT")
-		fmt.Println("|")
 		fmt.Println("| Loading policy file :", viper.ConfigFileUsed())
 
 	}
