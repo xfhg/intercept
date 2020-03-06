@@ -21,6 +21,7 @@ import (
 	"os"
 
 	"github.com/spf13/cobra"
+	"gopkg.in/ffmt.v1"
 	"gopkg.in/yaml.v2"
 )
 
@@ -50,6 +51,10 @@ var configCmd = &cobra.Command{
 		defaultCfgFile = "config.yaml"
 
 		if fileExists(addCfgFile) {
+
+			fmt.Println("|")
+			fmt.Println("| Config file updated")
+			fmt.Println("|")
 
 			if fileExists(defaultCfgFile) {
 
@@ -83,6 +88,8 @@ var configCmd = &cobra.Command{
 					panic(err)
 				}
 
+				ffmt.Puts(master)
+
 			} else {
 
 				var newfile map[string]interface{}
@@ -101,11 +108,9 @@ var configCmd = &cobra.Command{
 					panic(err)
 				}
 
-			}
+				ffmt.Puts(newfile)
 
-			fmt.Println("|")
-			fmt.Println("| Config file updated")
-			fmt.Println("|")
+			}
 
 		} else {
 

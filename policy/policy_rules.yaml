@@ -2,7 +2,7 @@ Banner: |
 
   INTERCEPT
 
-  POLICY AS CODE AUDIT SCAN
+  Policy as Code Static Analysis Auditing
 
   RIPGREP WEAPONISED
 
@@ -16,7 +16,7 @@ Rules:
     description: DESCRIPTION_TEXT
     solution: SOLUTION_TEXT
     error: ERROR_TEXT
-    environment:
+    environment: DEV
     type: scan
     fatal: true
     patterns:
@@ -29,7 +29,7 @@ Rules:
     description: DESCRIPTION_TEXT
     error: ERROR_TEXT
     solution: SOLUTION_TEXT
-    environment: ENVIRONMENT_ID
+    environment: PROD
     type: scan
     fatal: true
     patterns:
@@ -55,7 +55,7 @@ Rules:
       - (http|https)
 
   - name: Resources
-    description: Endpoints need to be validated on an environment scope
+    description: Resources need to be validated on an environment scope
     type: collect
     patterns:
       - regex

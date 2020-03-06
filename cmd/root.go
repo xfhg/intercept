@@ -12,6 +12,7 @@ import (
 
 // main command flags
 var cfgFile string
+var cfgEnv string
 
 // subcommand flags
 var (
@@ -40,7 +41,7 @@ func init() {
 
 	// global flags
 	rootCmd.PersistentFlags().StringVarP(&cfgFile, "config", "c", "config.yaml", "global Config file (config.yaml)")
-	rootCmd.PersistentFlags().StringVarP(&cfgFile, "environment", "e", "", "global Environment id")
+	rootCmd.PersistentFlags().StringVarP(&cfgEnv, "environment", "e", "", "global Environment id")
 
 }
 
