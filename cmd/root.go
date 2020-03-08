@@ -25,7 +25,7 @@ var rootCmd = &cobra.Command{
 	Long:  ``,
 }
 
-// Global Execute
+// Execute is the global command
 func Execute() {
 
 	if err := rootCmd.Execute(); err != nil {

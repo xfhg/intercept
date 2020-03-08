@@ -58,7 +58,7 @@ func getRuleStruct() *allRules {
 }
 
 // ContainsInt
-func ContainsInt(s []int, e int) bool {
+func containsInt(s []int, e int) bool {
 	for _, a := range s {
 		if a == e {
 			return true
@@ -126,7 +126,7 @@ var auditCmd = &cobra.Command{
 				fmt.Println("| Rule description : ", value.Description)
 				fmt.Println("| ")
 
-				exception := ContainsInt(rules.RulesDeactivated, value.Id)
+				exception := containsInt(rules.RulesDeactivated, value.Id)
 
 				if exception {
 
