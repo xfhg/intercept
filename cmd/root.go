@@ -25,6 +25,7 @@ var rootCmd = &cobra.Command{
 	Long:  ``,
 }
 
+// Global Execute
 func Execute() {
 
 	if err := rootCmd.Execute(); err != nil {
@@ -66,7 +67,7 @@ func initConfig() {
 
 	if err := viper.ReadInConfig(); err == nil {
 
-		fmt.Println("| Loading policy file :", viper.ConfigFileUsed())
+		fmt.Println("| Policy file :", viper.ConfigFileUsed())
 
 	}
 

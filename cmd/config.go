@@ -6,7 +6,6 @@ import (
 	"os"
 
 	"github.com/spf13/cobra"
-	"gopkg.in/ffmt.v1"
 	"gopkg.in/yaml.v2"
 )
 
@@ -28,18 +27,15 @@ var configCmd = &cobra.Command{
 
 	Run: func(cmd *cobra.Command, args []string) {
 
+		defaultCfgFile = cfgFile
+
 		if configReset {
 			if fileExists(defaultCfgFile) {
 				_ = os.Remove(defaultCfgFile)
-				fmt.Println("")
-				fmt.Println("| INTERCEPT CONFIG")
 				fmt.Println("|")
 				fmt.Println("| Config clear")
-				fmt.Println("")
 			}
 		}
-
-		defaultCfgFile = "config.yaml"
 
 		if fileExists(addCfgFile) {
 
@@ -79,8 +75,6 @@ var configCmd = &cobra.Command{
 					panic(err)
 				}
 
-				ffmt.Puts(master)
-
 			} else {
 
 				var newfile map[string]interface{}
@@ -98,8 +92,6 @@ var configCmd = &cobra.Command{
 				if err := ioutil.WriteFile("config.yaml", nf, 0644); err != nil {
 					panic(err)
 				}
-
-				ffmt.Puts(newfile)
 
 			}
 

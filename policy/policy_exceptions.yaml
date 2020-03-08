@@ -1,8 +1,8 @@
-Rules_Deactivated:
+RulesDeactivated:
   - 666
   - 12
 
-Exception_Message: "THIS RULE CHECK IS DEACTIVATED BY AN EXCEPTION REQUEST"
+ExceptionMessage: "THIS RULE CHECK IS DEACTIVATED BY AN EXCEPTION REQUEST"
 
 # Optional
 Exceptions:
