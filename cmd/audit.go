@@ -7,7 +7,6 @@ import (
 	"os"
 	"os/exec"
 	"runtime"
-	"sort"
 	"strings"
 
 	"github.com/spf13/cobra"
@@ -62,6 +61,15 @@ func getRuleStruct() *allRules {
 
 }
 
+func ContainsInt(s []int, e int) bool {
+	for _, a := range s {
+		if a == e {
+			return true
+		}
+	}
+	return false
+}
+
 var auditCmd = &cobra.Command{
 	Use:   "audit",
 	Short: "INTERCEPT / AUDIT - Scan a target path against configured policy rules and exceptions",
@@ -89,6 +97,8 @@ var auditCmd = &cobra.Command{
 			}
 		}
 
+		fmt.Println("| Scan Path : ", scanPath)
+
 		pwddir, _ := os.Getwd()
 
 		searchPatternFile := strings.Join([]string{pwddir, "/", "search_regex"}, "")
@@ -114,9 +124,9 @@ var auditCmd = &cobra.Command{
 				fmt.Println("| Rule description : ", value.Description)
 				fmt.Println("| ")
 
-				exception := sort.SearchInts(rules.Rules_Deactivated, value.Id)
+				exception := ContainsInt(rules.Rules_Deactivated, value.Id)
 
-				if exception < len(rules.Rules_Deactivated) && rules.Rules_Deactivated[exception] == value.Id {
+				if exception {
 
 					colorRedBold.Println("|")
 					colorRedBold.Println("| ", rules.Exception_Message)
