@@ -21,16 +21,12 @@ var (
 )
 
 type allRules struct {
-	Exceptions []struct {
-		Id   int    `yaml:"id"`
-		Auth string `yaml:"auth"`
-	} `yaml:"Exceptions"`
-	Exception_Message string `yaml:"exception_message"`
-	Banner            string `yaml:"banner"`
-	Exit_Critical     string `yaml:"exit_critical"`
-	Exit_Warning      string `yaml:"exit_warning"`
-	Exit_Clean        string `yaml:"exit_clean"`
-	Rules             []struct {
+	Banner           string `yaml:"banner"`
+	ExceptionMessage string `yaml:"exceptionmessage"`
+	ExitCritical     string `yaml:"exitcritical"`
+	ExitWarning      string `yaml:"exitwarning"`
+	ExitClean        string `yaml:"exitclean"`
+	Rules            []struct {
 		Id          int      `yaml:"id"`
 		Name        string   `yaml:"name"`
 		Description string   `yaml:"description"`
@@ -41,7 +37,7 @@ type allRules struct {
 		Fatal       bool     `yaml:"fatal"`
 		Patterns    []string `yaml:"patterns"`
 	} `yaml:"Rules"`
-	Rules_Deactivated []int `yaml:"rules_deactivated"`
+	RulesDeactivated []int `yaml:"rulesdeactivated"`
 }
 
 var (
@@ -61,6 +57,7 @@ func getRuleStruct() *allRules {
 
 }
 
+// ContainsInt
 func ContainsInt(s []int, e int) bool {
 	for _, a := range s {
 		if a == e {
@@ -105,8 +102,13 @@ var auditCmd = &cobra.Command{
 
 		fmt.Println("| ")
 		fmt.Println("| ")
-		fmt.Println(rules.Banner)
+		if rules.Banner != "" {
+			fmt.Println(rules.Banner)
+		}
 		fmt.Println("| ")
+		if len(rules.Rules) < 1 {
+			fmt.Println("| No Policy rules detected")
+		}
 
 		for index, value := range rules.Rules {
 
@@ -124,12 +126,12 @@ var auditCmd = &cobra.Command{
 				fmt.Println("| Rule description : ", value.Description)
 				fmt.Println("| ")
 
-				exception := ContainsInt(rules.Rules_Deactivated, value.Id)
+				exception := ContainsInt(rules.RulesDeactivated, value.Id)
 
 				if exception {
 
 					colorRedBold.Println("|")
-					colorRedBold.Println("| ", rules.Exception_Message)
+					colorRedBold.Println("| ", rules.ExceptionMessage)
 					colorRedBold.Println("|")
 
 				} else {
@@ -188,7 +190,7 @@ var auditCmd = &cobra.Command{
 			case "collect":
 
 				fmt.Println("| ")
-				fmt.Println("| ------------------------------------------------------------")
+				fmt.Println("| ------------------------------------------------------------ ", index)
 				fmt.Println("| Collection : ", value.Name)
 				fmt.Println("| Description : ", value.Description)
 				fmt.Println("| ")
@@ -226,7 +228,7 @@ var auditCmd = &cobra.Command{
 
 		if fatal {
 
-			colorRedBold.Println("| ", rules.Exit_Critical)
+			colorRedBold.Println("| ", rules.ExitCritical)
 			fmt.Println("|")
 			fmt.Println("| INTERCEPT")
 			fmt.Println("")
@@ -236,11 +238,11 @@ var auditCmd = &cobra.Command{
 
 		if warning {
 
-			colorYellowBold.Println("| ", rules.Exit_Warning)
+			colorYellowBold.Println("| ", rules.ExitWarning)
 
 		} else {
 
-			colorGreenBold.Println("| ", rules.Exit_Clean)
+			colorGreenBold.Println("| ", rules.ExitClean)
 
 		}
 

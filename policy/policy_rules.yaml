@@ -6,9 +6,9 @@ Banner: |
 
   RIPGREP WEAPONISED
 
-Exit_Critical: "Critical irregularities found in your code"
-Exit_Warning: "Irregularities found in your code"
-Exit_Clean: "Clean report"
+ExitCritical: "Critical irregularities found in your code"
+ExitWarning: "Irregularities found in your code"
+ExitClean: "Clean report"
 
 Rules:
   - id: 1
