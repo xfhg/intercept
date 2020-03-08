@@ -7,7 +7,6 @@ import (
 	"os"
 	"os/exec"
 	"runtime"
-	"sort"
 	"strings"
 
 	"github.com/spf13/cobra"
@@ -21,17 +20,17 @@ var (
 	warning  = false
 )
 
-// AllRules : internal struct of the rules yaml file
 type allRules struct {
 	Exceptions []struct {
 		Id   int    `yaml:"id"`
 		Auth string `yaml:"auth"`
 	} `yaml:"Exceptions"`
-	Banner        string `yaml:"banner"`
-	Exit_Critical string `yaml:"exit_critical"`
-	Exit_Warning  string `yaml:"exit_warning"`
-	Exit_Clean    string `yaml:"exit_clean"`
-	Rules         []struct {
+	Exception_Message string `yaml:"exception_message"`
+	Banner            string `yaml:"banner"`
+	Exit_Critical     string `yaml:"exit_critical"`
+	Exit_Warning      string `yaml:"exit_warning"`
+	Exit_Clean        string `yaml:"exit_clean"`
+	Rules             []struct {
 		Id          int      `yaml:"id"`
 		Name        string   `yaml:"name"`
 		Description string   `yaml:"description"`
@@ -46,8 +45,7 @@ type allRules struct {
 }
 
 var (
-	rules *allRules
-
+	rules           *allRules
 	colorRedBold    = color.New(color.Red, color.OpBold)
 	colorGreenBold  = color.New(color.Green, color.OpBold)
 	colorYellowBold = color.New(color.Yellow, color.OpBold)
@@ -57,15 +55,21 @@ func getRuleStruct() *allRules {
 
 	err := viper.Unmarshal(&rules)
 	if err != nil {
-
 		colorRedBold.Println("| Unable to decode config struct : ", err)
-
 	}
 	return rules
 
 }
 
-// auditCmd represents the audit command
+func ContainsInt(s []int, e int) bool {
+	for _, a := range s {
+		if a == e {
+			return true
+		}
+	}
+	return false
+}
+
 var auditCmd = &cobra.Command{
 	Use:   "audit",
 	Short: "INTERCEPT / AUDIT - Scan a target path against configured policy rules and exceptions",
@@ -73,9 +77,7 @@ var auditCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 
 		rules = getRuleStruct()
-
 		rgbin := "rg"
-
 		path, err := exec.LookPath("rg")
 
 		if err != nil || path == "" {
@@ -94,6 +96,8 @@ var auditCmd = &cobra.Command{
 
 			}
 		}
+
+		fmt.Println("| Scan Path : ", scanPath)
 
 		pwddir, _ := os.Getwd()
 
@@ -120,12 +124,12 @@ var auditCmd = &cobra.Command{
 				fmt.Println("| Rule description : ", value.Description)
 				fmt.Println("| ")
 
-				exception := sort.SearchInts(rules.Rules_Deactivated, value.Id)
+				exception := ContainsInt(rules.Rules_Deactivated, value.Id)
 
-				if exception < len(rules.Rules_Deactivated) && rules.Rules_Deactivated[exception] == value.Id {
+				if exception {
 
 					colorRedBold.Println("|")
-					colorRedBold.Println("| THIS RULE CHECK IS DEACTIVATED BY AN EXCEPTION REQUEST ")
+					colorRedBold.Println("| ", rules.Exception_Message)
 					colorRedBold.Println("|")
 
 				} else {
