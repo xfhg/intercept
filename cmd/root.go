@@ -17,6 +17,7 @@ var cfgEnv string
 // subcommand flags
 var (
 	configReset bool
+	auditNox    bool
 )
 
 var rootCmd = &cobra.Command{
@@ -72,6 +73,7 @@ func initConfig() {
 	}
 
 	configReset = configCmdisReset()
+	auditNox = auditCmdisNoExceptions()
 
 }
 
@@ -79,4 +81,10 @@ func configCmdisReset() bool {
 
 	reset, _ := configCmd.PersistentFlags().GetBool("reset")
 	return reset
+}
+
+func auditCmdisNoExceptions() bool {
+
+	nox, _ := auditCmd.PersistentFlags().GetBool("no-exceptions")
+	return nox
 }

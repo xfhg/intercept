@@ -96,6 +96,11 @@ var auditCmd = &cobra.Command{
 
 		fmt.Println("| Scan Path : ", scanPath)
 
+		if auditNox {
+			fmt.Println("| Exceptions Disabled ")
+			fmt.Println("| All Policies Activated ")
+		}
+
 		pwddir, _ := os.Getwd()
 
 		searchPatternFile := strings.Join([]string{pwddir, "/", "search_regex"}, "")
@@ -128,7 +133,7 @@ var auditCmd = &cobra.Command{
 
 				exception := containsInt(rules.RulesDeactivated, value.Id)
 
-				if exception {
+				if exception && !auditNox {
 
 					colorRedBold.Println("|")
 					colorRedBold.Println("| ", rules.ExceptionMessage)
@@ -255,7 +260,7 @@ var auditCmd = &cobra.Command{
 func init() {
 
 	auditCmd.PersistentFlags().StringVarP(&scanPath, "target", "t", ".", "scanning Target path")
-	auditCmd.PersistentFlags().BoolP("report", "d", false, "debrief json Report output file (auditdebrief.json)")
+	auditCmd.PersistentFlags().BoolP("no-exceptions", "x", false, "disables the option to deactivate rules by exception")
 
 	rootCmd.AddCommand(auditCmd)
 

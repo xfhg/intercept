@@ -21,3 +21,5 @@ sandbox/
 examples/
 
 .DS_Store
+
+Makefile

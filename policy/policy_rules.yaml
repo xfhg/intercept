@@ -1,10 +1,7 @@
 Banner: |
 
   INTERCEPT
-
   Policy as Code Static Analysis Auditing
-
-  RIPGREP WEAPONISED
 
 ExitCritical: "Critical irregularities found in your code"
 ExitWarning: "Irregularities found in your code"
