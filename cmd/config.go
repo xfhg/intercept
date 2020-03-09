@@ -22,7 +22,7 @@ func fileExists(filename string) bool {
 
 var configCmd = &cobra.Command{
 	Use:   "config",
-	Short: "INTERCEPT CONFIG - Add and merge config files to setup AUDIT",
+	Short: "INTERCEPT / CONFIG - Add and merge config files to setup AUDIT",
 	Long:  ``,
 
 	Run: func(cmd *cobra.Command, args []string) {
