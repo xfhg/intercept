@@ -34,6 +34,7 @@ type allRules struct {
 		Error       string   `yaml:"error"`
 		Type        string   `yaml:"type"`
 		Environment string   `yaml:"environment"`
+		Enforcement bool     `yaml:"enforcement"`
 		Fatal       bool     `yaml:"fatal"`
 		Patterns    []string `yaml:"patterns"`
 	} `yaml:"Rules"`
@@ -133,7 +134,7 @@ var auditCmd = &cobra.Command{
 
 				exception := containsInt(rules.RulesDeactivated, value.Id)
 
-				if exception && !auditNox {
+				if exception && !auditNox && !value.Enforcement {
 
 					colorRedBold.Println("|")
 					colorRedBold.Println("| ", rules.ExceptionMessage)

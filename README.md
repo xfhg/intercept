@@ -8,19 +8,28 @@
 
 # INTERCEPT
 
-Easy to configure, small footprint Policy as Code command-line scanner that leverages the power of the fastest multi-line search tool to scan your codebase. It can be used as a linter, guard rail control or simple data collector and inspector. Consider it a weaponized ripgrep.
+Stupidly easy to use, small footprint Policy as Code command-line scanner that leverages the power of the fastest multi-line search tool to scan your codebase. It can be used as a linter, guard rail control or simple data collector and inspector. Consider it a weaponized ripgrep. Works on Mac, Linux and Windows
 
 ## How it works 
 
-Consumes policy files with single or grouped rules ( regex patterns ) that will be scanned recursively against code (text) in a target path and can be customized/filtered to environments, exceptions, and criticality of the findings. Generates detailed human-readable reports.
+- intercept binary
+- (included) ripgrep binary 
+- policies yaml file
+- (optional) exceptions yaml file
 
-## Use cases
+Intercept merges environment flags, policies yaml, exceptions yaml to generate a global config.
+Uses ripgrep to scan a target path recursively against code and generates a humand readable detailed output of the findings.
 
-- simple and powerful free alternative for Hashicorp Sentinel if you are more comfortable writing and maintaining regular expressions than a new custom policy language.
+<details><summary><b>Example output </b></summary>
+</details>
 
-- adds the same functionality as git-secrets and can prevent sensitive information to run through your pipeline.
+### Use cases
 
-- identifies the policy breach (files and line numbers) and can report solutions/suggestions to its findings making it a great tool to ease onboarding developer teams to your unified deployment pipeline.
+- simple and powerful free drop in alternative for Hashicorp Sentinel if you are more comfortable writing and maintaining regular expressions than a new custom policy language.
+
+- captures the patterns as git-secrets and trufflehog and can prevent sensitive information to run through your pipeline.
+
+- identifies policy breach (files and line numbers), reports solutions/suggestions to its findings making it a great tool to ease onboarding developer teams to your unified deployment pipeline.
 
 - can enforce style-guides, coding-standards, best practices and also report on suboptimal configurations.
 
@@ -28,9 +37,35 @@ Consumes policy files with single or grouped rules ( regex patterns ) that will 
 
 - anything you can crunch on a regular expression can be actioned on.
 
+
+
+<details><summary><b>Instructions</b></summary>
+
+
+### Simple Example
+
 ```
 
 ```
+
+### Complex Example
+
+```
+
+```
+
+### Full Feature Example
+
+```
+
+```
+
+
+</details>
+
+---
+
+## Standing on the shoulders of giants
 
 ### Why ripgrep? Why is it fast?
 
@@ -43,11 +78,9 @@ Rust's regex library maintains performance with full Unicode support by building
 
 - It uses a lock-free parallel recursive directory iterator, courtesy of crossbeam and ignore libraries.
 
-```
 
-```
 
-### Benchmark
+### Benchmark ripgrep
 
 | Tool | Command | Line count | Time |
 | ---- | ------- | ---------- | ---- |
@@ -61,24 +94,12 @@ Rust's regex library maintains performance with full Unicode support by building
 
 ---
 
-## Simple Example
-
-```
-
-```
-
-## Complex Example
-
-```
-
-```
-
-## Full Feature Example
-
-```
-
-```
-
 ## TODO
 
-- full test suite
+- [ ] Tests obviously
+- [ ] Configurable output types for main report
+- [ ] Configurable output types for data collection
+
+## Building
+
+## Contributing
