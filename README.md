@@ -8,13 +8,13 @@
 
 # INTERCEPT
 
-Stupidly easy to use, small footprint Policy as Code command-line scanner that leverages the power of the fastest multi-line search tool to scan your codebase. It can be used as a linter, guard rail control or simple data collector and inspector. Consider it a weaponized ripgrep. Works on Mac, Linux and Windows
+Stupidly easy to use, small footprint **Policy as Code** command-line scanner that leverages the power of the fastest multi-line search tool to scan your codebase. It can be used as a linter, guard rail control or simple data collector and inspector. Consider it a weaponized ripgrep. Works on Mac, Linux and Windows
 
 ## How it works 
 
 - intercept binary
-- (included) ripgrep binary 
 - policies yaml file
+- (included) ripgrep binary 
 - (optional) exceptions yaml file
 
 Intercept merges environment flags, policies yaml, exceptions yaml to generate a global config.
@@ -27,7 +27,7 @@ Uses ripgrep to scan a target path recursively against code and generates a huma
 
 - simple and powerful free drop in alternative for Hashicorp Sentinel if you are more comfortable writing and maintaining regular expressions than a new custom policy language.
 
-- captures the patterns as git-secrets and trufflehog and can prevent sensitive information to run through your pipeline.
+- captures the patterns from git-secrets and trufflehog and can prevent sensitive information to run through your pipeline.
 
 - identifies policy breach (files and line numbers), reports solutions/suggestions to its findings making it a great tool to ease onboarding developer teams to your unified deployment pipeline.
 
@@ -96,10 +96,15 @@ Rust's regex library maintains performance with full Unicode support by building
 
 ## TODO
 
+- [ ] Complete this README
 - [ ] Tests obviously
 - [ ] Configurable output types for main report
 - [ ] Configurable output types for data collection
 
 ## Building
+
+```
+check Makefile for details
+```
 
 ## Contributing
