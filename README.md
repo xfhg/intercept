@@ -49,7 +49,7 @@ Uses **ripgrep** to scan a target path for policy breaches recursively against y
 
 - Can enforce style-guides, coding-standards, best practices and also report on suboptimal configurations.
 
-- Can collect patterns or high entropy data and output it in multiple formats (on the roadmap).
+- Can collect patterns or high entropy data and output it in multiple formats.
 
 - Anything you can crunch on a regular expression can be actioned on.
 
@@ -60,15 +60,15 @@ Uses **ripgrep** to scan a target path for policy breaches recursively against y
 
 ```sh
 
-  # Clean package (intercept only) for individual platforms
-    -- intercept-linux-*.zip
-    -- intercept-macos-*.zip
-    -- intercept-win-*.zip
-  
   # Standard package (intercept + ripgrep) for individual platforms
     -- intercept-rg-linux-*.zip
     -- intercept-rg-macos-*.zip
     -- intercept-rg-win-*.zip
+
+  # Clean package (intercept only) for individual platforms
+    -- intercept-linux-*.zip
+    -- intercept-macos-*.zip
+    -- intercept-win-*.zip
 
   # Full package (intercept + ripgrep) for all platforms
     -- intercept-x-*.zip
@@ -114,6 +114,24 @@ Uses **ripgrep** to scan a target path for policy breaches recursively against y
 ---
 
 
+## TODO
+
+- [ ] Complete this README
+- [ ] Tests obviously
+- [ ] Configurable output types for main report
+- [ ] Configurable output types for data collection
+
+
+## Inspired by 
+
+
+- [ripgrep](https://github.com/BurntSushi/ripgrep)
+- [Hashicorp Sentinel](https://www.hashicorp.com/sentinel/)
+- [Open Policy Agent](https://www.openpolicyagent.org/)
+
+## Used in production
+
+INTERCEPT was created to lint more than 8000 infra deployments a day with minor human intervention, first mvp been running for a year already with no reported flaws. Keep in mind INTERCEPT is not and does not pretend to be a security tool.
 
 ## Standing on the shoulders of giants
 
@@ -160,17 +178,3 @@ Rust's regex library maintains performance with full Unicode support by building
 
 ---
 
-## TODO
-
-- [ ] Complete this README
-- [ ] Tests obviously
-- [ ] Configurable output types for main report
-- [ ] Configurable output types for data collection
-
-
-## Inspired by 
-
-
-- [ripgrep](https://github.com/BurntSushi/ripgrep)
-- [Hashicorp Sentinel](https://www.hashicorp.com/sentinel/)
-- [Open Policy Agent](https://www.openpolicyagent.org/)
