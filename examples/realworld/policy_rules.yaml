@@ -1,0 +1,149 @@
+Banner: |
+
+  | XXX
+  | Report any false positives or issues to : XXX@XXX
+  | More info at : XXX
+ 
+
+Rules:
+  - name: Module not sourced from artifactory 
+    id: 1
+    description: In production environment modules should be sourced from artifactory and not locally nor from git
+    error: This violation will block your code promotion to production environments
+    type: scan
+    solution: "\n\tSource your modules from their latest version on artifactory \n\tMore info at XXX"
+    environment: prod
+    fatal: true
+    patterns:
+      - source\s*.*\.git"
+      - \s+source\s*=\s*"((?!https\:).)
+
+  - name: Private key committed in code
+    id: 2
+    description: Private key inside code version control
+    solution: Remove it, rewrite git history and use Vault or AWS SSM Parameter store to secure your private keys
+    error: This violation blocks your code deployment
+    type: scan
+    environment: non-prod
+    fatal: true
+    patterns:
+      - \s*(-----BEGIN PRIVATE KEY-----)
+      - \s*(-----BEGIN RSA PRIVATE KEY-----)
+      - \s*(-----BEGIN OPENSSH PRIVATE KEY-----)
+      - \s*(-----BEGIN PGP PRIVATE KEY BLOCK-----)
+
+  - name: Environment / baseline hardcoded ids on code or variables
+    id: 3
+    description: Refrain from hardcoding resource ids per environment
+    solution: Capture them dynamically from data lookups or module outputs
+    environment: non-prod
+    error: This violation will block your code promotion between environments
+    type: scan
+    fatal: true
+    patterns:
+      - (subnet_ids\s*=\s*\[\s*"\$\{v)
+      - (subnet_ids\s*=\s*\[\s*"[s])
+      - (subnet_ids\s*=\s*=\s*"\$\{v)
+      - (subnet_id\s*=\s*"\s*[s])
+      - (subnet_id\s*=\s*"\s*\$\{v)
+      - (subnets\s*=\s*\[\s*"\$\{v)
+      - (subnets\s*=\s*\[\s*"[s])
+      - (vpc_zone_identifier\s*=\s*\[\s*"\$\{v)
+      - (vpc_zone_identifier\s*=\s*\[\s*"[v])
+      - (vpc_zone_identifier\s*=\s*=\s*"\$\{v)
+      - (vpc_id\s*=\s*"\s*[v])
+      - (vpc_id\s*=\s*"\s*\$\{v)
+      - (aws_apps_ami\s*=\s*"\s*\$\{v)
+      - (aws_apps_ami\s*=\s*"\s*[a])
+      - (ami\s*=\s*"\s*\$\{v)
+      - (ami\s*=\s*"\s*[a])
+      - (image_id\s*=\s*"\s*\$\{v)
+      - (image_id\s*=\s*"\s*[a])
+      - (vpc_security_group_ids\s*=\s*\[\s*"\$\{v)
+      - (vpc_security_group_ids\s*=\s*\[\s*"[sg])
+      - (security_groups\s*=\s*\[\s*"\$\{v)
+      - (security_groups\s*=\s*\[\s*"[sg])
+      - ("subnet-)
+      - ("sg-)
+      - ("vpc-)
+
+  - name: Sub-optimal parameter on Module/Resource
+    id: 4
+    description: Module/Resource is configured with a sub-optimal parameter
+    solution: Tune the parameters to a more specific/recommended value   
+    environment: prod
+    error: This violation will block your code promotion to production environments
+    type: scan
+    fatal: false
+    patterns:
+      - \s+healthcheck_target\s*=\s*"22"
+      - \s+healthcheck_target\s*=\s*"3389"
+      - \s+protocol\s*=\s*"-1"
+      - \s+from_port\s*=\s*"-1"
+      - \s+to_port\s*=\s*"-1"
+      - ("0\.0\.0\.0)
+
+  - name: Unencrypted ? fs mounts
+    id: 5
+    description: EFS / NTFS unencrypted mounts 
+    solution: "\n\tUse stunnel or AWS EFS helper tools to mount your fs \n\tDetailed instructions : XXX"
+    environment: non-prod
+    error: Please validate the correct use of AWS EFS
+    type: scan
+    fatal: false
+    patterns:
+      - (aws-efs)
+      - (fs-.+:/)+.*(defaults)+
+
+  - name: Non compliant terraform resources
+    id: 6
+    description: Setup of non compliant terraform resources outside of modules
+    solution: "\n\tOnly use the available terraform modules to deploy this type of resource \n\tAvailable modules XXX"
+    error: This violation will block your code promotion to production environments
+    type: scan
+    environment: non-prod
+    fatal: true
+    patterns:
+      - (resource\s+"aws_db_instance")
+      - (resource\s+"aws_rds_cluster")
+      - (resource\s+"aws_s3_bucket")
+      - (resource\s+"aws_ebs_volume")
+      - (resource\s+"aws_instance")
+      - (resource\s+"aws_volume_attachment")
+      - (resource\s+"aws_ssm_parameter")
+      - (resource\s+"aws_efs_mount_target")
+      - (resource\s+"aws_efs_file_system")
+
+  - name: Endpoints 
+    description: Endpoints to be validated 
+    type: collect
+    patterns:
+      - (http|https):\/\/(([a-z0-9]|[a-z0-9][a-z0-9\-]*[a-z0-9])\.)*([a-z0-9]|[a-z0-9][a-z0-9\-]*[a-z0-9])(:[0-9]+)?(\S*)
+
+  - name: Resources 
+    description: Resources to be validated 
+    type: collect
+    patterns:
+      - (resource)\s*"(.*)"
+  
+  - name: Software 
+    description: Software to be validated 
+    type: collect
+    patterns:
+      - (yum\s*install)\s*(.*)
+      - (yum -y install)\s*(.*)
+      - (rpm )\s*(.*)
+      - (make install)\s*(.*)
+      - (podman run)\s*(.*)
+      - (docker run)\s*(.*)
+      - (systemctl start)\s*(.*)
+      - (systemctl restart)\s*(.*)
+      - (systemctl daemon-reload)\s*(.*)
+      - (pip\s*install)\s*(.*)
+
+  - name: Terraform State  
+    description: Verify consistent state name accross environments 
+    type: collect
+    patterns:
+      - (env.PROJECT)\s*=\s*(.+)
+

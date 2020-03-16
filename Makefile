@@ -3,7 +3,7 @@ MOMENT=$(shell date +'%Y%m%d-%H%M')
 VERSION=$(shell git rev-parse --short HEAD)
 RANDOM=$(shell awk 'BEGIN{srand();printf("%d", 65536*rand())}')
 
-all: windows linux macos out-full
+all: purge-output windows linux macos out-full out-linux out-macos out-win ripgrep intercept
 
 mod:
 	go mod tidy
@@ -23,6 +23,7 @@ clean: mod
 	rm -f bin/interceptl
 	rm -f bin/interceptm
 	rm -f bin/intercept.exe
+	rm -f bin/.ignore
 	
 purge:
 	rm -f release/interceptl
@@ -46,17 +47,17 @@ out-full: purge
 out-linux: clean purge linux
 	cp bin/interceptl release/interceptl
 	cp .ignore release/.ignore
-	zip -9 -T -x "*.DS_Store*" "*.exe" "*rgm*" "*interceptm*" -r output/intercept-linux-$(VERSION)-$(MOMENT).zip release/ 
+	zip -9 -T -x "*.DS_Store*" "*.exe" "*rgm*" "*interceptm*" -r output/intercept-rg-linux-$(VERSION)-$(MOMENT).zip release/ 
 
 out-macos: clean purge macos
 	cp bin/interceptm release/interceptm
 	cp .ignore release/.ignore
-	zip -9 -T -x "*.DS_Store*" "*.exe" "*rgl*" "*interceptl*" -r output/intercept-macos-$(VERSION)-$(MOMENT).zip release/ 
+	zip -9 -T -x "*.DS_Store*" "*.exe" "*rgl*" "*interceptl*" -r output/intercept-rg-macos-$(VERSION)-$(MOMENT).zip release/ 
 
 out-win: clean purge windows
 	cp bin/intercept.exe release/intercept.exe
 	cp .ignore release/.ignore
-	zip -9 -T -x "*.DS_Store*" "*interceptm*" "*rgl*" "*rgm*" "*interceptl*" -r output/intercept-win-$(VERSION)-$(MOMENT).zip release/ 
+	zip -9 -T -x "*.DS_Store*" "*interceptm*" "*rgl*" "*rgm*" "*interceptl*" -r output/intercept-rg-win-$(VERSION)-$(MOMENT).zip release/ 
 
 ripgrep-full: 
 	zip -9 -T -x "*.DS_Store*" "*intercept*" -r output/intercept-ripgrep-$(VERSION)-$(MOMENT).zip release/ 
@@ -70,7 +71,25 @@ ripgrep-macos:
 ripgrep-linux: 
 	zip -9 -T -x "*.DS_Store*" "*intercept*" "*.exe" "*rgm*" -r output/intercept-ripgrep-linux-$(VERSION).zip release/ 
 
+
 ripgrep: purge-ripgrep ripgrep-win ripgrep-linux ripgrep-macos
+
+add-ignore:
+	cp release/.ignore bin/.ignore
+
+intercept-win: add-ignore
+	zip -9 -T -x "*.DS_Store*" "*interceptl*" "*interceptm*"  -r output/intercept-win-$(VERSION).zip bin/ 
+
+intercept-macos: add-ignore
+	zip -9 -T -x "*.DS_Store*" "*interceptl*" "*intercept.exe*"  -r output/intercept-macos-$(VERSION).zip bin/ 
+
+intercept-linux: add-ignore
+	zip -9 -T -x "*.DS_Store*" "*interceptm*" "*intercept.exe*" -r output/intercept-linux-$(VERSION).zip bin/ 
+
+intercept: intercept-win intercept-linux intercept-macos
+
+build-package:
+	zip -9 -T -x "*.DS_Store*" "*interceptm*" "*intercept.exe*" "*interceptl*" -r output/intercept-buildpack-$(VERSION).zip release/
 
 fast: clean purge macos
 	cp bin/interceptm release/interceptm

@@ -213,7 +213,7 @@ var auditCmd = &cobra.Command{
 						colorRedBold.Println("| Error")
 						log.Fatal(err)
 					} else {
-						colorRedBold.Println("| Clean")
+						colorGreenBold.Println("| Clean")
 						fmt.Println("| ")
 					}
 				} else {

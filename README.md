@@ -8,9 +8,10 @@
 
 # INTERCEPT 
 
-Stupidly easy to use, small footprint **Policy as Code** command-line scanner that leverages the power of the fastest multi-line search tool to scan your codebase. It can be used as a linter, guard rail control or simple data collector and inspector. Consider it a weaponized ripgrep. Works on Mac, Linux and Windows
+Stupidly easy to use, small footprint **Policy as Code** subsecond command-line scanner that leverages the power of the fastest multi-line search tool to scan your codebase. It can be used as a linter, guard rail control or simple data collector and inspector. Consider it a weaponized ripgrep. Works on Mac, Linux and Windows
 
-[![Go Report Card](https://goreportcard.com/badge/github.com/xfhg/intercept)](https://goreportcard.com/report/github.com/xfhg/intercept)
+[![Latest release](https://img.shields.io/badge/release-mvp%201-blue)](https://github.com/xfhg/intercept/releases)
+ [![Go Report Card](https://goreportcard.com/badge/github.com/xfhg/intercept)](https://goreportcard.com/report/github.com/xfhg/intercept) 
 
 ## How it works 
 
@@ -19,8 +20,8 @@ Stupidly easy to use, small footprint **Policy as Code** command-line scanner th
 - (included) [ripgrep](https://github.com/BurntSushi/ripgrep) binary 
 - (optional) exceptions yaml file
 
-Intercept merges environment flags, policies yaml, exceptions yaml to generate a global config.
-Uses ripgrep to scan a target path recursively against code and generates a humand readable detailed output of the findings.
+**Intercept** merges environment flags, policies yaml, exceptions yaml to generate a global config.
+Uses **ripgrep** to scan a target path for policy breaches recursively against your code and generates a humand readable detailed output of the findings.
 
 <br>
 
@@ -40,7 +41,7 @@ Uses ripgrep to scan a target path recursively against code and generates a huma
 
 - Simple and powerful free drop in alternative for [Hashicorp Sentinel](https://www.hashicorp.com/sentinel/)  if you are more comfortable writing and maintaining regular expressions than using a **new custom policy language**.
 
-- And do you find [Open Policy Agent](https://www.openpolicyagent.org/) **rego** files too much sugar for your pipeline ? 
+- Do you find [Open Policy Agent](https://www.openpolicyagent.org/) **rego** files too much sugar for your pipeline ? 
 
 - Captures the patterns from [git-secrets](https://github.com/awslabs/git-secrets) and [trufflehog](https://github.com/dxa4481/truffleHog) and can prevent sensitive information to run through your pipeline.
 
@@ -48,9 +49,39 @@ Uses ripgrep to scan a target path recursively against code and generates a huma
 
 - Can enforce style-guides, coding-standards, best practices and also report on suboptimal configurations.
 
-- Can collect patterns or high entropy data and output it in multiple formats.
+- Can collect patterns or high entropy data and output it in multiple formats (on the roadmap).
 
 - Anything you can crunch on a regular expression can be actioned on.
+
+### Latest [Releases](https://github.com/xfhg/intercept/releases) : 
+
+[![Latest release](https://img.shields.io/badge/release-mvp%201-blue)](https://github.com/xfhg/intercept/releases)
+
+
+```sh
+
+  # Clean package (intercept only) for individual platforms
+    -- intercept-linux-*.zip
+    -- intercept-macos-*.zip
+    -- intercept-win-*.zip
+  
+  # Standard package (intercept + ripgrep) for individual platforms
+    -- intercept-rg-linux-*.zip
+    -- intercept-rg-macos-*.zip
+    -- intercept-rg-win-*.zip
+
+  # Full package (intercept + ripgrep) for all platforms
+    -- intercept-x-*.zip
+
+  # Package needed to full use the Makefile
+    -- intercept-buildpack-*.zip
+
+  # Package of the latest compatible release of ripgrep (doesn't include intercept)
+    -- i-ripgrep-linux-*.zip
+    -- i-ripgrep-macos-*.zip
+    -- i-ripgrep-win-*.zip
+
+```
 
 <br>
 
@@ -86,7 +117,7 @@ Uses ripgrep to scan a target path recursively against code and generates a huma
 
 ## Standing on the shoulders of giants
 
-### Why ripgrep? Why is it fast?
+### Why [ripgrep](https://github.com/BurntSushi/ripgrep) ? Why is it fast?
 
 - It is built on top of Rust's regex engine. Rust's regex engine uses finite automata, SIMD and aggressive literal optimizations to make searching very fast. (PCRE2 support)
 Rust's regex library maintains performance with full Unicode support by building UTF-8 decoding directly into its deterministic finite automaton engine.
@@ -113,7 +144,7 @@ Rust's regex library maintains performance with full Unicode support by building
 
 <br>
 
-<details><summary><b>Tools</b></summary>
+<details><summary><b>Tools Reference</b></summary>
 
 - [ripgrep](https://github.com/BurntSushi/ripgrep)
 - [git grep](https://www.kernel.org/pub/software/scm/git/docs/git-grep.html)
@@ -136,13 +167,6 @@ Rust's regex library maintains performance with full Unicode support by building
 - [ ] Configurable output types for main report
 - [ ] Configurable output types for data collection
 
-## Building
-
-```
-check Makefile for details
-```
-
-## Contributing
 
 ## Inspired by 
 
