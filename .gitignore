@@ -18,8 +18,7 @@ bin/
 output/
 release/
 sandbox/
-examples/
 
 .DS_Store
 
-Makefile
+config.yaml
