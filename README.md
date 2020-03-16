@@ -6,7 +6,7 @@
 
 </p>
 
-# INTERCEPT
+# INTERCEPT 
 
 Stupidly easy to use, small footprint **Policy as Code** command-line scanner that leverages the power of the fastest multi-line search tool to scan your codebase. It can be used as a linter, guard rail control or simple data collector and inspector. Consider it a weaponized ripgrep. Works on Mac, Linux and Windows
 
@@ -38,17 +38,19 @@ Uses ripgrep to scan a target path recursively against code and generates a huma
 
 ### Use cases
 
-- simple and powerful free drop in alternative for [Hashicorp Sentinel](https://www.hashicorp.com/sentinel/)  if you are more comfortable writing and maintaining regular expressions than a new custom policy language.
+- Simple and powerful free drop in alternative for [Hashicorp Sentinel](https://www.hashicorp.com/sentinel/)  if you are more comfortable writing and maintaining regular expressions than using a **new custom policy language**.
 
-- captures the patterns from [git-secrets](https://github.com/awslabs/git-secrets) and [trufflehog](https://github.com/dxa4481/truffleHog) and can prevent sensitive information to run through your pipeline.
+- And do you find [Open Policy Agent](https://www.openpolicyagent.org/) **rego** files too much sugar for your pipeline ? 
 
-- identifies policy breach (files and line numbers), reports solutions/suggestions to its findings making it a great tool to ease onboarding developer teams to your unified deployment pipeline.
+- Captures the patterns from [git-secrets](https://github.com/awslabs/git-secrets) and [trufflehog](https://github.com/dxa4481/truffleHog) and can prevent sensitive information to run through your pipeline.
 
-- can enforce style-guides, coding-standards, best practices and also report on suboptimal configurations.
+- Identifies policy breach (files and line numbers), reports solutions/suggestions to its findings making it a great tool to ease onboarding developer teams to your unified deployment pipeline.
 
-- can collect patterns or high entropy data and output it in multiple formats.
+- Can enforce style-guides, coding-standards, best practices and also report on suboptimal configurations.
 
-- anything you can crunch on a regular expression can be actioned on.
+- Can collect patterns or high entropy data and output it in multiple formats.
+
+- Anything you can crunch on a regular expression can be actioned on.
 
 <br>
 
@@ -141,3 +143,10 @@ check Makefile for details
 ```
 
 ## Contributing
+
+## Inspired by 
+
+
+- [ripgrep](https://github.com/BurntSushi/ripgrep)
+- [Hashicorp Sentinel](https://www.hashicorp.com/sentinel/)
+- [Open Policy Agent](https://www.openpolicyagent.org/)
