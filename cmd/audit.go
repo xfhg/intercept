@@ -128,7 +128,7 @@ var auditCmd = &cobra.Command{
 			case "scan":
 
 				fmt.Println("| ")
-				fmt.Println("| ", line)
+				fmt.Println("|", line)
 				fmt.Println("| Rule #", value.ID)
 				fmt.Println("| Rule name : ", value.Name)
 				fmt.Println("| Rule description : ", value.Description)
@@ -198,7 +198,7 @@ var auditCmd = &cobra.Command{
 			case "collect":
 
 				fmt.Println("| ")
-				fmt.Println("| ", line)
+				fmt.Println("|", line)
 				fmt.Println("| Collection : ", value.Name)
 				fmt.Println("| Description : ", value.Description)
 				fmt.Println("| ")

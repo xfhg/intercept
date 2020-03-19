@@ -3,32 +3,35 @@ Banner: |
   | XXX
   | Report any false positives or issues to : XXX@XXX
   | More info at : XXX
- 
 
 Rules:
-  - name: Module not sourced from artifactory 
-    id: 1
+  - name: Module not sourced from artifactory
+    id: 001
     description: In production environment modules should be sourced from artifactory and not locally nor from git
     error: This violation will block your code promotion to production environments
     type: scan
     solution: "\n\tSource your modules from their latest version on artifactory \n\tMore info at XXX"
     environment: prod
     fatal: true
+    enforcement:
     patterns:
       - source\s*.*\.git"
       - \s+source\s*=\s*"((?!https\:).)
 
   - name: Private key committed in code
-    id: 2
+    id: 003
     description: Private key inside code version control
-    solution: Remove it, rewrite git history and use Vault or AWS SSM Parameter store to secure your private keys
+    solution: Remove it, rewrite git history and use Vault / AWS SSM Parameter store or AWS Sectets Manager to secure your private keys
     error: This violation blocks your code deployment
     type: scan
+    enforcement:
     environment: non-prod
     fatal: true
     patterns:
       - \s*(-----BEGIN PRIVATE KEY-----)
       - \s*(-----BEGIN RSA PRIVATE KEY-----)
+      - \s*(-----BEGIN DSA PRIVATE KEY-----)
+      - \s*(-----BEGIN EC PRIVATE KEY-----)
       - \s*(-----BEGIN OPENSSH PRIVATE KEY-----)
       - \s*(-----BEGIN PGP PRIVATE KEY BLOCK-----)
 
@@ -70,7 +73,7 @@ Rules:
   - name: Sub-optimal parameter on Module/Resource
     id: 4
     description: Module/Resource is configured with a sub-optimal parameter
-    solution: Tune the parameters to a more specific/recommended value   
+    solution: Tune the parameters to a more specific/recommended value
     environment: prod
     error: This violation will block your code promotion to production environments
     type: scan
@@ -82,18 +85,6 @@ Rules:
       - \s+from_port\s*=\s*"-1"
       - \s+to_port\s*=\s*"-1"
       - ("0\.0\.0\.0)
-
-  - name: Unencrypted ? fs mounts
-    id: 5
-    description: EFS / NTFS unencrypted mounts 
-    solution: "\n\tUse stunnel or AWS EFS helper tools to mount your fs \n\tDetailed instructions : XXX"
-    environment: non-prod
-    error: Please validate the correct use of AWS EFS
-    type: scan
-    fatal: false
-    patterns:
-      - (aws-efs)
-      - (fs-.+:/)+.*(defaults)+
 
   - name: Non compliant terraform resources
     id: 6
@@ -114,36 +105,14 @@ Rules:
       - (resource\s+"aws_efs_mount_target")
       - (resource\s+"aws_efs_file_system")
 
-  - name: Endpoints 
-    description: Endpoints to be validated 
+  - name: Endpoints
+    description: Endpoints to be validated
     type: collect
     patterns:
       - (http|https):\/\/(([a-z0-9]|[a-z0-9][a-z0-9\-]*[a-z0-9])\.)*([a-z0-9]|[a-z0-9][a-z0-9\-]*[a-z0-9])(:[0-9]+)?(\S*)
 
-  - name: Resources 
-    description: Resources to be validated 
+  - name: Resources
+    description: Resources to be validated
     type: collect
     patterns:
       - (resource)\s*"(.*)"
-  
-  - name: Software 
-    description: Software to be validated 
-    type: collect
-    patterns:
-      - (yum\s*install)\s*(.*)
-      - (yum -y install)\s*(.*)
-      - (rpm )\s*(.*)
-      - (make install)\s*(.*)
-      - (podman run)\s*(.*)
-      - (docker run)\s*(.*)
-      - (systemctl start)\s*(.*)
-      - (systemctl restart)\s*(.*)
-      - (systemctl daemon-reload)\s*(.*)
-      - (pip\s*install)\s*(.*)
-
-  - name: Terraform State  
-    description: Verify consistent state name accross environments 
-    type: collect
-    patterns:
-      - (env.PROJECT)\s*=\s*(.+)
-
