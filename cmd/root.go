@@ -22,7 +22,7 @@ var (
 
 var rootCmd = &cobra.Command{
 	Use:   "intercept",
-	Short: "INTERCEPT / Policy as Code Static Analysis Auditing",
+	Short: "INTERCEPT / Policy as Code Static Analysis Auditor",
 	Long:  ``,
 }
 

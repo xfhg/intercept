@@ -1,0 +1,93 @@
+Banner: |
+
+  | XXX
+  | Report any false positives or issues to : XXX@XXX
+  | More info at : XXX
+
+Rules:
+  - name: Private key committed in code
+    id: 1
+    description: Private key commited to code version control
+    solution: Remove it, rewrite git history and use Vault / AWS Sectets Manager to secure your private keys
+    error: This breach immediatly blocks your code deployment
+    type: scan
+    enforcement: true
+    environment:
+    fatal: true
+    patterns:
+      - \s*(-----BEGIN PRIVATE KEY-----)
+      - \s*(-----BEGIN RSA PRIVATE KEY-----)
+      - \s*(-----BEGIN DSA PRIVATE KEY-----)
+      - \s*(-----BEGIN EC PRIVATE KEY-----)
+      - \s*(-----BEGIN OPENSSH PRIVATE KEY-----)
+      - \s*(-----BEGIN PGP PRIVATE KEY BLOCK-----)
+
+  - name: Compliant module source
+    id: 5
+    description: In non-development environment modules should not be sourced locally nor from git
+    error: This breach blocks your deployment on production environments
+    type: scan
+    solution: "\n\tSource your modules from their latest version on artifactory \n\tMore info at https://XXX"
+    environment: prod
+    fatal: true
+    enforcement: false
+    patterns:
+      - source\s*.*\.git"
+      - \s+source\s*=\s*"((?!https\:).)
+
+  - name: Hardcoded ids on code or variables
+    id: 7
+    description: Refrain from hardcoding resource ids per environment
+    solution: Capture them dynamically from data lookups or module outputs
+    error: This breach blocks your code promotion between environments
+    type: scan
+    fatal: true
+    environment: dev
+    enforcement: true
+    patterns:
+      - (subnet_ids\s*=\s*\[\s*"\$\{v)
+      - (subnet_ids\s*=\s*\[\s*"[s])
+      - (subnet_ids\s*=\s*=\s*"\$\{v)
+      - (subnet_id\s*=\s*"\s*[s])
+      - (subnet_id\s*=\s*"\s*\$\{v)
+      - (subnets\s*=\s*\[\s*"\$\{v)
+      - (subnets\s*=\s*\[\s*"[s])
+      - (vpc_zone_identifier\s*=\s*\[\s*"\$\{v)
+      - (vpc_zone_identifier\s*=\s*\[\s*"[v])
+      - (vpc_zone_identifier\s*=\s*=\s*"\$\{v)
+      - (vpc_id\s*=\s*"\s*[v])
+      - (vpc_id\s*=\s*"\s*\$\{v)
+      - (vpc_security_group_ids\s*=\s*\[\s*"\$\{v)
+      - (vpc_security_group_ids\s*=\s*\[\s*"[sg])
+      - (security_groups\s*=\s*\[\s*"\$\{v)
+      - (security_groups\s*=\s*\[\s*"[sg])
+      - ("subnet-)
+      - ("sg-)
+      - ("vpc-)
+
+  - name: Sub-optimal parameter on Module/Resource
+    id: 8
+    description: Module/Resource is configured with a sub-optimal parameter
+    solution: Tune the parameters to a more specific/recommended value
+    environment:
+    error: This breach might trigger a security review of your infra
+    type: scan
+    fatal: false
+    enforcement: false
+    patterns:
+      - \s+healthcheck_target\s*=\s*"22"
+      - \s+healthcheck_target\s*=\s*"3389"
+      - \s+protocol\s*=\s*"-1"
+      - \s+from_port\s*=\s*"-1"
+      - \s+to_port\s*=\s*"-1"
+      - ("0\.0\.0\.0)
+
+  - name: Collect sparse TF resources outside of modules.
+    description: The following resources were detected outside of compliant module usage
+    type: collect
+    patterns:
+      - (resource)\s*"(.*)"
+
+ExitCritical: "Critical irregularities found in your code"
+ExitWarning: "Irregularities found in your code"
+ExitClean: "Clean report"

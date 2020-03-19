@@ -1,13 +1,5 @@
 RulesDeactivated:
-  - 666
-  - 12
+  - RULE_ID
+  - RULE_ID
 
-ExceptionMessage: "THIS RULE CHECK IS DEACTIVATED BY AN EXCEPTION REQUEST"
-
-# Optional
-Exceptions:
-  - rule_id: POLICY_RULE_ID
-    auth: EVIDENCE_AUTHORIZING_THE_EXCEPTION
-
-  - rule_id: POLICY_RULE_ID
-    auth: EVIDENCE_AUTHORIZING_THE_EXCEPTION
+ExceptionMessage: TXT_MESSAGE

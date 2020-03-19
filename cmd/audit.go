@@ -27,7 +27,7 @@ type allRules struct {
 	ExitWarning      string `yaml:"exitwarning"`
 	ExitClean        string `yaml:"exitclean"`
 	Rules            []struct {
-		Id          int      `yaml:"id"`
+		ID          int      `yaml:"id"`
 		Name        string   `yaml:"name"`
 		Description string   `yaml:"description"`
 		Solution    string   `yaml:"solution"`
@@ -104,6 +104,8 @@ var auditCmd = &cobra.Command{
 
 		pwddir, _ := os.Getwd()
 
+		line := "------------------------------------------------------------"
+
 		searchPatternFile := strings.Join([]string{pwddir, "/", "search_regex"}, "")
 
 		fmt.Println("| ")
@@ -116,7 +118,7 @@ var auditCmd = &cobra.Command{
 			fmt.Println("| No Policy rules detected")
 		}
 
-		for index, value := range rules.Rules {
+		for _, value := range rules.Rules {
 
 			searchPattern := []byte(strings.Join(value.Patterns, "\n") + "\n")
 			_ = ioutil.WriteFile(searchPatternFile, searchPattern, 0644)
@@ -126,13 +128,14 @@ var auditCmd = &cobra.Command{
 			case "scan":
 
 				fmt.Println("| ")
-				fmt.Println("| ------------------------------------------------------------ ", index)
-				fmt.Println("| Rule #", value.Id)
+				fmt.Println("|", line)
+				fmt.Println("| ")
+				fmt.Println("| Rule #", value.ID)
 				fmt.Println("| Rule name : ", value.Name)
 				fmt.Println("| Rule description : ", value.Description)
 				fmt.Println("| ")
 
-				exception := containsInt(rules.RulesDeactivated, value.Id)
+				exception := containsInt(rules.RulesDeactivated, value.ID)
 
 				if exception && !auditNox && !value.Enforcement {
 
@@ -196,7 +199,8 @@ var auditCmd = &cobra.Command{
 			case "collect":
 
 				fmt.Println("| ")
-				fmt.Println("| ------------------------------------------------------------ ", index)
+				fmt.Println("|", line)
+				fmt.Println("| ")
 				fmt.Println("| Collection : ", value.Name)
 				fmt.Println("| Description : ", value.Description)
 				fmt.Println("| ")
