@@ -295,7 +295,7 @@ Redacted report:
 <img src="static/03.png" width="">
 </p>
 
-## 6. Add local exceptions ([examples/policy/local_exceptions.yaml](https://github.com/xfhg/intercept/tree/master/examples/policy/local_exceptions.yaml))
+## 6. Add local exceptions ([examples/exception/local_exception.yaml](https://github.com/xfhg/intercept/tree/master/examples/exception/local_exception.yaml))
 
 Use case : If you parse the config file from a global location and need local (per repo) exceptions you can add a local yaml file and merge it to the main config.
 
@@ -310,7 +310,7 @@ ExceptionMessage: "THIS RULE CHECK IS DEACTIVATED BY A LOCAL EXCEPTION REQUEST"
 ```
 
 ```sh
-intercept config -a local_exceptions.yaml
+intercept config -a exception/local_exception.yaml
 ```
 
 Both files are merged and you can run the audit with the new exceptions in place
