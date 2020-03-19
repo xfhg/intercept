@@ -23,10 +23,10 @@ Uses **ripgrep** to scan a target path for policy breaches recursively against y
 
 <br>
 
-#### Example report output
+#### Example Output
 
 <p align="center">
-<img src="static/03.png" width="">
+<img src="static/output.png" >
 </p>
 
 <br>
@@ -79,7 +79,7 @@ Download the standard package for your platform to get started
 
 <br>
 
-## Step by Step Instructions
+### Step by Step Instructions
 
 <details>
 <summary><b>CLICK HERE FOR DETAILED INSTRUCTIONS</b></summary>
@@ -96,12 +96,12 @@ On the folder [examples/](https://github.com/xfhg/intercept/tree/master/examples
 
 We intend to :
 
-- **scan** if private keys are present on their infra code (rule 001)
+- **scan** if private keys are present on their infra code (rule 1)
 
   - we want this policy to be fatal (**fatal:true**) and accept no exceptions (**enforcement:true**)
   - by omission of environment, this policy is fatal regardless of where it is scanning
 
-- **scan** if modules are being sourced from its compliant source and not locally or from git (rule 005)
+- **scan** if modules are being sourced from its compliant source and not locally or from git (rule 5)
 
   - we want this policy to be fatal (**fatal:true**) only when the environment is PROD (**environment:prod**)
   - this policy can accept local exceptions (**enforcement:false**)
@@ -200,7 +200,7 @@ intercept audit -t target/
 ```
 
 <p align="center">
-<img src="static/01.png" width="">
+<img src="static/step01.png" style="border-radius:10px">
 </p>
 
 Exiting with just a warning...
@@ -212,7 +212,7 @@ intercept audit -t target/ -e prod
 ```
 
 <p align="center">
-<img src="static/02.png" width="">
+<img src="static/step02.png" style="border-radius:10px">
 </p>
 
 Notice the fatal exception and the exit code 1
@@ -235,10 +235,11 @@ Looks great so far... let's validate that networking resources are not being har
   id: 7
   description:
   solution:
-  environment: dev
   error:
-  type: scan
   fatal: true
+  environment: dev
+  enforcement: true
+  type: scan
   patterns:
     - (subnet_ids\s*=\s*\[\s*"\$\{v)
     - (subnet_ids\s*=\s*\[\s*"[s])
@@ -292,7 +293,7 @@ intercept audit -t target/ -e DEV
 Redacted report:
 
 <p align="center">
-<img src="static/03.png" width="">
+<img src="static/step03.png" style="border-radius:10px">
 </p>
 
 ## 6. Add local exceptions ([examples/exception/local_exception.yaml](https://github.com/xfhg/intercept/tree/master/examples/exception/local_exception.yaml))
@@ -322,7 +323,7 @@ intercept audit -t target/ -e dev
 Redacted report:
 
 <p align="center">
-<img src="static/04.png" width="">
+<img src="static/step04.png" style="border-radius:10px">
 </p>
 
 As you can notice rule 5 activated the exception but rule 7 just ignore it and returned a FATAL breach.
@@ -390,8 +391,6 @@ ExceptionMessage: TXT_MESSAGE
 </details>
 <br>
 
----
-
 ## Used in production
 
 INTERCEPT was created to lint thousands of infra deployments a day with minor human intervention, the first MVP been running for a year already with no reported flaws. Keep in mind INTERCEPT is not and does not pretend to be a security tool.
@@ -454,5 +453,3 @@ It's easy to circumvent a regex pattern once you know it, but the main objective
 - [ ] Configurable output types for main report
 - [ ] Configurable output types for data collection
   </details>
-
-##### [regular expressions playground](https://regex101.com/)
