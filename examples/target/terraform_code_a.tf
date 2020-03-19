@@ -2,7 +2,7 @@ module "ExampleBackEndApp8080" {
 
   source = "git::https://scm.yourcompany.xxx/modules/aws-alb-backend.git"
 
-  subnet_ids          = ["${data.aws_subnet_ids.tier2_app_layer.ids}"]
+  subnet_ids          = ["${var.devhardcodedsubnetids}"]
   app_lb_listener_arn = "${module.example_alb_v2.aws_alb_listener_arn}"
   frontend_sg_id      = "${module.example_alb_v2.aws_alb_frontend_sg_id}"
   target_port         = "8080"

@@ -129,6 +129,7 @@ var auditCmd = &cobra.Command{
 
 				fmt.Println("| ")
 				fmt.Println("|", line)
+				fmt.Println("| ")
 				fmt.Println("| Rule #", value.ID)
 				fmt.Println("| Rule name : ", value.Name)
 				fmt.Println("| Rule description : ", value.Description)
@@ -199,6 +200,7 @@ var auditCmd = &cobra.Command{
 
 				fmt.Println("| ")
 				fmt.Println("|", line)
+				fmt.Println("| ")
 				fmt.Println("| Collection : ", value.Name)
 				fmt.Println("| Description : ", value.Description)
 				fmt.Println("| ")

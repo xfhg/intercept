@@ -1,5 +1,5 @@
 RulesDeactivated:
-  - 666
-  - 12
+  - RULE_ID
+  - RULE_ID
 
-ExceptionMessage: "THIS RULE CHECK IS DEACTIVATED BY AN EXCEPTION REQUEST"
+ExceptionMessage: TXT_MESSAGE

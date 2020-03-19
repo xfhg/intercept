@@ -1,15 +1,12 @@
 Banner: |
 
-  | This is a simple policy file with just two main rules with 5 patterns to scan and report to
-  | Use this banner to post guidelines and ocumentation about this pipeline step
-
-  Rss
+  | Banner text here, drop documentation link or quick instructions on how to react to the report
 
 Rules:
   - name: Private key committed in code
-    id: 001
-    description: Private key inside code version control
-    solution: Remove it, rewrite git history and use Vault or AWS Sectets Manager to secure your private keys
+    id: 1
+    description: Private key commited to code version control
+    solution: Remove it, rewrite git history and use Vault / AWS Sectets Manager to secure your private keys
     error: This violation immediatly blocks your code deployment
     type: scan
     enforcement: true
@@ -23,21 +20,25 @@ Rules:
       - \s*(-----BEGIN OPENSSH PRIVATE KEY-----)
       - \s*(-----BEGIN PGP PRIVATE KEY BLOCK-----)
 
-  - name: Module not sourced from artifactory
-    id: 005
-    description: In production environment modules should be sourced from artifactory and not locally nor from git
-    error: This violation will block your code promotion to production environments
+  - name: Compliant module source
+    id: 5
+    description: In non-development environment modules should not be sourced locally nor from git
+    error: This breach blocks your deployment on production environments
     type: scan
-    solution: "\n\tSource your modules from their latest version on artifactory \n\tMore info at XXX"
+    solution: "\n\tSource your modules from their latest version on artifactory \n\tMore info at https://XXX"
     environment: prod
     fatal: true
-    enforcement:
+    enforcement: false
     patterns:
       - source\s*.*\.git"
       - \s+source\s*=\s*"((?!https\:).)
 
-  - name: Collect TF resources outside of modules.
-    description: Since we only authorize TF modules to be deployed we collect TF Resources to be validated
+  - name: Collect sparse TF resources outside of modules.
+    description: The following resources were detected outside of compliant module usage
     type: collect
     patterns:
       - (resource)\s*"(.*)"
+
+ExitCritical: "Critical irregularities found in your code"
+ExitWarning: "Irregularities found in your code"
+ExitClean: "Clean report"

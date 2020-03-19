@@ -5,27 +5,14 @@ Banner: |
   | More info at : XXX
 
 Rules:
-  - name: Module not sourced from artifactory
-    id: 001
-    description: In production environment modules should be sourced from artifactory and not locally nor from git
-    error: This violation will block your code promotion to production environments
-    type: scan
-    solution: "\n\tSource your modules from their latest version on artifactory \n\tMore info at XXX"
-    environment: prod
-    fatal: true
-    enforcement:
-    patterns:
-      - source\s*.*\.git"
-      - \s+source\s*=\s*"((?!https\:).)
-
   - name: Private key committed in code
-    id: 003
-    description: Private key inside code version control
-    solution: Remove it, rewrite git history and use Vault / AWS SSM Parameter store or AWS Sectets Manager to secure your private keys
-    error: This violation blocks your code deployment
+    id: 1
+    description: Private key commited to code version control
+    solution: Remove it, rewrite git history and use Vault / AWS Sectets Manager to secure your private keys
+    error: This breach immediatly blocks your code deployment
     type: scan
-    enforcement:
-    environment: non-prod
+    enforcement: true
+    environment:
     fatal: true
     patterns:
       - \s*(-----BEGIN PRIVATE KEY-----)
@@ -35,14 +22,28 @@ Rules:
       - \s*(-----BEGIN OPENSSH PRIVATE KEY-----)
       - \s*(-----BEGIN PGP PRIVATE KEY BLOCK-----)
 
-  - name: Environment / baseline hardcoded ids on code or variables
-    id: 3
+  - name: Compliant module source
+    id: 5
+    description: In non-development environment modules should not be sourced locally nor from git
+    error: This breach blocks your deployment on production environments
+    type: scan
+    solution: "\n\tSource your modules from their latest version on artifactory \n\tMore info at https://XXX"
+    environment: prod
+    fatal: true
+    enforcement: false
+    patterns:
+      - source\s*.*\.git"
+      - \s+source\s*=\s*"((?!https\:).)
+
+  - name: Hardcoded ids on code or variables
+    id: 7
     description: Refrain from hardcoding resource ids per environment
     solution: Capture them dynamically from data lookups or module outputs
-    environment: non-prod
-    error: This violation will block your code promotion between environments
+    error: This breach blocks your code promotion between environments
     type: scan
     fatal: true
+    environment: dev
+    enforcement: true
     patterns:
       - (subnet_ids\s*=\s*\[\s*"\$\{v)
       - (subnet_ids\s*=\s*\[\s*"[s])
@@ -56,12 +57,6 @@ Rules:
       - (vpc_zone_identifier\s*=\s*=\s*"\$\{v)
       - (vpc_id\s*=\s*"\s*[v])
       - (vpc_id\s*=\s*"\s*\$\{v)
-      - (aws_apps_ami\s*=\s*"\s*\$\{v)
-      - (aws_apps_ami\s*=\s*"\s*[a])
-      - (ami\s*=\s*"\s*\$\{v)
-      - (ami\s*=\s*"\s*[a])
-      - (image_id\s*=\s*"\s*\$\{v)
-      - (image_id\s*=\s*"\s*[a])
       - (vpc_security_group_ids\s*=\s*\[\s*"\$\{v)
       - (vpc_security_group_ids\s*=\s*\[\s*"[sg])
       - (security_groups\s*=\s*\[\s*"\$\{v)
@@ -71,13 +66,14 @@ Rules:
       - ("vpc-)
 
   - name: Sub-optimal parameter on Module/Resource
-    id: 4
+    id: 8
     description: Module/Resource is configured with a sub-optimal parameter
     solution: Tune the parameters to a more specific/recommended value
-    environment: prod
-    error: This violation will block your code promotion to production environments
+    environment:
+    error: This breach might trigger a security review of your infra
     type: scan
     fatal: false
+    enforcement: false
     patterns:
       - \s+healthcheck_target\s*=\s*"22"
       - \s+healthcheck_target\s*=\s*"3389"
@@ -86,33 +82,12 @@ Rules:
       - \s+to_port\s*=\s*"-1"
       - ("0\.0\.0\.0)
 
-  - name: Non compliant terraform resources
-    id: 6
-    description: Setup of non compliant terraform resources outside of modules
-    solution: "\n\tOnly use the available terraform modules to deploy this type of resource \n\tAvailable modules XXX"
-    error: This violation will block your code promotion to production environments
-    type: scan
-    environment: non-prod
-    fatal: true
-    patterns:
-      - (resource\s+"aws_db_instance")
-      - (resource\s+"aws_rds_cluster")
-      - (resource\s+"aws_s3_bucket")
-      - (resource\s+"aws_ebs_volume")
-      - (resource\s+"aws_instance")
-      - (resource\s+"aws_volume_attachment")
-      - (resource\s+"aws_ssm_parameter")
-      - (resource\s+"aws_efs_mount_target")
-      - (resource\s+"aws_efs_file_system")
-
-  - name: Endpoints
-    description: Endpoints to be validated
-    type: collect
-    patterns:
-      - (http|https):\/\/(([a-z0-9]|[a-z0-9][a-z0-9\-]*[a-z0-9])\.)*([a-z0-9]|[a-z0-9][a-z0-9\-]*[a-z0-9])(:[0-9]+)?(\S*)
-
-  - name: Resources
-    description: Resources to be validated
+  - name: Collect sparse TF resources outside of modules.
+    description: The following resources were detected outside of compliant module usage
     type: collect
     patterns:
       - (resource)\s*"(.*)"
+
+ExitCritical: "Critical irregularities found in your code"
+ExitWarning: "Irregularities found in your code"
+ExitClean: "Clean report"

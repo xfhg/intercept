@@ -40,7 +40,7 @@ module "my_stateless_web_app" {
   ec2_keypair_name        = "${var.ec2_keypair_name}"
 
   vpc_zone_identifier     = "${data.aws_subnet_ids.tier2_app_layer.ids}"
-  vpc_id                  = "${data.aws_vpc.vpc.id}"
+  vpc_id                  = "vpc-123456"
   subnet_ids              = "${data.aws_subnet_ids.tier2_app_layer.ids}"
 
 
