@@ -3,6 +3,8 @@ MOMENT=$(shell date +'%Y%m%d-%H%M')
 VERSION=$(shell git rev-parse --short HEAD)
 RANDOM=$(shell awk 'BEGIN{srand();printf("%d", 65536*rand())}')
 
+VENOM=v0.27.0
+
 all: purge-output windows linux macos out-full out-linux out-macos out-win ripgrep intercept
 
 mod:
@@ -92,21 +94,21 @@ build-package:
 	zip -9 -T -x "*.DS_Store*" "*interceptm*" "*intercept.exe*" "*interceptl*" -r output/intercept-buildpack-$(VERSION).zip release/
 
 test-macos: 
-	curl -S -O -J -L https://github.com/ovh/venom/releases/download/v0.27.0/venom.darwin-amd64
+	curl -S -O -J -L https://github.com/ovh/venom/releases/download/$(VENOM)/venom.darwin-amd64
 	mv venom.darwin-amd64 venom
 	chmod +x venom
 	./venom run tests/suite.yml
 	rm venom
 
 test-linux: 
-	curl -S -O -J -L https://github.com/ovh/venom/releases/download/v0.27.0/venom.linux-amd64
+	curl -S -O -J -L https://github.com/ovh/venom/releases/download/$(VENOM)/venom.linux-amd64
 	mv venom.linux-amd64 venom
 	chmod +x venom
 	./venom run tests/suite.yml
 	rm venom
 
 test-win: 
-	curl -S -O -J -L https://github.com/ovh/venom/releases/download/v0.27.0/venom.windows-amd64
+	curl -S -O -J -L https://github.com/ovh/venom/releases/download/$(VENOM)/venom.windows-amd64
 	mv venom.windows-amd64 venom.exe
 	chmod +x venom.exe
 	./venom.exe run tests/suite.yml
