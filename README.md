@@ -391,6 +391,22 @@ ExceptionMessage: TXT_MESSAGE
 </details>
 <br>
 
+## Tests
+
+#### Test Suite runs on [venom](https://github.com/ovh/venom)
+
+```sh
+venom run tests/suite.yml
+```
+
+Auto-pilot :
+
+```
+make test-macos
+make test-linux
+make test-win
+```
+
 ## Used in production
 
 INTERCEPT was created to lint thousands of infra deployments a day with minor human intervention, the first MVP been running for a year already with no reported flaws. Keep in mind INTERCEPT is not and does not pretend to be a security tool.
@@ -447,9 +463,16 @@ It's easy to circumvent a regex pattern once you know it, but the main objective
 
 <br>
 <details><summary><b>INTERCEPT TODO</b></summary>
+<br>
 
-- [ ] Complete this README
-- [ ] Tests obviously
+- [x] Complete this README
+
+- [x] Tests obviously
+
 - [ ] Configurable output types for main report
+
 - [ ] Configurable output types for data collection
+
+- [ ] Configurable output colors
+
   </details>
