@@ -79,7 +79,7 @@ Download the standard package for your platform to get started
 
 <br>
 
-### Step by Step Instructions
+## Step by Step
 
 <details>
 <summary><b>CLICK HERE FOR DETAILED INSTRUCTIONS</b></summary>
@@ -89,8 +89,6 @@ Download the standard package for your platform to get started
 Let's take a real-world example and verify how the dev teams are using our compliant terraform modules
 
 On the folder [examples/](https://github.com/xfhg/intercept/tree/master/examples) we will scan the imaginary infra repo that contains terraform code at [examples/target/](https://github.com/xfhg/intercept/tree/master/examples/target)
-
-## Steps
 
 ## 1. Write a global policy file ([examples/policy/simple.yaml](https://github.com/xfhg/intercept/tree/master/examples/policy/simple.yaml))
 
@@ -391,22 +389,6 @@ ExceptionMessage: TXT_MESSAGE
 </details>
 <br>
 
-## Tests
-
-#### Test Suite runs on [venom](https://github.com/ovh/venom)
-
-```sh
-venom run tests/suite.yml
-```
-
-Auto-pilot :
-
-```
-make test-macos
-make test-linux
-make test-win
-```
-
 ## Used in production
 
 INTERCEPT was created to lint thousands of infra deployments a day with minor human intervention, the first MVP been running for a year already with no reported flaws. Keep in mind INTERCEPT is not and does not pretend to be a security tool.
@@ -429,7 +411,7 @@ It's easy to circumvent a regex pattern once you know it, but the main objective
 
 - Applies ignore patterns in .gitignore files using a RegexSet. That means a single file path can be matched against multiple glob patterns simultaneously.
 
-- It uses a lock-free parallel recursive directory iterator, courtesy of crossbeam and ignore libraries.
+- It uses a lock-free parallel recursive directory iterator, courtesy of **crossbeam** and **ignore**.
 
 ### Benchmark ripgrep
 
@@ -462,17 +444,29 @@ It's easy to circumvent a regex pattern once you know it, but the main objective
 ---
 
 <br>
-<details><summary><b>INTERCEPT TODO</b></summary>
-<br>
 
-- [x] Complete this README
+## Tests
 
-- [x] Tests obviously
+#### Test Suite runs with [venom](https://github.com/ovh/venom)
+
+```sh
+venom run tests/suite.yml
+```
+
+## Vulnerabilities
+
+#### Scanned with [Sonatype Nancy](https://github.com/sonatype-nexus-community/nancy)
+
+```
+Audited dependencies:41,Vulnerable:0
+```
+
+from Sonatype OSS Index
+
+## TODO
 
 - [ ] Configurable output types for main report
 
 - [ ] Configurable output types for data collection
 
 - [ ] Configurable output colors
-
-  </details>
