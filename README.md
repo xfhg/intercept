@@ -15,11 +15,12 @@ Stupidly easy to use, small footprint **Policy as Code** subsecond command-line 
 
 - intercept binary
 - policies yaml file
-- (included) [ripgrep](https://github.com/BurntSushi/ripgrep) binary
+- (included) latest [ripgrep](https://github.com/BurntSushi/ripgrep) binary
+- (optional) latest [shellcheck](https://github.com/koalaman/shellcheck) binary
 - (optional) exceptions yaml file
 
 **Intercept** merges environment flags, policies yaml, exceptions yaml to generate a global config.
-Uses **ripgrep** to scan a target path for policy breaches recursively against your code and generates a humand readable detailed output of the findings.
+Uses **ripgrep** to scan a target path for policy breaches recursively against your code and generates a human readable detailed output of the findings.
 
 <br>
 
@@ -467,7 +468,7 @@ from Sonatype OSS Index
 
 - [ ] Complete the test suite
 
-- [ ] Add [shellcheck](https://github.com/koalaman/shellcheck) to give warnings and suggestions for bash/sh shell scripts
+- [ ] Add [shellcheck](https://github.com/koalaman/shellcheck) to give warnings and suggestions for bash/sh shell scripts (optional, not core feature)
 
 - [ ] Add system check and download of auxiliary tools (ripgrep and shellcheck)
 
