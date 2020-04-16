@@ -12,7 +12,6 @@ Stupidly easy to use, small footprint **Policy as Code** subsecond command-line 
 ![GitHub Release Date](https://img.shields.io/github/release-date/xfhg/intercept)
 ![GitHub last commit](https://img.shields.io/github/last-commit/xfhg/intercept)
 ![GitHub commits since latest release (by date)](https://img.shields.io/github/commits-since/xfhg/intercept/latest)
-![GitHub commit activity](https://img.shields.io/github/commit-activity/m/xfhg/intercept)
 
 ![GitHub code size in bytes](https://img.shields.io/github/languages/code-size/xfhg/intercept)
 ![GitHub go.mod Go version](https://img.shields.io/github/go-mod/go-version/xfhg/intercept)
