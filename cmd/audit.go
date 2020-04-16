@@ -58,16 +58,6 @@ func getRuleStruct() *allRules {
 
 }
 
-// ContainsInt
-func containsInt(s []int, e int) bool {
-	for _, a := range s {
-		if a == e {
-			return true
-		}
-	}
-	return false
-}
-
 var auditCmd = &cobra.Command{
 	Use:   "audit",
 	Short: "INTERCEPT / AUDIT - Scan a target path against configured policy rules and exceptions",
@@ -86,6 +76,12 @@ var auditCmd = &cobra.Command{
 			rgbin = "rg/rgl"
 		default:
 			colorRedBold.Println("| OS not supported")
+			os.Exit(1)
+		}
+
+		if !FileExists(rgbin) {
+			colorRedBold.Println("| RG not found")
+			colorRedBold.Println("| Run the command - intercept system - to validate dependencies")
 			os.Exit(1)
 		}
 
@@ -135,7 +131,7 @@ var auditCmd = &cobra.Command{
 				fmt.Println("| Rule description : ", value.Description)
 				fmt.Println("| ")
 
-				exception := containsInt(rules.RulesDeactivated, value.ID)
+				exception := ContainsInt(rules.RulesDeactivated, value.ID)
 
 				if exception && !auditNox && !value.Enforcement {
 

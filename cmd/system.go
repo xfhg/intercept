@@ -16,19 +16,7 @@ var systemCmd = &cobra.Command{
 
 		if systemSetup {
 			fmt.Println("|")
-			fmt.Println("| System Setup Start")
-
-			fmt.Println("|")
-			fmt.Println("| Updating ripgrep")
-
-			fmt.Println("|")
-			fmt.Println("| Updating shellcheck")
-
-			fmt.Println("|")
-			fmt.Println("| Validating permissions")
-
-			fmt.Println("|")
-			fmt.Println("| System Setup Complete")
+			fmt.Println("| System Setup")
 		}
 
 	},

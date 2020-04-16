@@ -12,14 +12,6 @@ import (
 var addCfgFile string
 var defaultCfgFile string
 
-func fileExists(filename string) bool {
-	info, err := os.Stat(filename)
-	if os.IsNotExist(err) {
-		return false
-	}
-	return !info.IsDir()
-}
-
 var configCmd = &cobra.Command{
 	Use:   "config",
 	Short: "INTERCEPT / CONFIG - Add and merge config files to setup AUDIT",
@@ -30,7 +22,7 @@ var configCmd = &cobra.Command{
 		defaultCfgFile = cfgFile
 
 		if configReset {
-			if fileExists(defaultCfgFile) {
+			if FileExists(defaultCfgFile) {
 				_ = os.Remove(defaultCfgFile)
 				fmt.Println("|")
 				fmt.Println("| Config clear")
@@ -40,13 +32,13 @@ var configCmd = &cobra.Command{
 			}
 		}
 
-		if fileExists(addCfgFile) {
+		if FileExists(addCfgFile) {
 
 			fmt.Println("|")
 			fmt.Println("| Config file updated")
 			fmt.Println("└")
 
-			if fileExists(defaultCfgFile) {
+			if FileExists(defaultCfgFile) {
 
 				var master map[string]interface{}
 				bs, err := ioutil.ReadFile(defaultCfgFile)
