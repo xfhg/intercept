@@ -18,6 +18,7 @@ Stupidly easy to use, small footprint **Policy as Code** subsecond command-line 
 [![Go Report Card](https://goreportcard.com/badge/github.com/xfhg/intercept)](https://goreportcard.com/report/github.com/xfhg/intercept)
 ![GitHub issues](https://img.shields.io/github/issues-raw/xfhg/intercept)
 ![GitHub pull requests](https://img.shields.io/github/issues-pr-raw/xfhg/intercept)
+[![Run on Repl.it](https://repl.it/badge/github/xfhg/intercept)](https://repl.it/github/xfhg/intercept)
 
 ## How it works
 
@@ -490,4 +491,8 @@ from Sonatype OSS Index
 
 ```
 make setup-dev
+make out-linux
+cd release
+./interceptl config -a ../examples/policy/simple.yaml
+./interceptl audit -t ../examples/target
 ```
