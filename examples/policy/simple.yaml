@@ -10,7 +10,7 @@ Rules:
     error: This violation immediatly blocks your code deployment
     type: scan
     enforcement: true
-    environment:
+    environment: all
     fatal: true
     patterns:
       - \s*(-----BEGIN PRIVATE KEY-----)

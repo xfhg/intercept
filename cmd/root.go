@@ -18,6 +18,7 @@ var cfgEnv string
 var (
 	configReset bool
 	auditNox    bool
+	systemSetup bool
 )
 
 var rootCmd = &cobra.Command{
@@ -62,7 +63,7 @@ func initConfig() {
 
 	viper.AutomaticEnv()
 
-	fmt.Println("")
+	fmt.Println("┌")
 	fmt.Println("| INTERCEPT")
 	fmt.Println("|")
 
@@ -74,7 +75,14 @@ func initConfig() {
 
 	configReset = configCmdisReset()
 	auditNox = auditCmdisNoExceptions()
+	systemSetup = systemCmdisSetup()
 
+}
+
+func systemCmdisSetup() bool {
+
+	setup, _ := systemCmd.PersistentFlags().GetBool("setup")
+	return setup
 }
 
 func configCmdisReset() bool {

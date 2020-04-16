@@ -34,6 +34,9 @@ var configCmd = &cobra.Command{
 				_ = os.Remove(defaultCfgFile)
 				fmt.Println("|")
 				fmt.Println("| Config clear")
+			} else {
+				fmt.Println("|")
+				fmt.Println("| Config clear")
 			}
 		}
 
@@ -41,7 +44,7 @@ var configCmd = &cobra.Command{
 
 			fmt.Println("|")
 			fmt.Println("| Config file updated")
-			fmt.Println("|")
+			fmt.Println("└")
 
 			if fileExists(defaultCfgFile) {
 
@@ -99,7 +102,7 @@ var configCmd = &cobra.Command{
 
 			fmt.Println("|")
 			fmt.Println("| No updates detected")
-			fmt.Println("|")
+			fmt.Println("└")
 
 		}
 
