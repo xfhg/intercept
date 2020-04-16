@@ -58,12 +58,12 @@ Uses **ripgrep** to scan a target path for policy breaches recursively against y
     -- intercept-rg-win-*.zip
 
   # Clean package (intercept only) for individual platforms
-    -- intercept-linux-*.zip
-    -- intercept-macos-*.zip
-    -- intercept-win-*.zip
+    -- raw-intercept-linux-*.zip
+    -- raw-intercept-macos-*.zip
+    -- raw-intercept-win-*.zip
 
   # Full package (intercept + ripgrep) for all platforms
-    -- intercept-x-*.zip
+    -- x-intercept-*.zip
 
   # Package needed to fully use the Makefile
     -- intercept-buildpack-*.zip

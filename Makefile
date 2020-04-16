@@ -44,7 +44,7 @@ out-full: purge
 	cp bin/interceptm release/interceptm
 	cp bin/intercept.exe release/intercept.exe
 	cp .ignore release/.ignore
-	zip -9 -T -x "*.DS_Store*" -r output/intercept-x-$(VERSION)-$(MOMENT).zip release/
+	zip -9 -T -x "*.DS_Store*" -r output/x-intercept-$(VERSION)-$(MOMENT).zip release/
 
 out-linux: clean purge linux
 	cp bin/interceptl release/interceptl
@@ -65,13 +65,13 @@ ripgrep-full:
 	zip -9 -T -x "*.DS_Store*" "*intercept*" -r output/intercept-ripgrep-$(VERSION)-$(MOMENT).zip release/
 
 ripgrep-win:
-	zip -9 -T -x "*.DS_Store*" "*intercept*" "*rgl*" "*rgm*" -r output/intercept-ripgrep-win.zip release/
+	zip -9 -T -x "*.DS_Store*" "*intercept*" "*rgl*" "*rgm*" -r output/i-ripgrep-win.zip release/
 
 ripgrep-macos:
-	zip -9 -T -x "*.DS_Store*" "*intercept*" "*rgl*" "*.exe" -r output/intercept-ripgrep-macos.zip release/
+	zip -9 -T -x "*.DS_Store*" "*intercept*" "*rgl*" "*.exe" -r output/i-ripgrep-macos.zip release/
 
 ripgrep-linux:
-	zip -9 -T -x "*.DS_Store*" "*intercept*" "*.exe" "*rgm*" -r output/intercept-ripgrep-linux.zip release/
+	zip -9 -T -x "*.DS_Store*" "*intercept*" "*.exe" "*rgm*" -r output/i-ripgrep-linux.zip release/
 
 
 ripgrep: purge-ripgrep ripgrep-win ripgrep-linux ripgrep-macos
@@ -80,13 +80,13 @@ add-ignore:
 	cp release/.ignore bin/.ignore
 
 intercept-win: add-ignore
-	zip -9 -T -x "*.DS_Store*" "*interceptl*" "*interceptm*"  -r output/intercept-win-$(VERSION).zip bin/
+	zip -9 -T -x "*.DS_Store*" "*interceptl*" "*interceptm*"  -r output/raw-intercept-win-$(VERSION).zip bin/
 
 intercept-macos: add-ignore
-	zip -9 -T -x "*.DS_Store*" "*interceptl*" "*intercept.exe*"  -r output/intercept-macos-$(VERSION).zip bin/
+	zip -9 -T -x "*.DS_Store*" "*interceptl*" "*intercept.exe*"  -r output/raw-intercept-macos-$(VERSION).zip bin/
 
 intercept-linux: add-ignore
-	zip -9 -T -x "*.DS_Store*" "*interceptm*" "*intercept.exe*" -r output/intercept-linux-$(VERSION).zip bin/
+	zip -9 -T -x "*.DS_Store*" "*interceptm*" "*intercept.exe*" -r output/raw-intercept-linux-$(VERSION).zip bin/
 
 intercept: intercept-win intercept-linux intercept-macos
 
