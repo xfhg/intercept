@@ -12,7 +12,7 @@ Rules:
     error: This breach immediatly blocks your code deployment
     type: scan
     enforcement: true
-    environment:
+    environment: all
     fatal: true
     patterns:
       - \s*(-----BEGIN PRIVATE KEY-----)
@@ -69,7 +69,7 @@ Rules:
     id: 8
     description: Module/Resource is configured with a sub-optimal parameter
     solution: Tune the parameters to a more specific/recommended value
-    environment:
+    environment: all
     error: This breach might trigger a security review of your infra
     type: scan
     fatal: false

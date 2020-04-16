@@ -163,7 +163,9 @@ var auditCmd = &cobra.Command{
 						}
 					} else {
 
-						if value.Environment == cfgEnv || value.Environment == "" {
+						if strings.Contains(value.Environment, cfgEnv) ||
+							strings.Contains(value.Environment, "all") ||
+							value.Environment == "" {
 							if value.Fatal {
 
 								colorRedBold.Println("|")
@@ -175,7 +177,8 @@ var auditCmd = &cobra.Command{
 							}
 						} else {
 
-							if value.Environment != cfgEnv && value.Environment != "" {
+							if value.Environment != cfgEnv &&
+								value.Environment != "" {
 
 								colorRedBold.Println("|")
 								colorRedBold.Println("|")
