@@ -25,4 +25,4 @@ config.yaml
 
 tests/venom
 
-Makefile
+search_regex

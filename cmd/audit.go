@@ -75,26 +75,21 @@ var auditCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 
 		rules = getRuleStruct()
-		rgbin := "rg"
-		path, err := exec.LookPath("rg")
 
-		if err != nil || path == "" {
-
-			switch runtime.GOOS {
-			case "windows":
-				rgbin = "rg/rg.exe"
-			case "darwin":
-				rgbin = "rg/rgm"
-			case "linux":
-				rgbin = "rg/rgl"
-			default:
-
-				colorRedBold.Println("| OS not supported")
-				os.Exit(1)
-
-			}
+		rgbin := ""
+		switch runtime.GOOS {
+		case "windows":
+			rgbin = "rg/rg.exe"
+		case "darwin":
+			rgbin = "rg/rgm"
+		case "linux":
+			rgbin = "rg/rgl"
+		default:
+			colorRedBold.Println("| OS not supported")
+			os.Exit(1)
 		}
 
+		fmt.Println("| RG Path : ", rgbin)
 		fmt.Println("| Scan Path : ", scanPath)
 
 		if auditNox {
@@ -116,6 +111,11 @@ var auditCmd = &cobra.Command{
 		fmt.Println("| ")
 		if len(rules.Rules) < 1 {
 			fmt.Println("| No Policy rules detected")
+			fmt.Println("|")
+			fmt.Println("| INTERCEPT")
+			fmt.Println("└")
+			fmt.Println("")
+			os.Exit(0)
 		}
 
 		for _, value := range rules.Rules {
@@ -163,7 +163,9 @@ var auditCmd = &cobra.Command{
 						}
 					} else {
 
-						if value.Environment == cfgEnv || value.Environment == "" {
+						if strings.Contains(value.Environment, cfgEnv) ||
+							strings.Contains(value.Environment, "all") ||
+							value.Environment == "" {
 							if value.Fatal {
 
 								colorRedBold.Println("|")
@@ -175,7 +177,8 @@ var auditCmd = &cobra.Command{
 							}
 						} else {
 
-							if value.Environment != cfgEnv && value.Environment != "" {
+							if value.Environment != cfgEnv &&
+								value.Environment != "" {
 
 								colorRedBold.Println("|")
 								colorRedBold.Println("|")
@@ -241,8 +244,9 @@ var auditCmd = &cobra.Command{
 			colorRedBold.Println("| ", rules.ExitCritical)
 			fmt.Println("|")
 			fmt.Println("| INTERCEPT")
+			fmt.Println("└")
 			fmt.Println("")
-			colorRedBold.Println("- break signal - ")
+			colorRedBold.Println("► break signal ")
 			os.Exit(1)
 		}
 
@@ -258,6 +262,7 @@ var auditCmd = &cobra.Command{
 
 		fmt.Println("|")
 		fmt.Println("| INTERCEPT")
+		fmt.Println("└")
 		fmt.Println("")
 	},
 }
@@ -265,7 +270,7 @@ var auditCmd = &cobra.Command{
 func init() {
 
 	auditCmd.PersistentFlags().StringVarP(&scanPath, "target", "t", ".", "scanning Target path")
-	auditCmd.PersistentFlags().BoolP("no-exceptions", "x", false, "disables the option to deactivate rules by exception")
+	auditCmd.PersistentFlags().BoolP("no-exceptions", "x", false, "disables the option to deactivate rules by eXception")
 
 	rootCmd.AddCommand(auditCmd)
 
