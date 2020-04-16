@@ -34,10 +34,10 @@ purge:
 	rm -f intercept-*.zip
 
 purge-output:
-	rm -f output/intercept-*.zip
+	rm -f output/*.zip
 
 purge-ripgrep:
-	rm -f output/intercept-ripgrep*.zip
+	rm -f output/i-*.zip
 
 out-full: purge
 	cp bin/interceptl release/interceptl
@@ -91,7 +91,14 @@ intercept-linux: add-ignore
 intercept: intercept-win intercept-linux intercept-macos
 
 build-package:
-	zip -9 -T -x "*.DS_Store*" "*interceptm*" "*intercept.exe*" "*interceptl*" -r output/intercept-buildpack-$(VERSION).zip release/
+	zip -9 -T -x "*.DS_Store*" "*interceptm*" "*intercept.exe*" "*interceptl*" -r output/setup-buildpack.zip release/
+
+setup-dev:
+	curl -S -O -J -L https://github.com/xfhg/intercept/releases/latest/download/setup-buildpack.zip
+	unzip setup-*
+	chmod -R a+x release/
+	mkdir output/
+	rm setup-buildpack.zip
 
 test-macos:
 	curl -S -O -J -L https://github.com/ovh/venom/releases/download/$(VENOM)/venom.darwin-amd64
@@ -114,7 +121,7 @@ test-win:
 	./venom.exe run tests/suite.yml
 	rm venom.exe
 
-dev: clean purge macos
+dev-macos: clean purge macos
 	cp bin/interceptm release/interceptm
 	cp .ignore release/.ignore
 	go install

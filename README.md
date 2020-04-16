@@ -74,7 +74,7 @@ Uses **ripgrep** to scan a target path for policy breaches recursively against y
     -- x-intercept-*.zip
 
   # Package needed to fully use the Makefile
-    -- intercept-buildpack-*.zip
+    -- setup-buildpack.zip
 
   # Package of the latest compatible release of ripgrep (doesn't include intercept)
     -- i-ripgrep-linux-*.zip
@@ -487,3 +487,7 @@ from Sonatype OSS Index
 ## CONTRIBUTE
 
 [![Open in Gitpod](https://gitpod.io/button/open-in-gitpod.svg)](https://gitpod.io/#https://github.com/xfhg/intercept)
+
+```
+make setup-dev
+```
