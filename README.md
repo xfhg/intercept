@@ -10,7 +10,6 @@ Stupidly easy to use, small footprint **Policy as Code** subsecond command-line 
 
 [![Latest release](https://img.shields.io/badge/release-MVP%20ONE-blue)](https://github.com/xfhg/intercept/releases)
 [![Go Report Card](https://goreportcard.com/badge/github.com/xfhg/intercept)](https://goreportcard.com/report/github.com/xfhg/intercept)
-[![Run on Repl.it](https://repl.it/badge/github/xfhg/intercept)](https://repl.it/github/xfhg/intercept)
 
 ## How it works
 
@@ -466,8 +465,10 @@ from Sonatype OSS Index
 
 ## TODO
 
-- [ ] Configurable output types for main report
+- [ ] Complete the test suite
 
-- [ ] Configurable output types for data collection
+- [ ] Add [shellcheck](https://github.com/koalaman/shellcheck) to give warnings and suggestions for bash/sh shell scripts
 
-- [ ] Configurable output colors
+- [ ] Add system check and download of auxiliary tools (ripgrep and shellcheck)
+
+- [ ] Configurable output types for data collection and overall report
