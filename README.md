@@ -10,6 +10,7 @@ Stupidly easy to use, small footprint **Policy as Code** subsecond command-line 
 
 [![Latest release](https://img.shields.io/badge/release-MVP%20ONE-blue)](https://github.com/xfhg/intercept/releases)
 [![Go Report Card](https://goreportcard.com/badge/github.com/xfhg/intercept)](https://goreportcard.com/report/github.com/xfhg/intercept)
+[![Run on Repl.it](https://repl.it/badge/github/xfhg/intercept)](https://repl.it/github/xfhg/intercept)
 
 ## How it works
 
