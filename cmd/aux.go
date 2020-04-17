@@ -1,6 +1,9 @@
 package cmd
 
-import "os"
+import (
+	"fmt"
+	"os"
+)
 
 // FileExists check if file exists
 func FileExists(filename string) bool {
@@ -19,4 +22,14 @@ func ContainsInt(s []int, e int) bool {
 		}
 	}
 	return false
+}
+
+// PrintClose prints the command ending
+func PrintClose() {
+
+	fmt.Println("|")
+	fmt.Println("| INTERCEPT")
+	fmt.Println("└")
+	fmt.Println("")
+
 }

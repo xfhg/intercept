@@ -14,7 +14,7 @@ module "my_stateless_web_app" {
   sg_app_port                 = "${var.sg_app_port}"
   default_lb_protocol         = "${var.default_lb_protocol}"
   default_elb_app_port        = "${var.default_elb_app_port}"
-  default_healthcheck_target  = "${var.default_healthcheck_target}"
+  default_healthcheck_target  = "22"
 
   elb_listener                = [
     {
