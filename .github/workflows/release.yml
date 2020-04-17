@@ -42,7 +42,7 @@ jobs:
         with:
           draft: "true"
           token: ${{ secrets.GITHUB_TOKEN }}
-          name: Release ${{ steps.get_version.outputs.VERSION }}
+          name: ${{ steps.get_version.outputs.VERSION }}
           body: >
             Release ${{ steps.get_version.outputs.VERSION }}
           gzip: "false"

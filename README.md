@@ -26,7 +26,6 @@ Stupidly easy to use, small footprint **Policy as Code** subsecond command-line 
 - intercept binary
 - policies yaml file
 - (included) latest [ripgrep](https://github.com/BurntSushi/ripgrep) binary
-- (optional) latest [shellcheck](https://github.com/koalaman/shellcheck) binary
 - (optional) exceptions yaml file
 
 **Intercept** merges environment flags, policies yaml, exceptions yaml to generate a global config.
@@ -63,25 +62,25 @@ Uses **ripgrep** to scan a target path for policy breaches recursively against y
 ```sh
 
   # Standard package (intercept + ripgrep) for individual platforms
-    -- intercept-rg-linux-*.zip
-    -- intercept-rg-macos-*.zip
-    -- intercept-rg-win-*.zip
+    -- intercept-rg-linux.zip
+    -- intercept-rg-macos.zip
+    -- intercept-rg-win.zip
 
   # Clean package (intercept only) for individual platforms
-    -- raw-intercept-linux-*.zip
-    -- raw-intercept-macos-*.zip
-    -- raw-intercept-win-*.zip
+    -- core-intercept-linux.zip
+    -- core-intercept-macos.zip
+    -- core-intercept-win.zip
 
   # Full package (intercept + ripgrep) for all platforms
-    -- x-intercept-*.zip
+    -- x-intercept.zip
 
   # Package needed to fully use the Makefile
     -- setup-buildpack.zip
 
   # Package of the latest compatible release of ripgrep (doesn't include intercept)
-    -- i-ripgrep-linux-*.zip
-    -- i-ripgrep-macos-*.zip
-    -- i-ripgrep-win-*.zip
+    -- i-ripgrep-linux.zip
+    -- i-ripgrep-macos.zip
+    -- i-ripgrep-win.zip
 
 ```
 
