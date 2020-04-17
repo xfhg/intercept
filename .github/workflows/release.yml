@@ -35,6 +35,9 @@ jobs:
       
     - name: Make all release artifacts
       run: make 
+    
+    - name: Make buildpack
+      run: make build-package
       
     - name: Create Release
       id: create_release
