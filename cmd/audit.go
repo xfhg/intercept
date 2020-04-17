@@ -156,37 +156,35 @@ var auditCmd = &cobra.Command{
 						}
 					} else {
 
-						if strings.Contains(value.Environment, cfgEnv) ||
+						//if matches environment and is fatal
+						//if environment is all and is fatal
+						//if environment is empty and is fatal
+						if (strings.Contains(value.Environment, cfgEnv) ||
 							strings.Contains(value.Environment, "all") ||
-							value.Environment == "" {
+							value.Environment == "") && value.Fatal {
+							colorRedBold.Println("|")
+							colorRedBold.Println("| FATAL : ")
+							colorRedBold.Println("| ", value.Error)
+							colorRedBold.Println("|")
+							fatal = true
+						} else {
 
-							if value.Fatal {
+							colorRedBold.Println("|")
+							colorRedBold.Println("|")
+							colorRedBold.Println("| ", value.Error)
+							colorRedBold.Println("|")
+							warning = true
 
-								colorRedBold.Println("|")
-								colorRedBold.Println("| FATAL : ")
-								colorRedBold.Println("| ", value.Error)
-								colorRedBold.Println("|")
-								fatal = true
-
-							} else {
-
-								colorRedBold.Println("|")
-								colorRedBold.Println("|")
-								colorRedBold.Println("| ", value.Error)
-								colorRedBold.Println("|")
-								warning = true
-
-							}
 						}
-
-						colorRedBold.Println("|")
-						colorRedBold.Println("| Rule : ", value.Name)
-						colorRedBold.Println("| Target Environment : ", value.Environment)
-						colorRedBold.Println("| Suggested Solution : ", value.Solution)
-						colorRedBold.Println("|")
-						fmt.Println("| ")
-
 					}
+
+					colorRedBold.Println("|")
+					colorRedBold.Println("| Rule : ", value.Name)
+					colorRedBold.Println("| Target Environment : ", value.Environment)
+					colorRedBold.Println("| Suggested Solution : ", value.Solution)
+					colorRedBold.Println("|")
+					fmt.Println("| ")
+
 				}
 
 			case "collect":
