@@ -177,14 +177,13 @@ var auditCmd = &cobra.Command{
 							warning = true
 
 						}
+						colorRedBold.Println("|")
+						colorRedBold.Println("| Rule : ", value.Name)
+						colorRedBold.Println("| Target Environment : ", value.Environment)
+						colorRedBold.Println("| Suggested Solution : ", value.Solution)
+						colorRedBold.Println("|")
+						fmt.Println("| ")
 					}
-
-					colorRedBold.Println("|")
-					colorRedBold.Println("| Rule : ", value.Name)
-					colorRedBold.Println("| Target Environment : ", value.Environment)
-					colorRedBold.Println("| Suggested Solution : ", value.Solution)
-					colorRedBold.Println("|")
-					fmt.Println("| ")
 
 				}
 

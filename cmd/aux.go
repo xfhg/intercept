@@ -2,6 +2,8 @@ package cmd
 
 import (
 	"fmt"
+	"io"
+	"net/http"
 	"os"
 )
 
@@ -31,5 +33,24 @@ func PrintClose() {
 	fmt.Println("| INTERCEPT")
 	fmt.Println("└")
 	fmt.Println("")
+
+}
+
+// ReaderFromURL grabs de config from URL
+func ReaderFromURL(path string) (io.ReadCloser, error) {
+	res, err := http.Get(path)
+	if err != nil {
+		return nil, err
+	}
+	if res.StatusCode >= 200 && res.StatusCode <= 299 {
+		return res.Body, nil
+	}
+
+	fmt.Println("|")
+	fmt.Println("| Could not download config file")
+	fmt.Println("└")
+	os.Exit(0)
+
+	return nil, err
 
 }
