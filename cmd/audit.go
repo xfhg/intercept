@@ -66,6 +66,10 @@ var auditCmd = &cobra.Command{
 
 		rules = loadUpRules()
 
+		if cfgEnv == "" {
+			cfgEnv = "先锋"
+		}
+
 		rgbin := ""
 		switch runtime.GOOS {
 		case "windows":
@@ -156,9 +160,6 @@ var auditCmd = &cobra.Command{
 						}
 					} else {
 
-						//if matches environment and is fatal
-						//if environment is all and is fatal
-						//if environment is empty and is fatal
 						if (strings.Contains(value.Environment, cfgEnv) ||
 							strings.Contains(value.Environment, "all") ||
 							value.Environment == "") && value.Fatal {
