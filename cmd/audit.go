@@ -48,7 +48,7 @@ var (
 	colorYellowBold = color.New(color.Yellow, color.OpBold)
 )
 
-func getRuleStruct() *allRules {
+func loadUpRules() *allRules {
 
 	err := viper.Unmarshal(&rules)
 	if err != nil {
@@ -58,23 +58,13 @@ func getRuleStruct() *allRules {
 
 }
 
-// ContainsInt
-func containsInt(s []int, e int) bool {
-	for _, a := range s {
-		if a == e {
-			return true
-		}
-	}
-	return false
-}
-
 var auditCmd = &cobra.Command{
 	Use:   "audit",
 	Short: "INTERCEPT / AUDIT - Scan a target path against configured policy rules and exceptions",
 	Long:  ``,
 	Run: func(cmd *cobra.Command, args []string) {
 
-		rules = getRuleStruct()
+		rules = loadUpRules()
 
 		rgbin := ""
 		switch runtime.GOOS {
@@ -86,6 +76,14 @@ var auditCmd = &cobra.Command{
 			rgbin = "rg/rgl"
 		default:
 			colorRedBold.Println("| OS not supported")
+			PrintClose()
+			os.Exit(1)
+		}
+
+		if !FileExists(rgbin) {
+			colorRedBold.Println("| RG not found")
+			colorRedBold.Println("| Run the command - intercept system - ")
+			PrintClose()
 			os.Exit(1)
 		}
 
@@ -93,8 +91,7 @@ var auditCmd = &cobra.Command{
 		fmt.Println("| Scan Path : ", scanPath)
 
 		if auditNox {
-			fmt.Println("| Exceptions Disabled ")
-			fmt.Println("| All Policies Activated ")
+			fmt.Println("| Exceptions Disabled - All Policies Activated")
 		}
 
 		pwddir, _ := os.Getwd()
@@ -111,10 +108,8 @@ var auditCmd = &cobra.Command{
 		fmt.Println("| ")
 		if len(rules.Rules) < 1 {
 			fmt.Println("| No Policy rules detected")
-			fmt.Println("|")
-			fmt.Println("| INTERCEPT")
-			fmt.Println("└")
-			fmt.Println("")
+			fmt.Println("| Run the command - intercept config - to setup policies")
+			PrintClose()
 			os.Exit(0)
 		}
 
@@ -135,7 +130,7 @@ var auditCmd = &cobra.Command{
 				fmt.Println("| Rule description : ", value.Description)
 				fmt.Println("| ")
 
-				exception := containsInt(rules.RulesDeactivated, value.ID)
+				exception := ContainsInt(rules.RulesDeactivated, value.ID)
 
 				if exception && !auditNox && !value.Enforcement {
 
@@ -147,10 +142,8 @@ var auditCmd = &cobra.Command{
 
 					codePatternScan := []string{"--pcre2", "-p", "-i", "-C2", "-U", "-f", searchPatternFile, scanPath}
 					xcmd := exec.Command(rgbin, codePatternScan...)
-
 					xcmd.Stdout = os.Stdout
 					xcmd.Stderr = os.Stderr
-
 					errr := xcmd.Run()
 
 					if errr != nil {
@@ -166,6 +159,7 @@ var auditCmd = &cobra.Command{
 						if strings.Contains(value.Environment, cfgEnv) ||
 							strings.Contains(value.Environment, "all") ||
 							value.Environment == "" {
+
 							if value.Fatal {
 
 								colorRedBold.Println("|")
@@ -174,11 +168,7 @@ var auditCmd = &cobra.Command{
 								colorRedBold.Println("|")
 								fatal = true
 
-							}
-						} else {
-
-							if value.Environment != cfgEnv &&
-								value.Environment != "" {
+							} else {
 
 								colorRedBold.Println("|")
 								colorRedBold.Println("|")
@@ -210,7 +200,6 @@ var auditCmd = &cobra.Command{
 
 				codePatternCollect := []string{"--pcre2", "--no-heading", "-i", "-o", "-U", "-f", searchPatternFile, scanPath}
 				xcmd := exec.Command(rgbin, codePatternCollect...)
-
 				xcmd.Stdout = os.Stdout
 				xcmd.Stderr = os.Stderr
 				err := xcmd.Run()
@@ -242,11 +231,9 @@ var auditCmd = &cobra.Command{
 		if fatal {
 
 			colorRedBold.Println("| ", rules.ExitCritical)
-			fmt.Println("|")
-			fmt.Println("| INTERCEPT")
-			fmt.Println("└")
-			fmt.Println("")
+			PrintClose()
 			colorRedBold.Println("► break signal ")
+			fmt.Println("")
 			os.Exit(1)
 		}
 
@@ -260,10 +247,7 @@ var auditCmd = &cobra.Command{
 
 		}
 
-		fmt.Println("|")
-		fmt.Println("| INTERCEPT")
-		fmt.Println("└")
-		fmt.Println("")
+		PrintClose()
 	},
 }
 
