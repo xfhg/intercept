@@ -70,7 +70,7 @@ var configCmd = &cobra.Command{
 
 		}
 
-		if FileExists(defaultCfgFile) {
+		if FileExists(defaultCfgFile) && (fromFile || fromURL) {
 			// merge
 			var master map[string]interface{}
 			bs, err := ioutil.ReadFile(defaultCfgFile)

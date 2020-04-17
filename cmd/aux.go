@@ -42,5 +42,15 @@ func ReaderFromURL(path string) (io.ReadCloser, error) {
 	if err != nil {
 		return nil, err
 	}
-	return res.Body, nil
+	if res.StatusCode >= 200 && res.StatusCode <= 299 {
+		return res.Body, nil
+	}
+
+	fmt.Println("|")
+	fmt.Println("| Could not download config file")
+	fmt.Println("└")
+	os.Exit(0)
+
+	return nil, err
+
 }
