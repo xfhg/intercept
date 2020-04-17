@@ -46,6 +46,4 @@ jobs:
             Release ${{ github.ref }}
           gzip: folders
           files: >
-            output/i-ripgrep-linux.zip
-            output/i-ripgrep-macos.zip
-            output/i-ripgrep-win.zip
+            output/
