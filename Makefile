@@ -36,6 +36,7 @@ purge:
 	rm -f release/interceptm
 	rm -f release/intercept.exe
 	rm -f release/v*
+	rm -f release/_*
 	rm -f release/config*
 	rm -f intercept-*.zip
 
