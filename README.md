@@ -10,6 +10,7 @@ Stupidly easy to use, small footprint **Policy as Code** subsecond command-line 
 
 ![GitHub release (latest by date)](https://img.shields.io/github/v/release/xfhg/intercept)
 ![GitHub Release Date](https://img.shields.io/github/release-date/xfhg/intercept)
+![Go](https://github.com/xfhg/intercept/workflows/Go/badge.svg?branch=master)
 ![GitHub last commit](https://img.shields.io/github/last-commit/xfhg/intercept)
 ![GitHub commits since latest release (by date)](https://img.shields.io/github/commits-since/xfhg/intercept/latest)
 
