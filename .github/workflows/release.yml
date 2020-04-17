@@ -36,14 +36,23 @@ jobs:
       - name: Make buildpack
         run: make build-package
 
+      - name: Get the version
+        id: get_version
+        run: echo ::set-output name=VERSION::${GITHUB_REF/refs\/tags\//}
+
       - name: Upload All artifacts
         uses: meeDamian/github-release@2.0
         with:
           draft: "true"
           token: ${{ secrets.GITHUB_TOKEN }}
-          name: Release ${{ github.ref }}
+          name: Release ${{ steps.get_version.outputs.VERSION }}
           body: >
-            Release ${{ github.ref }}
-          gzip: folders
+            Release ${{ steps.get_version.outputs.VERSION }}
+          gzip: "false"
           files: >
-            output/
+            output/i-*.zip
+            output/intercept-rg-*.zip
+            output/raw-intercept-i-*.zip
+            output/x-*.zip
+            output/i-*.zip
+            setup-buildpack.zip
