@@ -31,7 +31,8 @@ func PrintClose() {
 
 	fmt.Println("|")
 	fmt.Println("|")
-	fmt.Println("| INTERCEPT", buildVersion)
+	fmt.Println("| INTERCEPT")
+	fmt.Println("|", buildVersion)
 	fmt.Println("└")
 	fmt.Println("")
 

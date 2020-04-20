@@ -10,6 +10,7 @@ all: purge-output windows linux macos out-full out-linux out-macos out-win ripgr
 
 version:
 	touch release/$(TAG)_$(VERSION)-$(MOMENT)
+	echo $(TAG) > output/_version
 
 mod:
 	go mod tidy
@@ -42,6 +43,7 @@ purge:
 
 purge-output:
 	rm -f output/*.zip
+	rm -f output/_*
 
 purge-ripgrep:
 	rm -f output/i-*.zip
@@ -108,30 +110,31 @@ setup-dev:
 	rm setup-buildpack.zip
 
 test-macos:
-	curl -S -O -J -L https://github.com/ovh/venom/releases/download/$(VENOM)/venom.darwin-amd64
+	curl -S -O -J -L https://github.com/ovh/venom/releases/latest/download/venom.darwin-amd64
 	mv venom.darwin-amd64 venom
 	chmod +x venom
 	./venom run tests/suite.yml
 	rm venom
 
 test-linux:
-	curl -S -O -J -L https://github.com/ovh/venom/releases/download/$(VENOM)/venom.linux-amd64
+	curl -S -O -J -L https://github.com/ovh/venom/releases/latest/download/venom.linux-amd64
 	mv venom.linux-amd64 venom
 	chmod +x venom
 	./venom run tests/suite.yml
 	rm venom
 
 test-win:
-	curl -S -O -J -L https://github.com/ovh/venom/releases/download/$(VENOM)/venom.windows-amd64
+	curl -S -O -J -L https://github.com/ovh/venom/releases/latest/download/venom.windows-amd64
 	mv venom.windows-amd64 venom.exe
 	chmod +x venom.exe
 	./venom.exe run tests/suite.yml
 	rm venom.exe
 
-dev-macos: clean purge macos
+dev-macos: clean purge macos dev-test
 	cp bin/interceptm release/interceptm
 	cp .ignore release/.ignore
 	go install
 
 dev-test:
 	./tests/venom run tests/suite.yml
+
