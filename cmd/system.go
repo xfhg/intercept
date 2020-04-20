@@ -18,8 +18,6 @@ var systemCmd = &cobra.Command{
 	Long:  ``,
 	Run: func(cmd *cobra.Command, args []string) {
 
-		// FEATURE FLAG OFF
-
 		if systemSetup {
 
 			fmt.Println("|")
@@ -77,10 +75,25 @@ var systemCmd = &cobra.Command{
 
 			spinner.Stop()
 
-		} else {
+		}
+
+		if systemVersion {
+
+			// FEATURE FLAG OFF
+
+			latestVersion := ""
 
 			fmt.Println("|")
-			fmt.Println("| To setup the core system add --setup to this command")
+			fmt.Println("| Latest version : ", latestVersion)
+			fmt.Println("| ")
+
+		}
+
+		if !systemSetup && !systemVersion {
+
+			fmt.Println("|")
+			fmt.Println("| To setup/update the core system add --setup to this command")
+			fmt.Println("| To check for intercept updates add --version to this command")
 			fmt.Println("|")
 
 		}
@@ -93,6 +106,7 @@ var systemCmd = &cobra.Command{
 func init() {
 
 	systemCmd.PersistentFlags().BoolP("setup", "s", false, "Setup core tools")
+	systemCmd.PersistentFlags().BoolP("version", "v", false, "validate system Version")
 
 	rootCmd.AddCommand(systemCmd)
 

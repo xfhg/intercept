@@ -16,9 +16,11 @@ var cfgEnv string
 
 // subcommand flags
 var (
-	configReset bool
-	auditNox    bool
-	systemSetup bool
+	configReset   bool
+	auditNox      bool
+	systemSetup   bool
+	systemVersion bool
+	buildVersion  string
 )
 
 var rootCmd = &cobra.Command{
@@ -76,6 +78,7 @@ func initConfig() {
 	configReset = configCmdisReset()
 	auditNox = auditCmdisNoExceptions()
 	systemSetup = systemCmdisSetup()
+	systemVersion = systemCmdisVersion()
 
 }
 
@@ -83,6 +86,11 @@ func systemCmdisSetup() bool {
 
 	setup, _ := systemCmd.PersistentFlags().GetBool("setup")
 	return setup
+}
+func systemCmdisVersion() bool {
+
+	version, _ := systemCmd.PersistentFlags().GetBool("version")
+	return version
 }
 
 func configCmdisReset() bool {

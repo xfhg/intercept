@@ -30,7 +30,8 @@ func ContainsInt(s []int, e int) bool {
 func PrintClose() {
 
 	fmt.Println("|")
-	fmt.Println("| INTERCEPT")
+	fmt.Println("|")
+	fmt.Println("| INTERCEPT", buildVersion)
 	fmt.Println("└")
 	fmt.Println("")
 
