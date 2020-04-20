@@ -481,7 +481,7 @@ from Sonatype OSS Index
 
 - [ ] Add [hadolint](https://github.com/hadolint/hadolint), a smarter Dockerfile linter that helps you build best practice Docker images (optional, not core feature)
 
-- [ ] Add system check and download of auxiliary tools (ripgrep and shellcheck)
+- [x] Add system check and download of latest core tools
 
 - [ ] Configurable output types for data collection and overall report
 
