@@ -1,19 +1,27 @@
 name: Global Test Report
 testcases:
-  - name: Running with no subcommend should exit 0
+  - name: Running intercept with no subcommend should exit 0
     steps:
       - assertions:
           - result.code ShouldEqual 0
         script: intercept
 
-  - name: Running with subcommend should exit 0
+  - name: Running intercept system should exit 0
     steps:
       - assertions:
           - result.code ShouldEqual 0
         script: intercept system
 
+  - name: Running intercept config should exit 0
+    steps:
       - assertions:
           - result.code ShouldEqual 0
         script: intercept config
+
+  - name: Running intercept audit should exit 1
+    steps:
+      - assertions:
+          - result.code ShouldEqual 1
+        script: intercept audit
 
 vars: {}

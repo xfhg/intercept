@@ -33,12 +33,11 @@ var configCmd = &cobra.Command{
 		if configReset {
 			if FileExists(defaultCfgFile) {
 				_ = os.Remove(defaultCfgFile)
-				fmt.Println("|")
-				fmt.Println("| Config clear")
-			} else {
-				fmt.Println("|")
-				fmt.Println("| Config clear")
+
 			}
+			fmt.Println("|")
+			fmt.Println("| Config clear")
+
 		}
 
 		if strings.HasPrefix(addCfgFile, "http://") || strings.HasPrefix(addCfgFile, "https://") {

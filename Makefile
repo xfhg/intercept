@@ -72,13 +72,13 @@ ripgrep-full:
 	zip -9 -T -x "*.DS_Store*" "*intercept*" -r output/intercept-ripgrep.zip release/
 
 ripgrep-win:
-	zip -9 -T -x "*.DS_Store*" "*intercept*" "*rgl*" "*rgm*" -r output/i-ripgrep-win.zip release/
+	zip -9 -T -x "*.DS_Store*" "*intercept*" "*rgl*" "*rgm*" -r output/i-ripgrep-win.zip release/rg/
 
 ripgrep-macos:
-	zip -9 -T -x "*.DS_Store*" "*intercept*" "*rgl*" "*.exe" -r output/i-ripgrep-macos.zip release/
+	zip -9 -T -x "*.DS_Store*" "*intercept*" "*rgl*" "*.exe" -r output/i-ripgrep-macos.zip release/rg/
 
 ripgrep-linux:
-	zip -9 -T -x "*.DS_Store*" "*intercept*" "*.exe" "*rgm*" -r output/i-ripgrep-linux.zip release/
+	zip -9 -T -x "*.DS_Store*" "*intercept*" "*.exe" "*rgm*" -r output/i-ripgrep-linux.zip release/rg/
 
 
 ripgrep: purge-ripgrep ripgrep-win ripgrep-linux ripgrep-macos
@@ -128,9 +128,10 @@ test-win:
 	./venom.exe run tests/suite.yml
 	rm venom.exe
 
-dev-macos: clean purge macos
+dev-macos: clean purge macos 
 	cp bin/interceptm release/interceptm
 	cp .ignore release/.ignore
 	go install
-	./tests/venom run tests/suite.yml
 
+dev-test:
+	./tests/venom run tests/suite.yml
