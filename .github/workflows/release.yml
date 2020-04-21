@@ -32,6 +32,9 @@ jobs:
               dep ensure
           fi
 
+      - name: Get the compressor
+        run: sudo apt-get update -y ; sudo apt-get install -y upx
+
       - name: Prepare for dev
         run: make setup-dev
 

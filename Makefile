@@ -4,6 +4,7 @@ VERSION=$(shell git rev-parse --short HEAD)
 RANDOM=$(shell awk 'BEGIN{srand();printf("%d", 65536*rand())}')
 TAG=$(shell git describe --abbrev=0)
 
+
 all: purge-output windows linux macos out-full out-linux out-macos out-win ripgrep intercept build-package
 
 version:
@@ -49,7 +50,7 @@ purge-output:
 purge-ripgrep:
 	rm -f output/i-*.zip
 
-out-full: purge version
+out-full: purge version compress-bin
 	cp bin/interceptl release/interceptl
 	cp bin/interceptm release/interceptm
 	cp bin/intercept.exe release/intercept.exe
@@ -135,8 +136,15 @@ test-win:
 dev-macos: clean purge macos dev-test
 	cp bin/interceptm release/interceptm
 	cp .ignore release/.ignore
+	release/interceptm
 	go install
+
 
 dev-test:
 	./tests/venom run tests/suite.yml
+
+compress-bin:
+	upx -9 bin/interceptl
+	upx -9 bin/interceptm
+	upx -9 bin/intercept.exe
 

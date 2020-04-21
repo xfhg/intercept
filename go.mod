@@ -17,7 +17,7 @@ require (
 	github.com/spf13/viper v1.6.3
 	github.com/stretchr/testify v1.5.1 // indirect
 	github.com/theckman/yacspin v0.8.0
-	golang.org/x/sys v0.0.0-20200413165638-669c56c373c4 // indirect
+	golang.org/x/sys v0.0.0-20200420163511-1957bb5e6d1f // indirect
 	gopkg.in/gookit/color.v1 v1.1.6
 	gopkg.in/ini.v1 v1.55.0 // indirect
 	gopkg.in/yaml.v2 v2.2.8

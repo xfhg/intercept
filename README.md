@@ -89,7 +89,7 @@ Download the standard package for your platform to get started
 
 <br>
 
-## Step by Step
+## Step by Step (with standard package)
 
 <details>
 <summary><b>CLICK HERE FOR DETAILED INSTRUCTIONS</b></summary>
@@ -176,6 +176,12 @@ ExitClean: "Clean report"
 ```
 
 Where Exit Critical represents exit code of 1 when a fatal policy is breached.
+
+## VALIDATION STEP : VALIDATE YOU HAVE THE RIGHT TOOLS SETUP
+
+```
+intercept system --setup
+```
 
 ## 2. Add the config file to intercept
 
