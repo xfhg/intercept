@@ -4,8 +4,6 @@ VERSION=$(shell git rev-parse --short HEAD)
 RANDOM=$(shell awk 'BEGIN{srand();printf("%d", 65536*rand())}')
 TAG=$(shell git describe --abbrev=0)
 
-VENOM=v0.27.0
-
 all: purge-output windows linux macos out-full out-linux out-macos out-win ripgrep intercept build-package
 
 version:
@@ -53,35 +51,34 @@ out-full: purge version
 	cp bin/interceptm release/interceptm
 	cp bin/intercept.exe release/intercept.exe
 	cp .ignore release/.ignore
-	zip -9 -T -x "*.DS_Store*" -r output/x-intercept.zip release/
+	cd release/ ; zip -9 -T -x "*.DS_Store*" -r ../output/x-intercept.zip *
 
 out-linux: clean purge version linux
 	cp bin/interceptl release/interceptl
 	cp .ignore release/.ignore
-	zip -9 -T -x "*.DS_Store*" "*.exe" "*rgm*" "*interceptm*" -r output/intercept-rg-linux.zip release/
+	cd release/ ; zip -9 -T -x "*.DS_Store*" "*.exe" "*rgm*" "*interceptm*" -r ../output/intercept-rg-linux.zip *
 
 out-macos: clean purge version macos
 	cp bin/interceptm release/interceptm
 	cp .ignore release/.ignore
-	zip -9 -T -x "*.DS_Store*" "*.exe" "*rgl*" "*interceptl*" -r output/intercept-rg-macos.zip release/
+	cd release/ ; zip -9 -T -x "*.DS_Store*" "*.exe" "*rgl*" "*interceptl*" -r ../output/intercept-rg-macos.zip *
 
 out-win: clean purge version windows
 	cp bin/intercept.exe release/intercept.exe
 	cp .ignore release/.ignore
-	zip -9 -T -x "*.DS_Store*" "*interceptm*" "*rgl*" "*rgm*" "*interceptl*" -r output/intercept-rg-win.zip release/
+	cd release/ ; zip -9 -T -x "*.DS_Store*" "*interceptm*" "*rgl*" "*rgm*" "*interceptl*" -r ../output/intercept-rg-win.zip *
 
 ripgrep-full:
-	zip -9 -T -x "*.DS_Store*" "*intercept*" -r output/intercept-ripgrep.zip release/rg/
+	cd release/ ; zip -9 -T -x "*.DS_Store*" "*intercept*" -r ../output/intercept-ripgrep.zip rg/
 
 ripgrep-win:
-	zip -9 -T -x "*.DS_Store*" "*intercept*" "*rgl*" "*rgm*" -r output/i-ripgrep-win.zip release/rg/
+	cd release/ ; zip -9 -T -x "*.DS_Store*" "*intercept*" "*rgl*" "*rgm*" -r ../output/i-ripgrep-win.zip rg/
 
 ripgrep-macos:
-	zip -9 -T -x "*.DS_Store*" "*intercept*" "*rgl*" "*.exe" -r output/i-ripgrep-macos.zip release/rg/
+	cd release/ ; zip -9 -T -x "*.DS_Store*" "*intercept*" "*rgl*" "*.exe" -r ../output/i-ripgrep-macos.zip rg/
 
 ripgrep-linux:
-	zip -9 -T -x "*.DS_Store*" "*intercept*" "*.exe" "*rgm*" -r output/i-ripgrep-linux.zip release/rg/
-
+	cd release/ ; zip -9 -T -x "*.DS_Store*" "*intercept*" "*.exe" "*rgm*" -r ../output/i-ripgrep-linux.zip rg/
 
 ripgrep: purge-ripgrep ripgrep-win ripgrep-linux ripgrep-macos
 
@@ -89,13 +86,13 @@ add-ignore:
 	cp release/.ignore bin/.ignore
 
 intercept-win: add-ignore
-	zip -9 -T -x "*.DS_Store*" "*interceptl*" "*interceptm*"  -r output/core-intercept-win.zip bin/
+	cd bin/ ; zip -9 -T -x "*.DS_Store*" "*interceptl*" "*interceptm*"  -r ../output/core-intercept-win.zip *
 
 intercept-macos: add-ignore
-	zip -9 -T -x "*.DS_Store*" "*interceptl*" "*intercept.exe*"  -r output/core-intercept-macos.zip bin/
+	cd bin/ ; zip -9 -T -x "*.DS_Store*" "*interceptl*" "*intercept.exe*"  -r ../output/core-intercept-macos.zip *
 
 intercept-linux: add-ignore
-	zip -9 -T -x "*.DS_Store*" "*interceptm*" "*intercept.exe*" -r output/core-intercept-linux.zip bin/
+	cd bin/ ; zip -9 -T -x "*.DS_Store*" "*interceptm*" "*intercept.exe*" -r ../output/core-intercept-linux.zip *
 
 intercept: intercept-win intercept-linux intercept-macos
 
@@ -129,6 +126,8 @@ test-win:
 	chmod +x venom.exe
 	./venom.exe run tests/suite.yml
 	rm venom.exe
+
+# Quick dev tasks
 
 dev-macos: clean purge macos dev-test
 	cp bin/interceptm release/interceptm

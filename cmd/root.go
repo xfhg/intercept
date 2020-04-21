@@ -5,8 +5,6 @@ import (
 	"os"
 
 	"github.com/spf13/cobra"
-
-	homedir "github.com/mitchellh/go-homedir"
 	"github.com/spf13/viper"
 )
 
@@ -53,21 +51,14 @@ func initConfig() {
 	if cfgFile != "" {
 		viper.SetConfigFile(cfgFile)
 	} else {
-		home, err := homedir.Dir()
-		if err != nil {
-			fmt.Println(err)
-			os.Exit(1)
-		}
-
+		home := GetHomeDir()
 		viper.AddConfigPath(home)
 		viper.SetConfigFile("config.yaml")
 	}
 
 	viper.AutomaticEnv()
 
-	fmt.Println("┌")
-	fmt.Println("| INTERCEPT")
-	fmt.Println("|")
+	PrintStart()
 
 	if err := viper.ReadInConfig(); err == nil {
 

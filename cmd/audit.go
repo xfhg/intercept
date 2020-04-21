@@ -6,7 +6,6 @@ import (
 	"log"
 	"os"
 	"os/exec"
-	"runtime"
 	"strings"
 
 	"github.com/spf13/cobra"
@@ -64,32 +63,15 @@ var auditCmd = &cobra.Command{
 	Long:  ``,
 	Run: func(cmd *cobra.Command, args []string) {
 
-		rules = loadUpRules()
-
 		if cfgEnv == "" {
 			cfgEnv = "先锋"
 		}
 
-		rgbin := ""
-		switch runtime.GOOS {
-		case "windows":
-			rgbin = "rg/rg.exe"
-		case "darwin":
-			rgbin = "rg/rgm"
-		case "linux":
-			rgbin = "rg/rgl"
-		default:
-			colorRedBold.Println("| OS not supported")
-			PrintClose()
-			os.Exit(1)
-		}
+		rules = loadUpRules()
 
-		if !FileExists(rgbin) {
-			colorRedBold.Println("| RG not found")
-			colorRedBold.Println("| Run the command - intercept system - ")
-			PrintClose()
-			os.Exit(1)
-		}
+		pwddir := GetWd()
+
+		rgbin := CoreExists()
 
 		fmt.Println("| RG Path : ", rgbin)
 		fmt.Println("| Scan Path : ", scanPath)
@@ -97,8 +79,6 @@ var auditCmd = &cobra.Command{
 		if auditNox {
 			fmt.Println("| Exceptions Disabled - All Policies Activated")
 		}
-
-		pwddir, _ := os.Getwd()
 
 		line := "------------------------------------------------------------"
 

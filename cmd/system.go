@@ -25,6 +25,7 @@ var systemCmd = &cobra.Command{
 			fmt.Println("|")
 
 			core := ""
+			coreDst := GetExecutablePath()
 
 			switch runtime.GOOS {
 			case "windows":
@@ -59,7 +60,7 @@ var systemCmd = &cobra.Command{
 
 			client := &getter.Client{
 				Ctx:  context.Background(),
-				Dst:  "./",
+				Dst:  coreDst,
 				Dir:  true,
 				Src:  core,
 				Mode: getter.ClientModeDir,
@@ -82,6 +83,13 @@ var systemCmd = &cobra.Command{
 			// FEATURE FLAG OFF
 
 			latestVersion := ""
+			exxecutablePath := GetExecutablePath()
+
+			fmt.Println(exxecutablePath)
+
+			workingPath := GetWd()
+
+			fmt.Println(workingPath)
 
 			fmt.Println("|")
 			fmt.Println("| Latest version : ", latestVersion)
