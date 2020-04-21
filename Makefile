@@ -10,6 +10,9 @@ version:
 	touch release/$(TAG)_$(VERSION)-$(MOMENT)
 	echo $(TAG) > output/_version
 
+global: windows linux macos
+	go install
+
 mod:
 	go mod tidy
 	go mod verify

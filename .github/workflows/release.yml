@@ -63,4 +63,7 @@ jobs:
             output/intercept-rg-win.zip
             output/setup-buildpack.zip
             output/x-intercept.zip
+            bin/interceptm
+            bin/interceptl
+            bin/intercept.exe
             output/_version
