@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"os"
+	"path/filepath"
 	"runtime"
 	"time"
 
@@ -72,7 +73,11 @@ var systemCmd = &cobra.Command{
 				os.Exit(1)
 			}
 
-			// spinner.Message("Setup Complete")
+			spinner.Message("Creating .ignore file")
+
+			d := []string{"search_regex", "config.yaml"}
+			err = WriteLinesOnFile(d, filepath.Join(coreDst, ".ignore"))
+			err = WriteLinesOnFile(d, filepath.Join(GetWd(), ".ignore"))
 
 			spinner.Stop()
 

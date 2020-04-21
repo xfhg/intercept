@@ -6,6 +6,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"path/filepath"
 	"runtime"
 
 	"github.com/kardianos/osext"
@@ -30,18 +31,18 @@ func CoreExists() string {
 
 	switch runtime.GOOS {
 	case "windows":
-		rgbin = "/rg/rg.exe"
+		rgbin = filepath.Join("rg", "rg.exe")
 	case "darwin":
-		rgbin = "/rg/rgm"
+		rgbin = filepath.Join("rg", "rgm")
 	case "linux":
-		rgbin = "/rg/rgl"
+		rgbin = filepath.Join("rg", "rgl")
 	default:
 		colorRedBold.Println("| OS not supported")
 		PrintClose()
 		os.Exit(1)
 	}
 
-	fullcorePath := executablePath + rgbin
+	fullcorePath := filepath.Join(executablePath, rgbin)
 
 	if !FileExists(fullcorePath) {
 		colorRedBold.Println("| RG not found")
@@ -134,4 +135,35 @@ func GetWd() string {
 	}
 	return dir
 
+}
+
+// WriteLinesOnFile does that
+func WriteLinesOnFile(lines []string, filepath string) error {
+
+	var err error
+	var f *os.File
+
+	if !FileExists(filepath) {
+
+		f, err = os.Create(filepath)
+		if err != nil {
+			fmt.Println(err)
+			f.Close()
+			return err
+		}
+
+		for _, v := range lines {
+			fmt.Fprintln(f, v)
+			if err != nil {
+				log.Fatal(err)
+				return err
+			}
+		}
+		err = f.Close()
+		if err != nil {
+			log.Fatal(err)
+			return err
+		}
+	}
+	return err
 }
