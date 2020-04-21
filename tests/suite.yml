@@ -18,10 +18,10 @@ testcases:
           - result.code ShouldEqual 0
         script: intercept config
 
-  - name: Running intercept audit should exit 1
+  - name: Running intercept audit should exit 0
     steps:
       - assertions:
-          - result.code ShouldEqual 1
+          - result.code ShouldEqual 0
         script: intercept audit
 
 vars: {}
