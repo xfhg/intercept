@@ -120,13 +120,13 @@ On our example intend to :
 
 - **scan** if private keys are present on infra code (rule id 1)
 
-- we want this policy to be fatal (**fatal:true**) and accept no exceptions (**enforcement:true**)
-- setting **environment: all** guaranteed this policy will be enforced on all environments
+  - we want this policy to be fatal (**fatal:true**) and accept no exceptions (**enforcement:true**)
+  - setting **environment: all** guaranteed this policy will be enforced on all environments
 
 - **scan** if modules are being sourced from its compliant source and not locally or from git (rule id 5)
 
-- we want this policy to be fatal (**fatal:true**) only when the environment is PROD (**environment:prod**)
-- this policy can accept local exceptions (**enforcement:false**)
+  - we want this policy to be fatal (**fatal:true**) only when the environment is PROD (**environment:prod**)
+  - this policy can accept local exceptions (**enforcement:false**)
 
 - **collect** instances of terraform resources detected outside of the module usage
 
@@ -284,12 +284,12 @@ Looks great so far... let's validate that networking resources are not being har
 
 - **scan** if any SUBNET or VPC ids are being hardcoded instead of captured via data lookups (rule 001)
 
-- we want this policy to be fatal (**fatal:true**) immediately on DEV environment (**environment:dev**)
-- accept no exceptions (**enforcement:true**)
+  - we want this policy to be fatal (**fatal:true**) immediately on DEV environment (**environment:dev**)
+  - accept no exceptions (**enforcement:true**)
 
 - **scan** if modules are being set up with suboptimal configuration parameters. (rule 005)
 
-- we just want this policy to be a notice warning with fixing recommendation
+  - we just want this policy to be a notice warning with fixing recommendation
 
 ### Example patterns on file (some text redacted for clarity) :
 
