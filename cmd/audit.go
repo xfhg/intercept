@@ -3,7 +3,6 @@ package cmd
 import (
 	"fmt"
 	"io/ioutil"
-	"log"
 	"os"
 	"os/exec"
 	"strings"
@@ -132,8 +131,7 @@ var auditCmd = &cobra.Command{
 
 					if errr != nil {
 						if xcmd.ProcessState.ExitCode() == 2 {
-							colorRedBold.Println("| Error")
-							log.Fatal(errr)
+							LogError(errr)
 						} else {
 							colorGreenBold.Println("| Clean")
 							fmt.Println("| ")
@@ -184,8 +182,7 @@ var auditCmd = &cobra.Command{
 
 				if err != nil {
 					if xcmd.ProcessState.ExitCode() == 2 {
-						colorRedBold.Println("| Error")
-						log.Fatal(err)
+						LogError(err)
 					} else {
 						colorGreenBold.Println("| Clean")
 						fmt.Println("| ")

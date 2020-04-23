@@ -3,6 +3,7 @@ package cmd
 import (
 	"context"
 	"fmt"
+	"log"
 	"os"
 	"path/filepath"
 	"runtime"
@@ -15,7 +16,7 @@ import (
 
 var systemCmd = &cobra.Command{
 	Use:   "system",
-	Short: "INTERCEPT / SYSTEM - Setup, Check and Update system tools to run AUDIT",
+	Short: "INTERCEPT / SYSTEM - Setup and Update core system tools to run AUDIT",
 	Long:  ``,
 	Run: func(cmd *cobra.Command, args []string) {
 
@@ -53,7 +54,8 @@ var systemCmd = &cobra.Command{
 
 			spinner, err := yacspin.New(cfg)
 			if err != nil {
-				panic(err)
+				colorRedBold.Println("| Error")
+				log.Fatal(err)
 			}
 			spinner.Start()
 

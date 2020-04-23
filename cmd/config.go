@@ -17,7 +17,7 @@ var defaultCfgFile string
 
 var configCmd = &cobra.Command{
 	Use:   "config",
-	Short: "INTERCEPT / CONFIG - Add and merge config files to setup AUDIT",
+	Short: "INTERCEPT / CONFIG - Add and merge policy and config files",
 	Long:  ``,
 
 	Run: func(cmd *cobra.Command, args []string) {
@@ -74,10 +74,10 @@ var configCmd = &cobra.Command{
 			var master map[string]interface{}
 			bs, err := ioutil.ReadFile(defaultCfgFile)
 			if err != nil {
-				panic(err)
+				LogError(err)
 			}
 			if err := yaml.Unmarshal(bs, &master); err != nil {
-				panic(err)
+				LogError(err)
 			}
 
 			var override map[string]interface{}
@@ -87,10 +87,10 @@ var configCmd = &cobra.Command{
 				bs, err = ioutil.ReadFile(addCfgFile)
 			}
 			if err != nil {
-				panic(err)
+				LogError(err)
 			}
 			if err := yaml.Unmarshal(bs, &override); err != nil {
-				panic(err)
+				LogError(err)
 			}
 
 			for k, v := range override {
@@ -99,10 +99,10 @@ var configCmd = &cobra.Command{
 
 			bs, err = yaml.Marshal(master)
 			if err != nil {
-				panic(err)
+				LogError(err)
 			}
 			if err := ioutil.WriteFile("config.yaml", bs, 0644); err != nil {
-				panic(err)
+				LogError(err)
 			}
 
 			fmt.Println("|")
@@ -122,17 +122,17 @@ var configCmd = &cobra.Command{
 			}
 
 			if err != nil {
-				panic(err)
+				LogError(err)
 			}
 			if err := yaml.Unmarshal(nf, &newfile); err != nil {
-				panic(err)
+				LogError(err)
 			}
 			nf, err = yaml.Marshal(newfile)
 			if err != nil {
-				panic(err)
+				LogError(err)
 			}
 			if err := ioutil.WriteFile("config.yaml", nf, 0644); err != nil {
-				panic(err)
+				LogError(err)
 			}
 			fmt.Println("|")
 			fmt.Println("| New Config created")

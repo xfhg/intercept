@@ -15,7 +15,7 @@ import (
 // updateCmd represents the update command
 var updateCmd = &cobra.Command{
 	Use:   "update",
-	Short: "INTERCEPT / UPDATE - Self Update to the latest version",
+	Short: "INTERCEPT / UPDATE - Self Update intercept to the latest version",
 	Long:  ``,
 	Run: func(cmd *cobra.Command, args []string) {
 
@@ -80,9 +80,8 @@ func confirmAndSelfUpdate() {
 	}
 
 	spinner, err := yacspin.New(cfg)
-
 	if err != nil {
-		panic(err)
+		LogError(err)
 	}
 	fmt.Println("|")
 	spinner.Start()
@@ -93,8 +92,6 @@ func confirmAndSelfUpdate() {
 		spinner.StopCharacter("| x")
 		spinner.Message("Could not locate executable path")
 		spinner.Stop()
-		// fmt.Println("|")
-		// fmt.Println("| Could not locate executable path")
 		return
 	}
 	if err := selfupdate.UpdateTo(latest.AssetURL, exe); err != nil {
