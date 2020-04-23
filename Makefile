@@ -65,45 +65,45 @@ out-full: purge version compress-bin
 out-linux: clean purge version linux
 	cp bin/interceptl release/interceptl
 	cp .ignore release/.ignore
-	cd release/ ; zip -9 -T -x "*.DS_Store*" "*.exe" "*rgm*" "*interceptm*" -r ../output/intercept-rg-linux.zip *
+	cd release/ ; zip -9 -T -x "*.DS_Store*" "*.exe" "*rgm*" "*interceptm*" -r ../output/core-intercept-rg-x86_64-linux.zip *
 
 out-macos: clean purge version macos
 	cp bin/interceptm release/interceptm
 	cp .ignore release/.ignore
-	cd release/ ; zip -9 -T -x "*.DS_Store*" "*.exe" "*rgl*" "*interceptl*" -r ../output/intercept-rg-macos.zip *
+	cd release/ ; zip -9 -T -x "*.DS_Store*" "*.exe" "*rgl*" "*interceptl*" -r ../output/core-intercept-rg-x86_64-darwin.zip *
 
 out-win: clean purge version windows
 	cp bin/intercept.exe release/intercept.exe
 	cp .ignore release/.ignore
-	cd release/ ; zip -9 -T -x "*.DS_Store*" "*interceptm*" "*rgl*" "*rgm*" "*interceptl*" -r ../output/intercept-rg-win.zip *
+	cd release/ ; zip -9 -T -x "*.DS_Store*" "*interceptm*" "*rgl*" "*rgm*" "*interceptl*" -r ../output/core-intercept-rg-x86_64-windows.zip *
 
 ripgrep-full:
 	cd release/ ; zip -9 -T -x "*.DS_Store*" "*intercept*" -r ../output/intercept-ripgrep.zip rg/
 
 ripgrep-win:
-	cd release/ ; zip -9 -T -x "*.DS_Store*" "*intercept*" "*rgl*" "*rgm*" -r ../output/i-ripgrep-win.zip rg/
+	cd release/ ; zip -9 -T -x "*.DS_Store*" "*intercept*" "*rgl*" "*rgm*" -r ../output/i-ripgrep-x86_64-windows.zip rg/
 
 ripgrep-macos:
-	cd release/ ; zip -9 -T -x "*.DS_Store*" "*intercept*" "*rgl*" "*.exe" -r ../output/i-ripgrep-macos.zip rg/
+	cd release/ ; zip -9 -T -x "*.DS_Store*" "*intercept*" "*rgl*" "*.exe" -r ../output/i-ripgrep-x86_64-darwin.zip rg/
 
 ripgrep-linux:
-	cd release/ ; zip -9 -T -x "*.DS_Store*" "*intercept*" "*.exe" "*rgm*" -r ../output/i-ripgrep-linux.zip rg/
+	cd release/ ; zip -9 -T -x "*.DS_Store*" "*intercept*" "*.exe" "*rgm*" -r ../output/i-ripgrep-x86_64-linux.zip rg/
 
 ripgrep: purge-ripgrep ripgrep-win ripgrep-linux ripgrep-macos
 
 add-ignore:
 	cp release/.ignore bin/.ignore
 
-intercept-win: add-ignore
-	cd bin/ ; zip -9 -T -x "*.DS_Store*" "*interceptl*" "*interceptm*"  -r ../output/core-intercept-x86_64-win.zip *
+# intercept-win: add-ignore
+# 	cd bin/ ; zip -9 -T -x "*.DS_Store*" "*interceptl*" "*interceptm*"  -r ../output/core-intercept-x86_64-win.zip *
 
-intercept-macos: add-ignore
-	cd bin/ ; zip -9 -T -x "*.DS_Store*" "*interceptl*" "*intercept.exe*"  -r ../output/core-intercept-x86_64-macos.zip *
+# intercept-macos: add-ignore
+# 	cd bin/ ; zip -9 -T -x "*.DS_Store*" "*interceptl*" "*intercept.exe*"  -r ../output/core-intercept-x86_64-macos.zip *
 
-intercept-linux: add-ignore
-	cd bin/ ; zip -9 -T -x "*.DS_Store*" "*interceptm*" "*intercept.exe*" -r ../output/core-intercept-x86_64-linux.zip *
+# intercept-linux: add-ignore
+# 	cd bin/ ; zip -9 -T -x "*.DS_Store*" "*interceptm*" "*intercept.exe*" -r ../output/core-intercept-x86_64-linux.zip *
 
-intercept: intercept-win intercept-linux intercept-macos
+# intercept: intercept-win intercept-linux intercept-macos
 
 build-package:
 	zip -9 -T -x "*.DS_Store*" "*interceptm*" "*intercept.exe*" "*interceptl*" -r output/setup-buildpack.zip release/

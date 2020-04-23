@@ -62,25 +62,17 @@ Uses **ripgrep** to scan a target path for policy breaches recursively against y
 ```sh
 
   # Standard package (intercept + ripgrep) for individual platforms
-    -- intercept-rg-linux.zip
-    -- intercept-rg-macos.zip
-    -- intercept-rg-win.zip
+    -- core-intercept-rg-*.zip
 
-  # Clean package (intercept only) for individual platforms
-    -- core-intercept-linux.zip
-    -- core-intercept-macos.zip
-    -- core-intercept-win.zip
-
-  # Full package (intercept + ripgrep) for all platforms
+  # Cross Platform Full package (intercept + ripgrep)
     -- x-intercept.zip
 
-  # Package needed to fully use the Makefile
+  # Build package to build on all platforms (Development)
     -- setup-buildpack.zip
 
   # Package of the latest compatible release of ripgrep (doesn't include intercept)
-    -- i-ripgrep-linux.zip
-    -- i-ripgrep-macos.zip
-    -- i-ripgrep-win.zip
+    -- i-ripgrep-*.zip
+
 
 ```
 
