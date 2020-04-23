@@ -15,7 +15,7 @@ import (
 // updateCmd represents the update command
 var updateCmd = &cobra.Command{
 	Use:   "update",
-	Short: "",
+	Short: "INTERCEPT / UPDATE - Self Update to the latest version",
 	Long:  ``,
 	Run: func(cmd *cobra.Command, args []string) {
 
@@ -27,6 +27,8 @@ var updateCmd = &cobra.Command{
 
 func init() {
 	rootCmd.AddCommand(updateCmd)
+
+	updateCmd.PersistentFlags().BoolP("auto", "a", false, "Non interactive auto update to latest version")
 
 }
 
@@ -42,7 +44,7 @@ func confirmAndSelfUpdate() {
 		return
 	}
 	if buildVersion != "" {
-		current = buildVersion[1 : len(buildVersion)+1]
+		current = buildVersion[1:len(buildVersion)]
 	} else {
 		current = "0.0.1"
 	}
@@ -62,17 +64,23 @@ func confirmAndSelfUpdate() {
 		StopColors:      []string{"fgGreen"},
 	}
 
-	fmt.Print("| Do you want to update to v", latest.Version, " ? (y/n): ")
-	input, err := bufio.NewReader(os.Stdin).ReadString('\n')
-	if err != nil || (input != "y\n" && input != "n\n") {
-		fmt.Println("| Invalid input")
-		return
-	}
-	if input == "n\n" {
-		return
+	if !updateAuto {
+		fmt.Print("| Do you want to update to v", latest.Version, " ? (y/n): ")
+		input, err := bufio.NewReader(os.Stdin).ReadString('\n')
+		if err != nil || (input != "y\n" && input != "n\n") {
+			fmt.Println("| Invalid input")
+			return
+		}
+		if input == "n\n" {
+			return
+		}
+	} else {
+		fmt.Println("| Automatic Update")
+
 	}
 
 	spinner, err := yacspin.New(cfg)
+
 	if err != nil {
 		panic(err)
 	}
