@@ -30,11 +30,11 @@ var systemCmd = &cobra.Command{
 
 			switch runtime.GOOS {
 			case "windows":
-				core = "https://github.com/xfhg/intercept/releases/latest/download/i-ripgrep-win.zip"
+				core = "https://github.com/xfhg/intercept/releases/latest/download/i-ripgrep-x86_64-windows.zip"
 			case "darwin":
-				core = "https://github.com/xfhg/intercept/releases/latest/download/i-ripgrep-macos.zip"
+				core = "https://github.com/xfhg/intercept/releases/latest/download/i-ripgrep-x86_64-darwin.zip"
 			case "linux":
-				core = "https://github.com/xfhg/intercept/releases/latest/download/i-ripgrep-linux.zip"
+				core = "https://github.com/xfhg/intercept/releases/latest/download/i-ripgrep-x86_64-linux.zip"
 			default:
 				colorRedBold.Println("| OS not supported")
 				PrintClose()
