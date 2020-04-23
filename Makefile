@@ -5,7 +5,7 @@ RANDOM=$(shell awk 'BEGIN{srand();printf("%d", 65536*rand())}')
 TAG=$(shell git describe --abbrev=0)
 
 
-all: purge-output windows linux macos out-full out-linux out-macos out-win ripgrep intercept build-package rename-bin
+all: purge-output windows linux macos out-full out-linux out-macos out-win ripgrep build-package rename-bin
 
 version:
 	touch release/$(TAG)_$(VERSION)-$(MOMENT)
@@ -141,7 +141,6 @@ test-win:
 dev-macos: clean purge macos dev-test
 	cp bin/interceptm release/interceptm
 	cp .ignore release/.ignore
-	release/interceptm
 	go install
 
 
