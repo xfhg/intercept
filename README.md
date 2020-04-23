@@ -165,12 +165,12 @@ Rules:
     environment: all
     fatal: true
     patterns:
-    - \s*(-----BEGIN PRIVATE KEY-----)
-    - \s*(-----BEGIN RSA PRIVATE KEY-----)
-    - \s*(-----BEGIN DSA PRIVATE KEY-----)
-    - \s*(-----BEGIN EC PRIVATE KEY-----)
-    - \s*(-----BEGIN OPENSSH PRIVATE KEY-----)
-    - \s*(-----BEGIN PGP PRIVATE KEY BLOCK-----)
+      - \s*(-----BEGIN PRIVATE KEY-----)
+      - \s*(-----BEGIN RSA PRIVATE KEY-----)
+      - \s*(-----BEGIN DSA PRIVATE KEY-----)
+      - \s*(-----BEGIN EC PRIVATE KEY-----)
+      - \s*(-----BEGIN OPENSSH PRIVATE KEY-----)
+      - \s*(-----BEGIN PGP PRIVATE KEY BLOCK-----)
 
   # Another scan rule
   - name: Compliant module source
@@ -183,15 +183,15 @@ Rules:
     fatal: true
     enforcement: false
     patterns:
-    - source\s*.*\.git"
-    - \s+source\s*=\s*"((?!https\:).)
+      - source\s*.*\.git"
+      - \s+source\s*=\s*"((?!https\:).)
 
   # A different type of policy rule that just collects findings matched with the patterns listed
   - name: Collect sparse TF resources outside of modules.
     description: The following resources were detected outside of compliant module usage
     type: collect
     patterns:
-    - (resource)\s*"(.*)"
+      - (resource)\s*"(.*)"
 
 # These are the messages displayed at the end of the report
 # Clean for no finds
@@ -427,9 +427,9 @@ Rules:
   enforcement: BOOL
 
   patterns:
-  - regex_1
-  - regex_2
-  - regex_3
+    - regex_1
+    - regex_2
+    - regex_3
 
   - name: NAME_TEXT
   description: DESCRIPTION_TEXT
@@ -437,8 +437,8 @@ Rules:
   type: collect
 
   patterns:
-  - regex_4
-  - regex_5
+    - regex_4
+    - regex_5
 ```
 
 #### [policy/policy_exceptions.yaml](https://github.com/xfhg/intercept/tree/master/policy/policy_exceptions.yaml)
