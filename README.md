@@ -131,7 +131,7 @@ On our example intend to :
 - **collect** instances of terraform resources detected outside of the module usage
 
 Take a quick glance of what a policy file with 2 **scan** rules and 1 **collect** rule :
-([examples/policy/simple.yaml](https://github.com/xfhg/intercept/tree/master/examples/policy/simple.yaml))
+([examples/policy/simple.yaml](https://github.com/xfhg/intercept/tree/master/examples/policy/simple.yaml)) (some text redacted for clarity) :
 
 ```yaml
 # This banner is shown on the start of the scanning report, use it to point out important documentation/warnings/contacts
@@ -158,7 +158,7 @@ Rules:
   - name: Private key committed in code
     id: 1
     description: Private key committed to code version control
-    solution: Remove it, rewrite git history and use Vault / AWS Secrets Manager to secure your private keys
+    solution:
     error: This violation immediately blocks your code deployment
     type: scan
     enforcement: true
@@ -175,10 +175,10 @@ Rules:
   # Another scan rule
   - name: Compliant module source
     id: 5
-    description: In non-development environment modules should not be sourced locally nor from git
+    description: Modules should not be sourced locally nor from git
     error: This breach blocks your deployment on production environments
     type: scan
-    solution: "\n\tSource your modules from their latest version on artifactory \n\tMore info at https://XXX"
+    solution:
     environment: prod
     fatal: true
     enforcement: false

@@ -3,7 +3,6 @@ package cmd
 import (
 	"context"
 	"fmt"
-	"log"
 	"os"
 	"path/filepath"
 	"runtime"
@@ -54,12 +53,9 @@ var systemCmd = &cobra.Command{
 
 			spinner, err := yacspin.New(cfg)
 			if err != nil {
-				colorRedBold.Println("| Error")
-				log.Fatal(err)
+				LogError(err)
 			}
 			spinner.Start()
-
-			//spinner.Message("data data")
 
 			client := &getter.Client{
 				Ctx:  context.Background(),
@@ -70,6 +66,10 @@ var systemCmd = &cobra.Command{
 			}
 
 			if err := client.Get(); err != nil {
+				spinner.StopColors("fgRed")
+				spinner.StopCharacter("| x")
+				spinner.Message("Error getting path")
+				spinner.Stop()
 				fmt.Fprintf(os.Stderr, "| Error getting path %s : %v", client.Src, err)
 				PrintClose()
 				os.Exit(1)
