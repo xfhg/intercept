@@ -90,13 +90,13 @@ add-ignore:
 	cp release/.ignore bin/.ignore
 
 intercept-win: add-ignore
-	cd bin/ ; zip -9 -T -x "*.DS_Store*" "*interceptl*" "*interceptm*"  -r ../output/core-intercept-win.zip *
+	cd bin/ ; zip -9 -T -x "*.DS_Store*" "*interceptl*" "*interceptm*"  -r ../output/core-intercept-x86_64-win.zip *
 
 intercept-macos: add-ignore
-	cd bin/ ; zip -9 -T -x "*.DS_Store*" "*interceptl*" "*intercept.exe*"  -r ../output/core-intercept-macos.zip *
+	cd bin/ ; zip -9 -T -x "*.DS_Store*" "*interceptl*" "*intercept.exe*"  -r ../output/core-intercept-x86_64-macos.zip *
 
 intercept-linux: add-ignore
-	cd bin/ ; zip -9 -T -x "*.DS_Store*" "*interceptm*" "*intercept.exe*" -r ../output/core-intercept-linux.zip *
+	cd bin/ ; zip -9 -T -x "*.DS_Store*" "*interceptm*" "*intercept.exe*" -r ../output/core-intercept-x86_64-linux.zip *
 
 intercept: intercept-win intercept-linux intercept-macos
 

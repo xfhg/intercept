@@ -55,9 +55,9 @@ jobs:
             Release ${{ steps.get_version.outputs.VERSION }}
           gzip: "false"
           files: >
-            output/core-intercept-linux.zip
-            output/core-intercept-macos.zip
-            output/core-intercept-win.zip
+            output/core-intercept-x86_64-linux.zip
+            output/core-intercept-x86_64-macos.zip
+            output/core-intercept-x86_64-win.zip
             output/i-ripgrep-linux.zip
             output/i-ripgrep-macos.zip
             output/i-ripgrep-win.zip
