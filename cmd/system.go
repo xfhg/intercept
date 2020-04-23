@@ -83,32 +83,11 @@ var systemCmd = &cobra.Command{
 
 			spinner.Stop()
 
-		}
-
-		if systemVersion {
-
-			// FEATURE FLAG OFF
-
-			latestVersion := ""
-			exxecutablePath := GetExecutablePath()
-
-			fmt.Println(exxecutablePath)
-
-			workingPath := GetWd()
-
-			fmt.Println(workingPath)
+		} else {
 
 			fmt.Println("|")
-			fmt.Println("| Latest version : ", latestVersion)
-			fmt.Println("| ")
-
-		}
-
-		if !systemSetup && !systemVersion {
-
-			fmt.Println("|")
-			fmt.Println("| To setup/update the core system add --setup to this command")
-			fmt.Println("| To check for intercept updates add --version to this command")
+			fmt.Println("| To Setup/update the core system add --setup to this command")
+			fmt.Println("| To Update intercept binary run $ intercept update")
 			fmt.Println("|")
 
 		}
