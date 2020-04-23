@@ -26,7 +26,7 @@ Stupidly easy to use, small footprint **Policy as Code** subsecond command-line 
 - Policy as Code
 - Fine-grained regex policies
 - Multiple enforcement levels
-- Static Analysis, no Daemon
+- Static Analysis, no daemons
 - Low footprint, self-updatable binary
 - Easy to integrate on any CI/CD Pipeline
 - Declarative form policies / reduced complexity
@@ -113,8 +113,10 @@ Now we have our intercept binary ready plus an [examples/](https://github.com/xf
 
 Before we start looking in detail on policy files these are the types of policies available :
 
-- **scan** : where we enforce breaking rules on matched patterns
-- **collect** : where we just collect matched patterns
+```
+- scan : where we enforce breaking rules on matched patterns
+- collect : where we just collect matched patterns
+```
 
 On our example intend to :
 
