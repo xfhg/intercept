@@ -106,7 +106,7 @@ curl -fSL https://github.com/xfhg/intercept/releases/latest/download/intercept-w
 Let's grab some quick examples to scan
 
 ```
-curl -fSL https://github.com/xfhg/intercept/releases/latest/download/_examples.zip
+curl -fSLO https://github.com/xfhg/intercept/releases/latest/download/_examples.zip
 ```
 
 Now we have our intercept binary ready plus an [examples/](https://github.com/xfhg/intercept/tree/master/examples) folder to play around.
