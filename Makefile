@@ -5,7 +5,7 @@ RANDOM=$(shell awk 'BEGIN{srand();printf("%d", 65536*rand())}')
 TAG=$(shell git describe --abbrev=0)
 
 
-all: purge-output windows linux macos out-full out-linux out-macos out-win ripgrep intercept build-package
+all: purge-output windows linux macos out-full out-linux out-macos out-win ripgrep intercept build-package rename-bin
 
 version:
 	touch release/$(TAG)_$(VERSION)-$(MOMENT)
@@ -49,6 +49,11 @@ purge-output:
 
 purge-ripgrep:
 	rm -f output/i-*.zip
+
+rename-bin:
+	mv bin/interceptl bin/intercept-linux_amd64
+	mv bin/interceptm bin/intercept-darwin_amd64
+	mv bin/intercept.exe bin/intercept-windows_amd64.exe
 
 out-full: purge version compress-bin
 	cp bin/interceptl release/interceptl
