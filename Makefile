@@ -94,6 +94,9 @@ ripgrep: purge-ripgrep ripgrep-win ripgrep-linux ripgrep-macos
 add-ignore:
 	cp release/.ignore bin/.ignore
 
+compress-examples:
+	zip -9 -T -x "*.DS_Store*" -r output/_examples.zip examples/
+
 # intercept-win: add-ignore
 # 	cd bin/ ; zip -9 -T -x "*.DS_Store*" "*interceptl*" "*interceptm*"  -r ../output/core-intercept-x86_64-win.zip *
 

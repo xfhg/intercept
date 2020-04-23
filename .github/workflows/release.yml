@@ -67,3 +67,4 @@ jobs:
             bin/intercept-darwin_amd64
             bin/intercept-windows_amd64.exe
             output/_version
+            output/_examples.zip
