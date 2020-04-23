@@ -38,7 +38,7 @@ Policy as code is the idea of writing code to manage and automate policies. By r
 
 ## How it works
 
-- intercept CLI binary
+- **intercept** CLI binary
 - policies YAML file
 
 **Intercept** merges environment flags, policies YAML and optional exceptions YAML to generate a global config.
@@ -73,7 +73,6 @@ It recursively scans a target path for policy breaches against your code and gen
 ## Latest [Release](https://github.com/xfhg/intercept/releases)
 
 ```sh
-
 # Standard package (intercept + ripgrep) for individual platforms
 -- core-intercept-rg-*.zip
 
@@ -85,8 +84,6 @@ It recursively scans a target path for policy breaches against your code and gen
 
 # Package of the latest compatible release of ripgrep (doesn't include intercept)
 -- i-ripgrep-*.zip
-
-
 ```
 
 # Quick Start
@@ -145,56 +142,56 @@ Banner: |
 Rules:
 # This is the main policy block, all rules will be part of this array
 
-# This is a rule structure block
-# Each rule can have one or more patterns (regex)
-# The rule is triggered by any of the patterns listed
-#
-# Essential settings :
+  # This is a rule structure block
+  # Each rule can have one or more patterns (regex)
+  # The rule is triggered by any of the patterns listed
+  #
+  # Essential settings :
 
-# id : ( must be unique )
-# type : ( scan | collect )
-# fatal : ( true | false )
-# enforcement : ( true | false )
-# environment : ( all | anystring)
+  # id : ( must be unique )
+  # type : ( scan | collect )
+  # fatal : ( true | false )
+  # enforcement : ( true | false )
+  # environment : ( all | anystring)
 
-# All other settings are free TEXT to complement your final report
-- name: Private key committed in code
-id: 1
-description: Private key committed to code version control
-solution: Remove it, rewrite git history and use Vault / AWS Secrets Manager to secure your private keys
-error: This violation immediately blocks your code deployment
-type: scan
-enforcement: true
-environment: all
-fatal: true
-patterns:
-- \s*(-----BEGIN PRIVATE KEY-----)
-- \s*(-----BEGIN RSA PRIVATE KEY-----)
-- \s*(-----BEGIN DSA PRIVATE KEY-----)
-- \s*(-----BEGIN EC PRIVATE KEY-----)
-- \s*(-----BEGIN OPENSSH PRIVATE KEY-----)
-- \s*(-----BEGIN PGP PRIVATE KEY BLOCK-----)
+  # All other settings are free TEXT to complement your final report
+  - name: Private key committed in code
+    id: 1
+    description: Private key committed to code version control
+    solution: Remove it, rewrite git history and use Vault / AWS Secrets Manager to secure your private keys
+    error: This violation immediately blocks your code deployment
+    type: scan
+    enforcement: true
+    environment: all
+    fatal: true
+    patterns:
+    - \s*(-----BEGIN PRIVATE KEY-----)
+    - \s*(-----BEGIN RSA PRIVATE KEY-----)
+    - \s*(-----BEGIN DSA PRIVATE KEY-----)
+    - \s*(-----BEGIN EC PRIVATE KEY-----)
+    - \s*(-----BEGIN OPENSSH PRIVATE KEY-----)
+    - \s*(-----BEGIN PGP PRIVATE KEY BLOCK-----)
 
-# Another scan rule
-- name: Compliant module source
-id: 5
-description: In non-development environment modules should not be sourced locally nor from git
-error: This breach blocks your deployment on production environments
-type: scan
-solution: "\n\tSource your modules from their latest version on artifactory \n\tMore info at https://XXX"
-environment: prod
-fatal: true
-enforcement: false
-patterns:
-- source\s*.*\.git"
-- \s+source\s*=\s*"((?!https\:).)
+  # Another scan rule
+  - name: Compliant module source
+    id: 5
+    description: In non-development environment modules should not be sourced locally nor from git
+    error: This breach blocks your deployment on production environments
+    type: scan
+    solution: "\n\tSource your modules from their latest version on artifactory \n\tMore info at https://XXX"
+    environment: prod
+    fatal: true
+    enforcement: false
+    patterns:
+    - source\s*.*\.git"
+    - \s+source\s*=\s*"((?!https\:).)
 
-# A different type of policy rule that just collects findings matched with the patterns listed
-- name: Collect sparse TF resources outside of modules.
-description: The following resources were detected outside of compliant module usage
-type: collect
-patterns:
-- (resource)\s*"(.*)"
+  # A different type of policy rule that just collects findings matched with the patterns listed
+  - name: Collect sparse TF resources outside of modules.
+    description: The following resources were detected outside of compliant module usage
+    type: collect
+    patterns:
+    - (resource)\s*"(.*)"
 
 # These are the messages displayed at the end of the report
 # Clean for no finds
@@ -298,50 +295,50 @@ Looks great so far... let's validate that networking resources are not being har
 
 ```yaml
 - name: Hardcoded ids on code or variables
-id: 7
-description:
-solution:
-error:
-fatal: true
-environment: dev
-enforcement: true
-type: scan
-patterns:
-- (subnet_ids\s*=\s*\[\s*"\$\{v)
-- (subnet_ids\s*=\s*\[\s*"[s])
-- (subnet_ids\s*=\s*=\s*"\$\{v)
-- (subnet_id\s*=\s*"\s*[s])
-- (subnet_id\s*=\s*"\s*\$\{v)
-- (subnets\s*=\s*\[\s*"\$\{v)
-- (subnets\s*=\s*\[\s*"[s])
-- (vpc_zone_identifier\s*=\s*\[\s*"\$\{v)
-- (vpc_zone_identifier\s*=\s*\[\s*"[v])
-- (vpc_zone_identifier\s*=\s*=\s*"\$\{v)
-- (vpc_id\s*=\s*"\s*[v])
-- (vpc_id\s*=\s*"\s*\$\{v)
-- (vpc_security_group_ids\s*=\s*\[\s*"\$\{v)
-- (vpc_security_group_ids\s*=\s*\[\s*"[sg])
-- (security_groups\s*=\s*\[\s*"\$\{v)
-- (security_groups\s*=\s*\[\s*"[sg])
-- ("subnet-)
-- ("sg-)
-- ("vpc-)
+  id: 7
+  description:
+  solution:
+  error:
+  fatal: true
+  environment: dev
+  enforcement: true
+  type: scan
+  patterns:
+    - (subnet_ids\s*=\s*\[\s*"\$\{v)
+    - (subnet_ids\s*=\s*\[\s*"[s])
+    - (subnet_ids\s*=\s*=\s*"\$\{v)
+    - (subnet_id\s*=\s*"\s*[s])
+    - (subnet_id\s*=\s*"\s*\$\{v)
+    - (subnets\s*=\s*\[\s*"\$\{v)
+    - (subnets\s*=\s*\[\s*"[s])
+    - (vpc_zone_identifier\s*=\s*\[\s*"\$\{v)
+    - (vpc_zone_identifier\s*=\s*\[\s*"[v])
+    - (vpc_zone_identifier\s*=\s*=\s*"\$\{v)
+    - (vpc_id\s*=\s*"\s*[v])
+    - (vpc_id\s*=\s*"\s*\$\{v)
+    - (vpc_security_group_ids\s*=\s*\[\s*"\$\{v)
+    - (vpc_security_group_ids\s*=\s*\[\s*"[sg])
+    - (security_groups\s*=\s*\[\s*"\$\{v)
+    - (security_groups\s*=\s*\[\s*"[sg])
+    - ("subnet-)
+    - ("sg-)
+    - ("vpc-)
 
 - name: Sub-optimal parameter on Module/Resource
-id: 8
-description:
-solution:
-environment:
-error:
-type: scan
-fatal: false
-patterns:
-- \s+healthcheck_target\s*=\s*"22"
-- \s+healthcheck_target\s*=\s*"3389"
-- \s+protocol\s*=\s*"-1"
-- \s+from_port\s*=\s*"-1"
-- \s+to_port\s*=\s*"-1"
-- ("0\.0\.0\.0)
+  id: 8
+  description:
+  solution:
+  environment:
+  error:
+  type: scan
+  fatal: false
+  patterns:
+    - \s+healthcheck_target\s*=\s*"22"
+    - \s+healthcheck_target\s*=\s*"3389"
+    - \s+protocol\s*=\s*"-1"
+    - \s+from_port\s*=\s*"-1"
+    - \s+to_port\s*=\s*"-1"
+    - ("0\.0\.0\.0)
 ```
 
 Recompile the config file :
@@ -416,32 +413,32 @@ ExitWarning: WARNING_EXIT_TEXT
 ExitClean: CLEAN_EXIT_TEXT
 
 Rules:
-- id: 1
+  - id: 1
 
-name: NAME_TEXT
-description: DESCRIPTION_TEXT
-solution: SOLUTION_TEXT
-error: ERROR_TEXT
+  name: NAME_TEXT
+  description: DESCRIPTION_TEXT
+  solution: SOLUTION_TEXT
+  error: ERROR_TEXT
 
-type: scan
+  type: scan
 
-fatal: BOOL
-environment: TXT
-enforcement: BOOL
+  fatal: BOOL
+  environment: TXT
+  enforcement: BOOL
 
-patterns:
-- regex_1
-- regex_2
-- regex_3
+  patterns:
+  - regex_1
+  - regex_2
+  - regex_3
 
-- name: NAME_TEXT
-description: DESCRIPTION_TEXT
+  - name: NAME_TEXT
+  description: DESCRIPTION_TEXT
 
-type: collect
+  type: collect
 
-patterns:
-- regex_4
-- regex_5
+  patterns:
+  - regex_4
+  - regex_5
 ```
 
 #### [policy/policy_exceptions.yaml](https://github.com/xfhg/intercept/tree/master/policy/policy_exceptions.yaml)
@@ -458,7 +455,7 @@ ExceptionMessage: TXT_MESSAGE
 
 # Used in production
 
-INTERCEPT was created to lint thousands of infra PRs and deployments a day with minor human intervention, the first MVP been running for a year already with no reported flaws and saving countless hours of human debug time. Keep in mind INTERCEPT is not and does not pretend to be a security tool.
+**INTERCEPT** was created to lint thousands of infra PRs and deployments a day with minor human intervention, the first MVP been running for a year already with no reported flaws and saving countless hours of human debug time. Keep in mind INTERCEPT is not and does not pretend to be a security tool.
 It's easy to circumvent a regex pattern once you know it, but the main objective of this tool is to pro-actively help the developers fix their code and assist with style/rule suggestions to keep the codebase clean and avoid trivial support tickets from the uneducated crowd.
 
 ## Inspired by
@@ -525,7 +522,7 @@ venom run tests/suite.yml
 #### Scanned with [Sonatype Nancy](https://github.com/sonatype-nexus-community/nancy)
 
 ```
-Audited dependencies:41,Vulnerable:0
+Audited dependencies:92,Vulnerable:0
 ```
 
 from Sonatype OSS Index
