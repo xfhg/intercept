@@ -7,9 +7,9 @@ Banner: |
 Rules:
   - name: Private key committed in code
     id: 1
-    description: Private key commited to code version control
-    solution: Remove it, rewrite git history and use Vault / AWS Sectets Manager to secure your private keys
-    error: This breach immediatly blocks your code deployment
+    description: Private key committed to code version control
+    solution: Remove it, rewrite git history and use Vault / AWS Secrets Manager to secure your private keys
+    error: This violation immediately blocks your code deployment
     type: scan
     enforcement: true
     environment: all
