@@ -413,6 +413,9 @@ ExitWarning: WARNING_EXIT_TEXT
 ExitClean: CLEAN_EXIT_TEXT
 
 Rules:
+
+  # SCAN TYPE
+
   - id: 1
 
   name: NAME_TEXT
@@ -430,6 +433,8 @@ Rules:
     - regex_1
     - regex_2
     - regex_3
+
+  # COLLECT TYPE
 
   - name: NAME_TEXT
   description: DESCRIPTION_TEXT
@@ -449,6 +454,38 @@ RulesDeactivated:
   - RULE_ID
 
 ExceptionMessage: TXT_MESSAGE
+```
+
+<br>
+
+# Policy Enforcement Levels
+
+Enforcement levels are a first class concept in allowing pass/fail behavior to be associated separately from the policy logic. This enables any policy to be a warning, allow exceptions, or be absolutely mandatory. These levels can be coupled to environments, different uses of the same policy can have different enforcement levels per environment.
+
+You can set three enforcement levels:
+
+- **Advisory**: The policy is allowed to fail. However, a warning will be shown to the user or logged.
+
+```
+  - fatal: false
+  - enforcement: false
+  - environment : (all | optional)
+```
+
+- **Soft Mandatory**: The policy must pass unless an exception is specified. The purpose of this level is to provide a level of privilege separation for a behavior. Additionally, the exception provides non-repudiation since at least the primary actor was explicitly overriding a failed policy.
+
+```
+  - fatal: true
+  - enforcement: false
+  - environment : (all | optional)
+```
+
+- **Hard Mandatory**: The policy must pass no matter what. The only way to override a hard mandatory policy is to explicitly remove the policy. It should be used in situations where an exception is not possible.
+
+```
+  - fatal: true
+  - enforcement: true
+  - environment : (all | optional)
 ```
 
 <br>
