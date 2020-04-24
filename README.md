@@ -284,12 +284,12 @@ Notice the fatal exception and the exit code 1
 
 Looks great so far... let's validate that networking resources are not being hardcoded and also intercept any module deployment with suboptimal configuration parameters.
 
-- **scan** if any SUBNET or VPC ids are being hardcoded instead of captured via data lookups (rule 001)
+- **scan** if any SUBNET or VPC ids are being hardcoded instead of captured via data lookups (rule id 7)
 
   - we want this policy to be fatal (**fatal:true**) immediately on DEV environment (**environment:dev**)
   - accept no exceptions (**enforcement:true**)
 
-- **scan** if modules are being set up with suboptimal configuration parameters. (rule 005)
+- **scan** if modules are being set up with suboptimal configuration parameters. (rule id 8)
 
   - we just want this policy to be a notice warning with fixing recommendation
 
