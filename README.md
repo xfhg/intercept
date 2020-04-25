@@ -222,7 +222,7 @@ intercept system --setup
 ## 1. Add the config file to intercept
 
 ```sh
-intercept config -a _examples/policy/simple.yaml
+intercept config -a examples/policy/simple.yaml
 
 # you can also download config from remote endpoints
 
@@ -252,11 +252,11 @@ intercept config -r
 This is the simplest call of audit:
 
 ```sh
-intercept audit -t _examples/target/
+intercept audit -t examples/target/
 
 # you can merge the previous step with the audit by calling :
 
-intercept audit -c _examples/policy/simple.yaml -t _examples/target/
+intercept audit -c examples/policy/simple.yaml -t examples/target/
 ```
 
 <br>
@@ -270,7 +270,7 @@ Exiting with just a warning...
 Adding **prod** as environment variable:
 
 ```
-intercept audit -t _examples/target/target/ -e prod
+intercept audit -t examples/target/target/ -e prod
 ```
 
 <br>
@@ -346,13 +346,13 @@ Looks great so far... let's validate that networking resources are not being har
 Recompile the config file :
 
 ```bash
-intercept config -a policy/complex.yaml
+intercept config -a examples/policy/complex.yaml
 ```
 
 Let's pretend to run the audit on DEV environment and check the differences on the report :
 
 ```
-intercept audit -t target/ -e dev
+intercept audit -t examples/target/ -e dev
 ```
 
 Redacted report:
@@ -376,13 +376,13 @@ ExceptionMessage: "THIS RULE CHECK IS DEACTIVATED BY A LOCAL EXCEPTION REQUEST"
 ```
 
 ```sh
-intercept config -a exception/local_exception.yaml
+intercept config -a examples/exception/local_exception.yaml
 ```
 
 Both files are merged and you can run the audit with the new exceptions in place
 
 ```sh
-intercept audit -t target/ -e dev
+intercept audit -t examples/target/ -e dev
 ```
 
 Redacted report:
@@ -398,7 +398,7 @@ As you can notice rule 5 activated the exception but rule 7 just ignore it and r
 By activating the **No Exceptions** flag (-x) all the exceptions will be ignored.
 
 ```
-intercept audit -t target/ -e prod -x
+intercept audit -t examples/target/ -e prod -x
 ```
 
 ## 6. Policy File Explained
