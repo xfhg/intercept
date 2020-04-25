@@ -94,7 +94,13 @@ var configCmd = &cobra.Command{
 			}
 
 			for k, v := range override {
-				master[k] = v
+				if strings.Contains(k, "Rules") {
+					fmt.Println("| Protected from rewriting [Rules]")
+					fmt.Println("| This component is declared once, cannot be merged")
+				} else {
+					master[k] = v
+				}
+
 			}
 
 			bs, err = yaml.Marshal(master)
