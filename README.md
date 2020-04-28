@@ -212,11 +212,10 @@ On the folder [examples/](https://github.com/xfhg/intercept/tree/master/examples
 
 ## Integrity validation step: Before start
 
-The following commands will update your binary and its core tools to the latest version
+The following command will update your binary and its core tools to the latest version
 
 ```
-intercept update --auto
-intercept system --setup
+intercept system --setup --update
 ```
 
 ## 1. Add the config file to intercept

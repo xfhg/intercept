@@ -15,11 +15,13 @@ import (
 
 // FileExists check if file exists
 func FileExists(filename string) bool {
-	info, err := os.Stat(filename)
-	if os.IsNotExist(err) {
+	if _, err := os.Stat(filename); err == nil {
+		return true
+	} else if os.IsNotExist(err) {
 		return false
+	} else {
+		return true
 	}
-	return !info.IsDir()
 }
 
 // CoreExists return path of core binaries on this platform
@@ -37,7 +39,7 @@ func CoreExists() string {
 	case "linux":
 		rgbin = filepath.Join("rg", "rgl")
 	default:
-		colorRedBold.Println("| OS not supported")
+		colorRedBold.Println("│ OS not supported")
 		PrintClose()
 		os.Exit(1)
 	}
@@ -45,8 +47,8 @@ func CoreExists() string {
 	fullcorePath := filepath.Join(executablePath, rgbin)
 
 	if !FileExists(fullcorePath) {
-		colorRedBold.Println("| RG not found")
-		colorRedBold.Println("| Run the command - intercept system - ")
+		colorRedBold.Println("│ RG not found")
+		colorRedBold.Println("│ Run the command - intercept system - ")
 		PrintClose()
 		os.Exit(1)
 	}
@@ -57,8 +59,8 @@ func CoreExists() string {
 // PrintStart prints the command banner
 func PrintStart() {
 	fmt.Println("┌")
-	fmt.Println("| INTERCEPT")
-	fmt.Println("|")
+	fmt.Println("│ INTERCEPT")
+	fmt.Println("│")
 }
 
 // ContainsInt checks for ints
@@ -74,11 +76,11 @@ func ContainsInt(s []int, e int) bool {
 // PrintClose prints the command ending
 func PrintClose() {
 
-	fmt.Println("|")
-	fmt.Println("|")
-	fmt.Println("| INTERCEPT")
+	fmt.Println("│")
+	fmt.Println("│")
+	fmt.Println("│ INTERCEPT")
 	if buildVersion != "" {
-		fmt.Println("|", buildVersion)
+		fmt.Println("│", buildVersion)
 	}
 	fmt.Println("└")
 	fmt.Println("")
@@ -95,8 +97,8 @@ func ReaderFromURL(path string) (io.ReadCloser, error) {
 		return res.Body, nil
 	}
 
-	fmt.Println("|")
-	fmt.Println("| Could not download config file")
+	fmt.Println("│")
+	fmt.Println("│ Could not download config file")
 	fmt.Println("└")
 	os.Exit(0)
 
@@ -170,6 +172,9 @@ func WriteLinesOnFile(lines []string, filepath string) error {
 
 // LogError does that
 func LogError(err error) {
-	colorRedBold.Println("| Error")
+	colorRedBold.Println("│")
+	colorRedBold.Println("│ Error")
+	colorRedBold.Println("│")
+	PrintClose()
 	log.Fatal(err)
 }
