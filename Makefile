@@ -28,7 +28,7 @@ macos: clean
 	CGO_ENABLED=0 GOOS=darwin GOARCH=amd64 go build -ldflags="-s -w -X 'github.com/xfhg/intercept/cmd.buildVersion=$(TAG)'" -mod=readonly -o bin/interceptm
 
 clean: mod
-
+	go clean
 	rm -f bin/interceptl
 	rm -f bin/interceptm
 	rm -f bin/intercept.exe
@@ -139,8 +139,7 @@ test-win:
 	./venom.exe run tests/suite.yml
 	rm venom.exe
 
-# Quick dev tasks
-
+## dev-macos: temp quick dev task
 dev-macos: clean purge macos dev-test
 	cp bin/interceptm release/interceptm
 	cp .ignore release/.ignore
@@ -155,3 +154,7 @@ compress-bin:
 	upx -9 bin/interceptm
 	upx -9 bin/intercept.exe
 
+## help: prints this help message
+help:
+	@echo "Usage: \n"
+	@sed -n 's/^##//p' ${MAKEFILE_LIST} | column -t -s ':' |  sed -e 's/^/ /'

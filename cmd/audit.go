@@ -50,7 +50,7 @@ func loadUpRules() *allRules {
 
 	err := viper.Unmarshal(&rules)
 	if err != nil {
-		colorRedBold.Println("| Unable to decode config struct : ", err)
+		colorRedBold.Println("│ Unable to decode config struct : ", err)
 	}
 	return rules
 
@@ -72,26 +72,26 @@ var auditCmd = &cobra.Command{
 
 		rgbin := CoreExists()
 
-		fmt.Println("| RG Path : ", rgbin)
-		fmt.Println("| Scan Path : ", scanPath)
+		fmt.Println("│ RG Path : ", rgbin)
+		fmt.Println("│ Scan Path : ", scanPath)
 
 		if auditNox {
-			fmt.Println("| Exceptions Disabled - All Policies Activated")
+			fmt.Println("│ Exceptions Disabled - All Policies Activated")
 		}
 
 		line := "------------------------------------------------------------"
 
 		searchPatternFile := strings.Join([]string{pwddir, "/", "search_regex"}, "")
 
-		fmt.Println("| ")
-		fmt.Println("| ")
+		fmt.Println("│ ")
+		fmt.Println("│ ")
 		if rules.Banner != "" {
 			fmt.Println(rules.Banner)
 		}
-		fmt.Println("| ")
+		fmt.Println("│ ")
 		if len(rules.Rules) < 1 {
-			fmt.Println("| No Policy rules detected")
-			fmt.Println("| Run the command - intercept config - to setup policies")
+			fmt.Println("│ No Policy rules detected")
+			fmt.Println("│ Run the command - intercept config - to setup policies")
 			PrintClose()
 			os.Exit(0)
 		}
@@ -105,21 +105,21 @@ var auditCmd = &cobra.Command{
 
 			case "scan":
 
-				fmt.Println("| ")
-				fmt.Println("|", line)
-				fmt.Println("| ")
-				fmt.Println("| Rule #", value.ID)
-				fmt.Println("| Rule name : ", value.Name)
-				fmt.Println("| Rule description : ", value.Description)
-				fmt.Println("| ")
+				fmt.Println("│ ")
+				fmt.Println("│", line)
+				fmt.Println("│ ")
+				fmt.Println("├ Rule #", value.ID)
+				fmt.Println("│ Rule name : ", value.Name)
+				fmt.Println("│ Rule description : ", value.Description)
+				fmt.Println("│ ")
 
 				exception := ContainsInt(rules.RulesDeactivated, value.ID)
 
 				if exception && !auditNox && !value.Enforcement {
 
-					colorRedBold.Println("|")
-					colorRedBold.Println("| ", rules.ExceptionMessage)
-					colorRedBold.Println("|")
+					colorRedBold.Println("│")
+					colorRedBold.Println("│ ", rules.ExceptionMessage)
+					colorRedBold.Println("│")
 
 				} else {
 
@@ -133,46 +133,46 @@ var auditCmd = &cobra.Command{
 						if xcmd.ProcessState.ExitCode() == 2 {
 							LogError(errr)
 						} else {
-							colorGreenBold.Println("| Clean")
-							fmt.Println("| ")
+							colorGreenBold.Println("│ Clean")
+							fmt.Println("│ ")
 						}
 					} else {
 
 						if (strings.Contains(value.Environment, cfgEnv) ||
 							strings.Contains(value.Environment, "all") ||
 							value.Environment == "") && value.Fatal {
-							colorRedBold.Println("|")
-							colorRedBold.Println("| FATAL : ")
-							colorRedBold.Println("| ", value.Error)
-							colorRedBold.Println("|")
+							colorRedBold.Println("│")
+							colorRedBold.Println("│ FATAL : ")
+							colorRedBold.Println("│ ", value.Error)
+							colorRedBold.Println("│")
 							fatal = true
 						} else {
 
-							colorRedBold.Println("|")
-							colorRedBold.Println("|")
-							colorRedBold.Println("| ", value.Error)
-							colorRedBold.Println("|")
+							colorRedBold.Println("│")
+							colorRedBold.Println("│")
+							colorRedBold.Println("│ ", value.Error)
+							colorRedBold.Println("│")
 							warning = true
 
 						}
-						colorRedBold.Println("|")
-						colorRedBold.Println("| Rule : ", value.Name)
-						colorRedBold.Println("| Target Environment : ", value.Environment)
-						colorRedBold.Println("| Suggested Solution : ", value.Solution)
-						colorRedBold.Println("|")
-						fmt.Println("| ")
+						colorRedBold.Println("│")
+						colorRedBold.Println("│ Rule : ", value.Name)
+						colorRedBold.Println("│ Target Environment : ", value.Environment)
+						colorRedBold.Println("│ Suggested Solution : ", value.Solution)
+						colorRedBold.Println("│")
+						fmt.Println("│ ")
 					}
 
 				}
 
 			case "collect":
 
-				fmt.Println("| ")
-				fmt.Println("|", line)
-				fmt.Println("| ")
-				fmt.Println("| Collection : ", value.Name)
-				fmt.Println("| Description : ", value.Description)
-				fmt.Println("| ")
+				fmt.Println("│ ")
+				fmt.Println("│", line)
+				fmt.Println("│ ")
+				fmt.Println("├ Collection : ", value.Name)
+				fmt.Println("│ Description : ", value.Description)
+				fmt.Println("│ ")
 
 				codePatternCollect := []string{"--pcre2", "--no-heading", "-i", "-o", "-U", "-f", searchPatternFile, scanPath}
 				xcmd := exec.Command(rgbin, codePatternCollect...)
@@ -184,11 +184,11 @@ var auditCmd = &cobra.Command{
 					if xcmd.ProcessState.ExitCode() == 2 {
 						LogError(err)
 					} else {
-						colorGreenBold.Println("| Clean")
-						fmt.Println("| ")
+						colorGreenBold.Println("│ Clean")
+						fmt.Println("│ ")
 					}
 				} else {
-					fmt.Println("| ")
+					fmt.Println("│ ")
 				}
 
 			default:
@@ -199,13 +199,13 @@ var auditCmd = &cobra.Command{
 
 		_ = os.Remove(searchPatternFile)
 
-		fmt.Println("|")
-		fmt.Println("|")
-		fmt.Println("|")
+		fmt.Println("│")
+		fmt.Println("│")
+		fmt.Println("│")
 
 		if fatal {
 
-			colorRedBold.Println("| ", rules.ExitCritical)
+			colorRedBold.Println("├ ", rules.ExitCritical)
 			PrintClose()
 			colorRedBold.Println("► break signal ")
 			fmt.Println("")
@@ -214,11 +214,11 @@ var auditCmd = &cobra.Command{
 
 		if warning {
 
-			colorYellowBold.Println("| ", rules.ExitWarning)
+			colorYellowBold.Println("├ ", rules.ExitWarning)
 
 		} else {
 
-			colorGreenBold.Println("| ", rules.ExitClean)
+			colorGreenBold.Println("├ ", rules.ExitClean)
 
 		}
 

@@ -35,8 +35,8 @@ var configCmd = &cobra.Command{
 				_ = os.Remove(defaultCfgFile)
 
 			}
-			fmt.Println("|")
-			fmt.Println("| Config clear")
+			fmt.Println("│")
+			fmt.Println("│ Config clear")
 
 		}
 
@@ -45,27 +45,27 @@ var configCmd = &cobra.Command{
 			downloadedCfgFile, err = ReaderFromURL(addCfgFile)
 
 			if err != nil {
-				colorRedBold.Println("| Error")
+				colorRedBold.Println("│ Error")
 				log.Fatal(err)
 			}
 			defer downloadedCfgFile.Close()
 
 			if err != nil {
-				colorRedBold.Println("| Error")
+				colorRedBold.Println("│ Error")
 				log.Fatal(err)
 			}
 			fromURL = true
 
-			fmt.Println("|")
-			fmt.Println("| Config downloaded")
+			fmt.Println("│")
+			fmt.Println("│ Config downloaded")
 
 		}
 
 		if FileExists(addCfgFile) {
 			fromFile = true
 
-			fmt.Println("|")
-			fmt.Println("| Config read from file")
+			fmt.Println("│")
+			fmt.Println("│ Config read from file")
 
 		}
 
@@ -95,8 +95,8 @@ var configCmd = &cobra.Command{
 
 			for k, v := range override {
 				if strings.Contains(k, "Rules") {
-					fmt.Println("| Protected from rewriting [Rules]")
-					fmt.Println("| This component is declared once, cannot be merged")
+					fmt.Println("│ Protected from rewriting [Rules]")
+					fmt.Println("│ This component is declared once, cannot be merged")
 				} else {
 					master[k] = v
 				}
@@ -111,8 +111,8 @@ var configCmd = &cobra.Command{
 				LogError(err)
 			}
 
-			fmt.Println("|")
-			fmt.Println("| Config Updated")
+			fmt.Println("│")
+			fmt.Println("│ Config Updated")
 			fmt.Println("└")
 
 		} else if fromFile || fromURL {
@@ -140,13 +140,13 @@ var configCmd = &cobra.Command{
 			if err := ioutil.WriteFile("config.yaml", nf, 0644); err != nil {
 				LogError(err)
 			}
-			fmt.Println("|")
-			fmt.Println("| New Config created")
+			fmt.Println("│")
+			fmt.Println("│ New Config created")
 			fmt.Println("└")
 
 		} else {
-			fmt.Println("|")
-			fmt.Println("| No updates detected")
+			fmt.Println("│")
+			fmt.Println("│ No updates detected")
 			fmt.Println("└")
 		}
 
