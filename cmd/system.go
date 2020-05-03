@@ -33,7 +33,7 @@ var systemCmd = &cobra.Command{
 
 		if systemUpdate {
 
-			confirmAndSelfUpdate()
+			selfUpdate()
 
 		}
 
@@ -57,7 +57,7 @@ func init() {
 
 }
 
-func confirmAndSelfUpdate() {
+func selfUpdate() {
 
 	var current string
 
