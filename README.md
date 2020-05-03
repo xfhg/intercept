@@ -317,20 +317,7 @@ Looks great so far... let's validate that networking resources are not being har
     - (subnet_ids\s*=\s*=\s*"\$\{v)
     - (subnet_id\s*=\s*"\s*[s])
     - (subnet_id\s*=\s*"\s*\$\{v)
-    - (subnets\s*=\s*\[\s*"\$\{v)
-    - (subnets\s*=\s*\[\s*"[s])
-    - (vpc_zone_identifier\s*=\s*\[\s*"\$\{v)
-    - (vpc_zone_identifier\s*=\s*\[\s*"[v])
-    - (vpc_zone_identifier\s*=\s*=\s*"\$\{v)
-    - (vpc_id\s*=\s*"\s*[v])
-    - (vpc_id\s*=\s*"\s*\$\{v)
-    - (vpc_security_group_ids\s*=\s*\[\s*"\$\{v)
-    - (vpc_security_group_ids\s*=\s*\[\s*"[sg])
-    - (security_groups\s*=\s*\[\s*"\$\{v)
-    - (security_groups\s*=\s*\[\s*"[sg])
-    - ("subnet-)
-    - ("sg-)
-    - ("vpc-)
+    ...redacted for clarity
 
 - name: Sub-optimal parameter on Module/Resource
   id: 8
@@ -414,44 +401,38 @@ intercept audit -t examples/target/ -e prod -x
 ```yaml
 Banner: |
 
-MULTI LINE TXT
+  MULTI LINE TXT
 
 ExitCritical: CRITICAL_ERROR_EXIT_TEXT
 ExitWarning: WARNING_EXIT_TEXT
 ExitClean: CLEAN_EXIT_TEXT
 
 Rules:
-
   # SCAN TYPE
 
   - id: 1
 
-  name: NAME_TEXT
-  description: DESCRIPTION_TEXT
-  solution: SOLUTION_TEXT
-  error: ERROR_TEXT
-
-  type: scan
-
-  fatal: BOOL
-  environment: TXT
-  enforcement: BOOL
-
-  patterns:
-    - regex_1
-    - regex_2
-    - regex_3
+    name: NAME_TEXT
+    description: DESCRIPTION_TEXT
+    solution: SOLUTION_TEXT
+    error: ERROR_TEXT
+    type: scan
+    fatal: BOOL
+    environment: TXT
+    enforcement: BOOL
+    patterns:
+      - regex_1
+      - regex_2
+      - regex_3
 
   # COLLECT TYPE
 
   - name: NAME_TEXT
-  description: DESCRIPTION_TEXT
-
-  type: collect
-
-  patterns:
-    - regex_4
-    - regex_5
+    description: DESCRIPTION_TEXT
+    type: collect
+    patterns:
+      - regex_4
+      - regex_5
 ```
 
 #### [policy/policy_exceptions.yaml](https://github.com/xfhg/intercept/tree/master/policy/policy_exceptions.yaml)
@@ -520,7 +501,7 @@ It's easy to circumvent a regex pattern once you know it, but the main objective
 
 - Applies ignore patterns in .gitignore files using a RegexSet. That means a single file path can be matched against multiple glob patterns simultaneously.
 
-- It uses a lock-free parallel recursive directory iterator, courtesy of **crossbeam** and **ignore**.
+- It uses a lock-free parallel recursive directory iterator
 
 ### Benchmark ripgrep
 
@@ -580,11 +561,7 @@ from Sonatype OSS Index
 
 - [ ] Configurable output types for data collection and overall report
 
-- [ ] POST results (in JSON or YAML) to a configurable webhook
-
-- [ ] Add [shellcheck](https://github.com/koalaman/shellcheck) to give warnings and suggestions for bash/sh shell scripts (optional, not core feature)
-
-- [ ] Add [hadolint](https://github.com/hadolint/hadolint), a smarter Dockerfile linter that helps you build best practice Docker images (optional, not core feature)
+- [ ] POST results (in JSON or YAML) to a configurable webhook or notification stream
 
 <br>
 
