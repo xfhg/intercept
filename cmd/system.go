@@ -1,7 +1,6 @@
 package cmd
 
 import (
-	"bufio"
 	"context"
 	"fmt"
 	"os"
@@ -18,9 +17,19 @@ import (
 
 var systemCmd = &cobra.Command{
 	Use:   "system",
-	Short: "INTERCEPT / SYSTEM - Setup and Update intercept and its core system tools to run AUDIT",
+	Short: "INTERCEPT / SYSTEM - Setup + Update intercept and its core system tools to run AUDIT",
 	Long:  ``,
 	Run: func(cmd *cobra.Command, args []string) {
+
+		if !systemUpdate && !systemSetup {
+
+			fmt.Println("│")
+			fmt.Println("│ Use : ")
+			fmt.Println("│")
+			fmt.Println("│ --update to download the latest intercept binary ")
+			fmt.Println("│ --setup to download the latest core tools package for your platform")
+
+		}
 
 		if systemUpdate {
 
@@ -32,12 +41,6 @@ var systemCmd = &cobra.Command{
 
 			updateCore()
 
-		} else {
-
-			fmt.Println("│")
-			fmt.Println("│ TEMP ")
-			fmt.Println("│")
-
 		}
 
 		PrintClose()
@@ -48,7 +51,6 @@ var systemCmd = &cobra.Command{
 func init() {
 
 	systemCmd.PersistentFlags().BoolP("setup", "s", false, "Setup core tools")
-	systemCmd.PersistentFlags().BoolP("auto", "a", false, "Non interactive mode")
 	systemCmd.PersistentFlags().BoolP("update", "u", false, "Update to the lastest version")
 
 	rootCmd.AddCommand(systemCmd)
@@ -81,7 +83,7 @@ func confirmAndSelfUpdate() {
 
 	cfg := yacspin.Config{
 		Frequency:       100 * time.Millisecond,
-		CharSet:         yacspin.CharSets[51],
+		CharSet:         yacspin.CharSets[32],
 		Suffix:          " Downloading Update",
 		SuffixAutoColon: true,
 		Message:         latest.Version.String(),
@@ -89,20 +91,7 @@ func confirmAndSelfUpdate() {
 		StopColors:      []string{"fgGreen"},
 	}
 
-	if !systemAuto {
-		fmt.Print("│ Do you want to update to v", latest.Version, " ? (y/n): ")
-		input, err := bufio.NewReader(os.Stdin).ReadString('\n')
-		if err != nil || (input != "y\n" && input != "n\n") {
-			fmt.Println("│ Invalid input")
-			return
-		}
-		if input == "n\n" {
-			return
-		}
-	} else {
-		fmt.Println("│ Automatic Update")
-
-	}
+	fmt.Println("│ Updating to", latest.Version)
 
 	spinner, err := yacspin.New(cfg)
 	if err != nil {
@@ -160,7 +149,7 @@ func updateCore() {
 
 	cfg := yacspin.Config{
 		Frequency:       100 * time.Millisecond,
-		CharSet:         yacspin.CharSets[51],
+		CharSet:         yacspin.CharSets[32],
 		Suffix:          " Downloading Core",
 		SuffixAutoColon: true,
 		Message:         core,

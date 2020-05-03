@@ -8,18 +8,25 @@
 
 Stupidly easy to use, small footprint **Policy as Code** subsecond command-line scanner that leverages the power of the fastest multi-line search tool to scan your codebase. It can be used as a linter, guard rail control or simple data collector and inspector. Consider it a cross-platform weaponized **ripgrep**.
 
+<br>
+
+[![Code Grade](https://www.code-inspector.com/project/7660/score/svg)](https://www.code-inspector.com)
+[![Code Grade](https://www.code-inspector.com/project/7660/status/svg)](https://www.code-inspector.com)
+[![Go Report Card](https://goreportcard.com/badge/github.com/xfhg/intercept)](https://goreportcard.com/report/github.com/xfhg/intercept)
+![Go](https://github.com/xfhg/intercept/workflows/Go/badge.svg?branch=master)
+
 ![GitHub release (latest by date)](https://img.shields.io/github/v/release/xfhg/intercept)
 ![GitHub Release Date](https://img.shields.io/github/release-date/xfhg/intercept)
-![Go](https://github.com/xfhg/intercept/workflows/Go/badge.svg?branch=master)
 ![GitHub last commit](https://img.shields.io/github/last-commit/xfhg/intercept)
 ![GitHub commits since latest release (by date)](https://img.shields.io/github/commits-since/xfhg/intercept/latest)
 
 ![GitHub code size in bytes](https://img.shields.io/github/languages/code-size/xfhg/intercept)
 ![GitHub go.mod Go version](https://img.shields.io/github/go-mod/go-version/xfhg/intercept)
-[![Go Report Card](https://goreportcard.com/badge/github.com/xfhg/intercept)](https://goreportcard.com/report/github.com/xfhg/intercept)
 ![GitHub issues](https://img.shields.io/github/issues-raw/xfhg/intercept)
 ![GitHub pull requests](https://img.shields.io/github/issues-pr-raw/xfhg/intercept)
 [![Run on Repl.it](https://repl.it/badge/github/xfhg/intercept)](https://repl.it/github/xfhg/intercept)
+
+<br>
 
 ## Features
 
