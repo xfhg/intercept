@@ -48,6 +48,7 @@ jobs:
       - name: Upload All artifacts
         uses: meeDamian/github-release@2.0
         with:
+          allow_override: "true"
           draft: "false"
           token: ${{ secrets.GITHUB_TOKEN }}
           name: ${{ steps.get_version.outputs.VERSION }}
@@ -67,4 +68,5 @@ jobs:
             bin/intercept-darwin_amd64
             bin/intercept-windows_amd64.exe
             output/_version
+            output/_changelog
             output/_examples.zip
