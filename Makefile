@@ -18,7 +18,11 @@ changelog:
 global: windows linux macos
 	go install
 
+mod-needs-update:
+	go list -m -u all
+
 mod:
+	go get -u
 	go mod tidy
 	go mod verify
 

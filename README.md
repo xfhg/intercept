@@ -143,7 +143,8 @@ Take a quick glance of what a policy file with 2 **scan** rules and 1 **collect*
 ([examples/policy/simple.yaml](https://github.com/xfhg/intercept/tree/master/examples/policy/simple.yaml)) (some text redacted for clarity) :
 
 ```yaml
-# This banner is shown on the start of the scanning report, use it to point out important documentation/warnings/contacts
+# This banner is shown on the start of the scanning report,
+# use it to point out important documentation/warnings/contacts
 Banner: |
 
 | Banner text here, drop documentation link or quick instructions on how to react to the report
@@ -361,7 +362,7 @@ Redacted report:
 We will try to have an exception on policy rule id 5 (accepts exceptions) and policy rule id 7 (doesn't accept exceptions)
 
 ```yaml
-RulesDeactivated:
+Exceptions:
   - 5
   - 7
 
@@ -438,7 +439,7 @@ Rules:
 #### [policy/policy_exceptions.yaml](https://github.com/xfhg/intercept/tree/master/policy/policy_exceptions.yaml)
 
 ```yaml
-RulesDeactivated:
+Exceptions:
   - RULE_ID
   - RULE_ID
 
@@ -481,7 +482,7 @@ You can set three enforcement levels:
 
 # Used in production
 
-**INTERCEPT** was created to lint thousands of infra PRs and deployments a day with minor human intervention, the first MVP been running for a year already with no reported flaws and saving countless hours of human debug time. Keep in mind INTERCEPT is not and does not pretend to be a security tool.
+**INTERCEPT** was created to lint thousands of infra PRs and deployments a day with minor human intervention, the first MVP been running for more than a year saving countless hours of human debug/review time. Keep in mind INTERCEPT is not and does not pretend to be a security tool.
 It's easy to circumvent a regex pattern once you know it, but the main objective of this tool is to pro-actively help the developers fix their code and assist with style/rule suggestions to keep the codebase clean and avoid trivial support tickets from the uneducated crowd.
 
 ## Inspired by
