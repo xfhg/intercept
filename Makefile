@@ -153,7 +153,6 @@ dev-macos: clean purge macos dev-test
 	cp .ignore release/.ignore
 	go install
 
-
 dev-test:
 	./tests/venom run tests/suite.yml
 

@@ -131,16 +131,16 @@ func updateCore() {
 	fmt.Println("├ Core Tools Setup")
 	fmt.Println("│")
 
-	core := ""
+	core := "https://github.com/xfhg/intercept/releases/latest/download/"
 	coreDst := GetExecutablePath()
 
 	switch runtime.GOOS {
 	case "windows":
-		core = "https://github.com/xfhg/intercept/releases/latest/download/i-ripgrep-x86_64-windows.zip"
+		core += "i-ripgrep-x86_64-windows.zip"
 	case "darwin":
-		core = "https://github.com/xfhg/intercept/releases/latest/download/i-ripgrep-x86_64-darwin.zip"
+		core += "i-ripgrep-x86_64-darwin.zip"
 	case "linux":
-		core = "https://github.com/xfhg/intercept/releases/latest/download/i-ripgrep-x86_64-linux.zip"
+		core += "i-ripgrep-x86_64-linux.zip"
 	default:
 		colorRedBold.Println("│ OS not supported")
 		PrintClose()
