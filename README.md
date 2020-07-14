@@ -24,7 +24,6 @@ Stupidly easy to use, small footprint **Policy as Code** subsecond command-line 
 ![GitHub go.mod Go version](https://img.shields.io/github/go-mod/go-version/xfhg/intercept)
 ![GitHub issues](https://img.shields.io/github/issues-raw/xfhg/intercept)
 ![GitHub pull requests](https://img.shields.io/github/issues-pr-raw/xfhg/intercept)
-[![Run on Repl.it](https://repl.it/badge/github/xfhg/intercept)](https://repl.it/github/xfhg/intercept)
 
 <br>
 
@@ -483,7 +482,7 @@ You can set three enforcement levels:
 # Used in production
 
 **INTERCEPT** was created to lint thousands of infra PRs and deployments a day with minor human intervention, the first MVP been running for more than a year saving countless hours of human debug/review time. Keep in mind INTERCEPT is not and does not pretend to be a security tool.
-It's easy to circumvent a regex pattern once you know it, but the main objective of this tool is to pro-actively help the developers fix their code and assist with style/rule suggestions to keep the codebase clean and avoid trivial support tickets from the uneducated crowd.
+It's easy to circumvent a regex pattern once you know it, but the main objective of this tool is to pro-actively help the developers fix their code and assist with style/rule suggestions to keep the codebase clean and avoid trivial support requests from the uneducated crowd.
 
 ## Inspired by
 
@@ -549,7 +548,13 @@ venom run tests/suite.yml
 #### Scanned with [Sonatype Nancy](https://github.com/sonatype-nexus-community/nancy)
 
 ```
-Audited dependencies:92,Vulnerable:0
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+┃ Summary                       ┃
+┣━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━┫
+┃ Audited Dependencies    ┃ 143 ┃
+┣━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━┫
+┃ Vulnerable Dependencies ┃ 0   ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━┛
 ```
 
 from Sonatype OSS Index
@@ -560,13 +565,15 @@ from Sonatype OSS Index
 
 - [x] Add system self-update check and download of latest core tools
 
-- [ ] Configurable output types for data collection and overall report
+- [ ] Configurable output types for data collection and overall telemetry report
 
 - [ ] POST results (in JSON or YAML) to a configurable webhook or notification stream
 
 <br>
 
-# PLAYGROUND / CONTRIBUTE
+# PLAYGROUND
+
+Full examples and functionality ready to mess around with :
 
 [![Open in Gitpod](https://gitpod.io/button/open-in-gitpod.svg)](https://gitpod.io/#https://github.com/xfhg/intercept)
 
@@ -577,3 +584,5 @@ cd release
 ./interceptl config -a ../examples/policy/simple.yaml
 ./interceptl audit -t ../examples/target
 ```
+
+---
