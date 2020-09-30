@@ -38,3 +38,6 @@ jobs:
 
       - name: Make all release artifacts
         run: make
+
+      - name: Run basic tests
+        run: ./tests/venom run tests/suite.yml
