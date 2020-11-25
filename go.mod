@@ -33,5 +33,5 @@ require (
 	golang.org/x/sys v0.0.0-20200929083018-4d22bbb62b3c // indirect
 	golang.org/x/tools v0.0.0-20200929223013-bf155c11ec6f // indirect
 	gopkg.in/ini.v1 v1.61.0 // indirect
-	gopkg.in/yaml.v2 v2.3.0
+	gopkg.in/yaml.v2 v2.4.0
 )
