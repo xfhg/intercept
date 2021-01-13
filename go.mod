@@ -20,7 +20,7 @@ require (
 	github.com/mitchellh/go-testing-interface v1.14.1 // indirect
 	github.com/mitchellh/mapstructure v1.3.3 // indirect
 	github.com/pelletier/go-toml v1.8.1 // indirect
-	github.com/rhysd/go-github-selfupdate v1.2.2
+	github.com/rhysd/go-github-selfupdate v1.2.3
 	github.com/spf13/afero v1.4.0 // indirect
 	github.com/spf13/cast v1.3.1 // indirect
 	github.com/spf13/cobra v1.0.0
@@ -29,7 +29,6 @@ require (
 	github.com/spf13/viper v1.7.1
 	github.com/stretchr/testify v1.5.1 // indirect
 	github.com/theckman/yacspin v0.8.0
-	golang.org/x/crypto v0.0.0-20200820211705-5c72a883971a // indirect
 	golang.org/x/sys v0.0.0-20200929083018-4d22bbb62b3c // indirect
 	golang.org/x/tools v0.0.0-20200929223013-bf155c11ec6f // indirect
 	gopkg.in/ini.v1 v1.61.0 // indirect
