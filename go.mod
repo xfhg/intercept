@@ -9,7 +9,7 @@ require (
 	github.com/blang/semver v3.5.1+incompatible
 	github.com/fatih/color v1.9.0 // indirect
 	github.com/fsnotify/fsnotify v1.4.9 // indirect
-	github.com/gookit/color v1.3.1
+	github.com/gookit/color v1.3.8
 	github.com/hashicorp/go-getter v1.5.0
 	github.com/hashicorp/go-version v1.2.1 // indirect
 	github.com/kardianos/osext v0.0.0-20190222173326-2bc1f35cddc0
