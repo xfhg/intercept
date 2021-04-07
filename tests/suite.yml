@@ -22,6 +22,9 @@ testcases:
     steps:
       - assertions:
           - result.code ShouldEqual 0
-        script: intercept audit
+        script: 
+          intercept system --setup 
+          intercept system --update 
+          intercept audit
 
 vars: {}

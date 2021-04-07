@@ -161,6 +161,9 @@ compress-bin:
 	upx -9 bin/interceptm
 	upx -9 bin/intercept.exe
 
+get-compressor-apt:
+	sudo apt-get install -y upx
+
 ## help: prints this help message
 help:
 	@echo "Usage: \n"
