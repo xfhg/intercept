@@ -5,8 +5,6 @@ import (
 	"os"
 
 	"github.com/spf13/cobra"
-
-	homedir "github.com/mitchellh/go-homedir"
 	"github.com/spf13/viper"
 )
 
@@ -16,9 +14,12 @@ var cfgEnv string
 
 // subcommand flags
 var (
-	configReset bool
-	auditNox    bool
-	systemSetup bool
+	configReset  bool
+	auditNox     bool
+	systemSetup  bool
+	systemUpdate bool
+	systemAuto   bool
+	buildVersion string
 )
 
 var rootCmd = &cobra.Command{
@@ -51,31 +52,26 @@ func initConfig() {
 	if cfgFile != "" {
 		viper.SetConfigFile(cfgFile)
 	} else {
-		home, err := homedir.Dir()
-		if err != nil {
-			fmt.Println(err)
-			os.Exit(1)
-		}
-
+		home := GetHomeDir()
 		viper.AddConfigPath(home)
 		viper.SetConfigFile("config.yaml")
 	}
 
 	viper.AutomaticEnv()
 
-	fmt.Println("┌")
-	fmt.Println("| INTERCEPT")
-	fmt.Println("|")
+	PrintStart()
 
 	if err := viper.ReadInConfig(); err == nil {
 
-		fmt.Println("| Policy file :", viper.ConfigFileUsed())
+		fmt.Println("├ Policy :", viper.ConfigFileUsed())
 
 	}
 
 	configReset = configCmdisReset()
 	auditNox = auditCmdisNoExceptions()
 	systemSetup = systemCmdisSetup()
+	systemUpdate = systemCmdisUpdate()
+	systemAuto = updateCmdAuto()
 
 }
 
@@ -83,6 +79,12 @@ func systemCmdisSetup() bool {
 
 	setup, _ := systemCmd.PersistentFlags().GetBool("setup")
 	return setup
+}
+
+func systemCmdisUpdate() bool {
+
+	update, _ := systemCmd.PersistentFlags().GetBool("update")
+	return update
 }
 
 func configCmdisReset() bool {
@@ -95,4 +97,9 @@ func auditCmdisNoExceptions() bool {
 
 	nox, _ := auditCmd.PersistentFlags().GetBool("no-exceptions")
 	return nox
+}
+
+func updateCmdAuto() bool {
+	autoUpdate, _ := systemCmd.PersistentFlags().GetBool("auto")
+	return autoUpdate
 }
