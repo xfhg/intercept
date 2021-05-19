@@ -3,18 +3,26 @@ MOMENT=$(shell date +'%Y%m%d-%H%M')
 VERSION=$(shell git rev-parse --short HEAD)
 RANDOM=$(shell awk 'BEGIN{srand();printf("%d", 65536*rand())}')
 TAG=$(shell git describe --abbrev=0)
-
+PTAG=$(shell git describe --tags --abbrev=0 @^)
+CL=$(shell git log --oneline $(PTAG)..@)
 
 all: purge-output windows linux macos out-full out-linux out-macos out-win ripgrep build-package compress-examples rename-bin
 
-version:
+version: changelog
 	touch release/$(TAG)_$(VERSION)-$(MOMENT)
 	echo $(TAG) > output/_version
+
+changelog:
+	echo "$(CL)" > output/_changelog
 
 global: windows linux macos
 	go install
 
+mod-needs-update:
+	go list -m -u all
+
 mod:
+	go get -u
 	go mod tidy
 	go mod verify
 
@@ -145,7 +153,6 @@ dev-macos: clean purge macos dev-test
 	cp .ignore release/.ignore
 	go install
 
-
 dev-test:
 	./tests/venom run tests/suite.yml
 
@@ -153,6 +160,9 @@ compress-bin:
 	upx -9 bin/interceptl
 	upx -9 bin/interceptm
 	upx -9 bin/intercept.exe
+
+get-compressor-apt:
+	sudo apt-get install -y upx
 
 ## help: prints this help message
 help:

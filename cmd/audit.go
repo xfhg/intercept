@@ -7,9 +7,9 @@ import (
 	"os/exec"
 	"strings"
 
+	"github.com/gookit/color"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
-	"gopkg.in/gookit/color.v1"
 )
 
 var (
@@ -36,7 +36,7 @@ type allRules struct {
 		Fatal       bool     `yaml:"fatal"`
 		Patterns    []string `yaml:"patterns"`
 	} `yaml:"Rules"`
-	RulesDeactivated []int `yaml:"rulesdeactivated"`
+	Exceptions []int `yaml:"exceptions"`
 }
 
 var (
@@ -79,7 +79,7 @@ var auditCmd = &cobra.Command{
 			fmt.Println("│ Exceptions Disabled - All Policies Activated")
 		}
 
-		line := "------------------------------------------------------------"
+		line := "├────────────────────────────────────────────────────────────"
 
 		searchPatternFile := strings.Join([]string{pwddir, "/", "search_regex"}, "")
 
@@ -106,14 +106,14 @@ var auditCmd = &cobra.Command{
 			case "scan":
 
 				fmt.Println("│ ")
-				fmt.Println("│", line)
+				fmt.Println(line)
 				fmt.Println("│ ")
 				fmt.Println("├ Rule #", value.ID)
 				fmt.Println("│ Rule name : ", value.Name)
 				fmt.Println("│ Rule description : ", value.Description)
 				fmt.Println("│ ")
 
-				exception := ContainsInt(rules.RulesDeactivated, value.ID)
+				exception := ContainsInt(rules.Exceptions, value.ID)
 
 				if exception && !auditNox && !value.Enforcement {
 
@@ -168,7 +168,7 @@ var auditCmd = &cobra.Command{
 			case "collect":
 
 				fmt.Println("│ ")
-				fmt.Println("│", line)
+				fmt.Println(line)
 				fmt.Println("│ ")
 				fmt.Println("├ Collection : ", value.Name)
 				fmt.Println("│ Description : ", value.Description)

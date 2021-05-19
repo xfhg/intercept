@@ -8,13 +8,20 @@
 
 Stupidly easy to use, small footprint **Policy as Code** subsecond command-line scanner that leverages the power of the fastest multi-line search tool to scan your codebase. It can be used as a linter, guard rail control or simple data collector and inspector. Consider it a cross-platform weaponized **ripgrep**.
 
+<br>
+
+
+![Go](https://github.com/xfhg/intercept/workflows/Go/badge.svg?branch=master)
 ![GitHub release (latest by date)](https://img.shields.io/github/v/release/xfhg/intercept)
 ![GitHub Release Date](https://img.shields.io/github/release-date/xfhg/intercept)
-![Go](https://github.com/xfhg/intercept/workflows/Go/badge.svg?branch=master)
 ![GitHub last commit](https://img.shields.io/github/last-commit/xfhg/intercept)
 ![GitHub commits since latest release (by date)](https://img.shields.io/github/commits-since/xfhg/intercept/latest)
+![GitHub code size in bytes](https://img.shields.io/github/languages/code-size/xfhg/intercept)
+![GitHub go.mod Go version](https://img.shields.io/github/go-mod/go-version/xfhg/intercept)
 
-[![Run on Repl.it](https://repl.it/badge/github/xfhg/intercept)](https://repl.it/github/xfhg/intercept)
+
+<br>
+
 
 ## Features
 
@@ -131,7 +138,8 @@ Take a quick glance of what a policy file with 2 **scan** rules and 1 **collect*
 ([examples/policy/simple.yaml](https://github.com/xfhg/intercept/tree/master/examples/policy/simple.yaml)) (some text redacted for clarity) :
 
 ```yaml
-# This banner is shown on the start of the scanning report, use it to point out important documentation/warnings/contacts
+# This banner is shown on the start of the scanning report,
+# use it to point out important documentation/warnings/contacts
 Banner: |
 
 | Banner text here, drop documentation link or quick instructions on how to react to the report
@@ -305,20 +313,7 @@ Looks great so far... let's validate that networking resources are not being har
     - (subnet_ids\s*=\s*=\s*"\$\{v)
     - (subnet_id\s*=\s*"\s*[s])
     - (subnet_id\s*=\s*"\s*\$\{v)
-    - (subnets\s*=\s*\[\s*"\$\{v)
-    - (subnets\s*=\s*\[\s*"[s])
-    - (vpc_zone_identifier\s*=\s*\[\s*"\$\{v)
-    - (vpc_zone_identifier\s*=\s*\[\s*"[v])
-    - (vpc_zone_identifier\s*=\s*=\s*"\$\{v)
-    - (vpc_id\s*=\s*"\s*[v])
-    - (vpc_id\s*=\s*"\s*\$\{v)
-    - (vpc_security_group_ids\s*=\s*\[\s*"\$\{v)
-    - (vpc_security_group_ids\s*=\s*\[\s*"[sg])
-    - (security_groups\s*=\s*\[\s*"\$\{v)
-    - (security_groups\s*=\s*\[\s*"[sg])
-    - ("subnet-)
-    - ("sg-)
-    - ("vpc-)
+    ...redacted for clarity
 
 - name: Sub-optimal parameter on Module/Resource
   id: 8
@@ -362,7 +357,7 @@ Redacted report:
 We will try to have an exception on policy rule id 5 (accepts exceptions) and policy rule id 7 (doesn't accept exceptions)
 
 ```yaml
-RulesDeactivated:
+Exceptions:
   - 5
   - 7
 
@@ -402,50 +397,44 @@ intercept audit -t examples/target/ -e prod -x
 ```yaml
 Banner: |
 
-MULTI LINE TXT
+  MULTI LINE TXT
 
 ExitCritical: CRITICAL_ERROR_EXIT_TEXT
 ExitWarning: WARNING_EXIT_TEXT
 ExitClean: CLEAN_EXIT_TEXT
 
 Rules:
-
   # SCAN TYPE
 
   - id: 1
 
-  name: NAME_TEXT
-  description: DESCRIPTION_TEXT
-  solution: SOLUTION_TEXT
-  error: ERROR_TEXT
-
-  type: scan
-
-  fatal: BOOL
-  environment: TXT
-  enforcement: BOOL
-
-  patterns:
-    - regex_1
-    - regex_2
-    - regex_3
+    name: NAME_TEXT
+    description: DESCRIPTION_TEXT
+    solution: SOLUTION_TEXT
+    error: ERROR_TEXT
+    type: scan
+    fatal: BOOL
+    environment: TXT
+    enforcement: BOOL
+    patterns:
+      - regex_1
+      - regex_2
+      - regex_3
 
   # COLLECT TYPE
 
   - name: NAME_TEXT
-  description: DESCRIPTION_TEXT
-
-  type: collect
-
-  patterns:
-    - regex_4
-    - regex_5
+    description: DESCRIPTION_TEXT
+    type: collect
+    patterns:
+      - regex_4
+      - regex_5
 ```
 
 #### [policy/policy_exceptions.yaml](https://github.com/xfhg/intercept/tree/master/policy/policy_exceptions.yaml)
 
 ```yaml
-RulesDeactivated:
+Exceptions:
   - RULE_ID
   - RULE_ID
 
@@ -488,8 +477,8 @@ You can set three enforcement levels:
 
 # Used in production
 
-**INTERCEPT** was created to lint thousands of infra PRs and deployments a day with minor human intervention, the first MVP been running for a year already with no reported flaws and saving countless hours of human debug time. Keep in mind INTERCEPT is not and does not pretend to be a security tool.
-It's easy to circumvent a regex pattern once you know it, but the main objective of this tool is to pro-actively help the developers fix their code and assist with style/rule suggestions to keep the codebase clean and avoid trivial support tickets from the uneducated crowd.
+**INTERCEPT** was created to lint thousands of infra PRs and deployments a day with minor human intervention, the first MVP been running for more than a year saving countless hours of human debug/review time. Keep in mind INTERCEPT is not and does not pretend to be a security tool.
+It's easy to circumvent a regex pattern once you know it, but the main objective of this tool is to pro-actively help the developers fix their code and assist with style/rule suggestions to keep the codebase clean and avoid trivial support requests from the uneducated crowd.
 
 ## Inspired by
 
@@ -508,7 +497,7 @@ It's easy to circumvent a regex pattern once you know it, but the main objective
 
 - Applies ignore patterns in .gitignore files using a RegexSet. That means a single file path can be matched against multiple glob patterns simultaneously.
 
-- It uses a lock-free parallel recursive directory iterator, courtesy of **crossbeam** and **ignore**.
+- It uses a lock-free parallel recursive directory iterator
 
 ### Benchmark ripgrep
 
@@ -555,7 +544,13 @@ venom run tests/suite.yml
 #### Scanned with [Sonatype Nancy](https://github.com/sonatype-nexus-community/nancy)
 
 ```
-Audited dependencies:92,Vulnerable:0
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+┃ Summary                       ┃
+┣━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━┫
+┃ Audited Dependencies    ┃ 143 ┃
+┣━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━┫
+┃ Vulnerable Dependencies ┃ 0   ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━┛
 ```
 
 from Sonatype OSS Index
@@ -566,12 +561,24 @@ from Sonatype OSS Index
 
 - [x] Add system self-update check and download of latest core tools
 
+<<<<<<< HEAD
 
 
 <br>
 
 
 # PLAYGROUND / CONTRIBUTE
+=======
+- [ ] Configurable output types for data collection and overall telemetry report
+
+- [ ] POST results (in JSON or YAML) to a configurable webhook or notification stream
+
+<br>
+
+# PLAYGROUND
+
+Full examples and functionality ready to mess around with :
+>>>>>>> 244fab538456034702097fdc31ffe8529b5648f7
 
 [![Open in Gitpod](https://gitpod.io/button/open-in-gitpod.svg)](https://gitpod.io/#https://github.com/xfhg/intercept)
 
@@ -582,3 +589,5 @@ cd release
 ./interceptl config -a ../examples/policy/simple.yaml
 ./interceptl audit -t ../examples/target
 ```
+
+---

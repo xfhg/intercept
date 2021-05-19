@@ -18,7 +18,6 @@ var (
 	auditNox     bool
 	systemSetup  bool
 	systemUpdate bool
-	systemAuto   bool
 	buildVersion string
 )
 
@@ -71,7 +70,6 @@ func initConfig() {
 	auditNox = auditCmdisNoExceptions()
 	systemSetup = systemCmdisSetup()
 	systemUpdate = systemCmdisUpdate()
-	systemAuto = updateCmdAuto()
 
 }
 
@@ -97,9 +95,4 @@ func auditCmdisNoExceptions() bool {
 
 	nox, _ := auditCmd.PersistentFlags().GetBool("no-exceptions")
 	return nox
-}
-
-func updateCmdAuto() bool {
-	autoUpdate, _ := systemCmd.PersistentFlags().GetBool("auto")
-	return autoUpdate
 }

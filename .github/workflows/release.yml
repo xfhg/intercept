@@ -10,10 +10,10 @@ jobs:
     name: Build
     runs-on: ubuntu-latest
     steps:
-      - name: Set up Go 1.13
+      - name: Set up Go 1.14
         uses: actions/setup-go@v1
         with:
-          go-version: 1.13
+          go-version: 1.14
         id: go
 
       - name: Check out code into the Go module directory
@@ -48,6 +48,7 @@ jobs:
       - name: Upload All artifacts
         uses: meeDamian/github-release@2.0
         with:
+          allow_override: "true"
           draft: "false"
           token: ${{ secrets.GITHUB_TOKEN }}
           name: ${{ steps.get_version.outputs.VERSION }}
@@ -67,4 +68,5 @@ jobs:
             bin/intercept-darwin_amd64
             bin/intercept-windows_amd64.exe
             output/_version
+            output/_changelog
             output/_examples.zip
