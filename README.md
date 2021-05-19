@@ -14,11 +14,6 @@ Stupidly easy to use, small footprint **Policy as Code** subsecond command-line 
 ![GitHub last commit](https://img.shields.io/github/last-commit/xfhg/intercept)
 ![GitHub commits since latest release (by date)](https://img.shields.io/github/commits-since/xfhg/intercept/latest)
 
-![GitHub code size in bytes](https://img.shields.io/github/languages/code-size/xfhg/intercept)
-![GitHub go.mod Go version](https://img.shields.io/github/go-mod/go-version/xfhg/intercept)
-[![Go Report Card](https://goreportcard.com/badge/github.com/xfhg/intercept)](https://goreportcard.com/report/github.com/xfhg/intercept)
-![GitHub issues](https://img.shields.io/github/issues-raw/xfhg/intercept)
-![GitHub pull requests](https://img.shields.io/github/issues-pr-raw/xfhg/intercept)
 [![Run on Repl.it](https://repl.it/badge/github/xfhg/intercept)](https://repl.it/github/xfhg/intercept)
 
 ## How it works
@@ -477,13 +472,6 @@ from Sonatype OSS Index
 
 - [ ] Complete the test suite
 
-- [ ] Add [shellcheck](https://github.com/koalaman/shellcheck) to give warnings and suggestions for bash/sh shell scripts (optional, not core feature)
-
-- [ ] Add [hadolint](https://github.com/hadolint/hadolint), a smarter Dockerfile linter that helps you build best practice Docker images (optional, not core feature)
-
-- [ ] Add system check and download of auxiliary tools (ripgrep and shellcheck)
-
-- [ ] Configurable output types for data collection and overall report
 
 ## CONTRIBUTE
 
