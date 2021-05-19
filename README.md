@@ -10,22 +10,18 @@ Stupidly easy to use, small footprint **Policy as Code** subsecond command-line 
 
 <br>
 
-[![Code Grade](https://www.code-inspector.com/project/7660/score/svg)](https://www.code-inspector.com)
-[![Code Grade](https://www.code-inspector.com/project/7660/status/svg)](https://www.code-inspector.com)
-[![Go Report Card](https://goreportcard.com/badge/github.com/xfhg/intercept)](https://goreportcard.com/report/github.com/xfhg/intercept)
-![Go](https://github.com/xfhg/intercept/workflows/Go/badge.svg?branch=master)
 
+![Go](https://github.com/xfhg/intercept/workflows/Go/badge.svg?branch=master)
 ![GitHub release (latest by date)](https://img.shields.io/github/v/release/xfhg/intercept)
 ![GitHub Release Date](https://img.shields.io/github/release-date/xfhg/intercept)
 ![GitHub last commit](https://img.shields.io/github/last-commit/xfhg/intercept)
 ![GitHub commits since latest release (by date)](https://img.shields.io/github/commits-since/xfhg/intercept/latest)
-
 ![GitHub code size in bytes](https://img.shields.io/github/languages/code-size/xfhg/intercept)
 ![GitHub go.mod Go version](https://img.shields.io/github/go-mod/go-version/xfhg/intercept)
-![GitHub issues](https://img.shields.io/github/issues-raw/xfhg/intercept)
-![GitHub pull requests](https://img.shields.io/github/issues-pr-raw/xfhg/intercept)
+
 
 <br>
+
 
 ## Features
 
@@ -565,6 +561,14 @@ from Sonatype OSS Index
 
 - [x] Add system self-update check and download of latest core tools
 
+<<<<<<< HEAD
+
+
+<br>
+
+
+# PLAYGROUND / CONTRIBUTE
+=======
 - [ ] Configurable output types for data collection and overall telemetry report
 
 - [ ] POST results (in JSON or YAML) to a configurable webhook or notification stream
@@ -574,6 +578,7 @@ from Sonatype OSS Index
 # PLAYGROUND
 
 Full examples and functionality ready to mess around with :
+>>>>>>> 244fab538456034702097fdc31ffe8529b5648f7
 
 [![Open in Gitpod](https://gitpod.io/button/open-in-gitpod.svg)](https://gitpod.io/#https://github.com/xfhg/intercept)
 
