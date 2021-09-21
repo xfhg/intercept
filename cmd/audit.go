@@ -53,7 +53,6 @@ func loadUpRules() *allRules {
 		colorRedBold.Println("│ Unable to decode config struct : ", err)
 	}
 	return rules
-
 }
 
 var auditCmd = &cobra.Command{
