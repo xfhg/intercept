@@ -27,13 +27,13 @@ mod:
 	go mod verify
 
 windows: clean
-	CGO_ENABLED=0 GOOS=windows GOARCH=amd64 go build -ldflags="-s -w -X 'github.com/xfhg/intercept/cmd.buildVersion=$(TAG)'" -mod=readonly -o bin/intercept.exe
+	CGO_ENABLED=0 GOOS=windows GOARCH=amd64 go build -ldflags="-s -w -X 'github.com/pandey-mohit/intercept/cmd.buildVersion=$(TAG)'" -mod=readonly -o bin/intercept.exe
 
 linux: clean
-	CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -ldflags="-s -w -X 'github.com/xfhg/intercept/cmd.buildVersion=$(TAG)'" -mod=readonly -o bin/interceptl
+	CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -ldflags="-s -w -X 'github.com/pandey-mohit/intercept/cmd.buildVersion=$(TAG)'" -mod=readonly -o bin/interceptl
 
 macos: clean
-	CGO_ENABLED=0 GOOS=darwin GOARCH=amd64 go build -ldflags="-s -w -X 'github.com/xfhg/intercept/cmd.buildVersion=$(TAG)'" -mod=readonly -o bin/interceptm
+	CGO_ENABLED=0 GOOS=darwin GOARCH=amd64 go build -ldflags="-s -w -X 'github.com/pandey-mohit/intercept/cmd.buildVersion=$(TAG)'" -mod=readonly -o bin/interceptm
 
 clean: mod
 	go clean
@@ -120,7 +120,7 @@ build-package:
 	zip -9 -T -x "*.DS_Store*" "*interceptm*" "*intercept.exe*" "*interceptl*" -r output/setup-buildpack.zip release/
 
 setup-dev:
-	curl -S -O -J -L https://github.com/xfhg/intercept/releases/latest/download/setup-buildpack.zip
+	curl -S -O -J -L https://github.com/pandey-mohit/intercept/releases/latest/download/setup-buildpack.zip
 	unzip setup-*
 	chmod -R a+x release/
 	mkdir output/
