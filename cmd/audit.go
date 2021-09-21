@@ -7,7 +7,7 @@ import (
 	"os/exec"
 	"strings"
 
-	"github.com/gookit/color"
+	"github.com/fatih/color"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
@@ -41,9 +41,9 @@ type allRules struct {
 
 var (
 	rules           *allRules
-	colorRedBold    = color.New(color.Red, color.OpBold)
-	colorGreenBold  = color.New(color.Green, color.OpBold)
-	colorYellowBold = color.New(color.Yellow, color.OpBold)
+	colorRedBold    = color.New(color.FgRed, color.Bold)
+	colorGreenBold  = color.New(color.FgGreen, color.Bold)
+	colorYellowBold = color.New(color.FgYellow, color.Bold)
 )
 
 func loadUpRules() *allRules {
