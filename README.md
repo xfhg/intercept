@@ -10,9 +10,6 @@ Stupidly easy to use, small footprint **Policy as Code** subsecond command-line 
 
 <br>
 
-[![Code Grade](https://www.code-inspector.com/project/7660/score/svg)](https://www.code-inspector.com)
-[![Code Grade](https://www.code-inspector.com/project/7660/status/svg)](https://www.code-inspector.com)
-[![Go Report Card](https://goreportcard.com/badge/github.com/xfhg/intercept)](https://goreportcard.com/report/github.com/xfhg/intercept)
 ![Go](https://github.com/xfhg/intercept/workflows/Go/badge.svg?branch=master)
 
 ![GitHub release (latest by date)](https://img.shields.io/github/v/release/xfhg/intercept)
@@ -559,13 +556,13 @@ venom run tests/suite.yml
 
 from Sonatype OSS Index
 
+## Latest Changes:
+
+- complimentary JSON output
+
 ## TODO
 
 - [ ] Complete the test suite
-
-- [x] Add system self-update check and download of latest core tools
-
-- [ ] Configurable output types for data collection and overall telemetry report
 
 - [ ] POST results (in JSON or YAML) to a configurable webhook or notification stream
 
