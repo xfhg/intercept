@@ -10,10 +10,10 @@ jobs:
     name: Build
     runs-on: ubuntu-latest
     steps:
-      - name: Set up Go 1.14
+      - name: Set up Go 1.16.3
         uses: actions/setup-go@v1
         with:
-          go-version: 1.14
+          go-version: 1.16.3
         id: go
 
       - name: Check out code into the Go module directory
@@ -34,12 +34,6 @@ jobs:
 
       - name: Get the compressor
         run: sudo apt-get update -y ; sudo apt-get install -y upx
-
-      - name: fix SSL to compile
-        run: |
-          echo "deb http://security.ubuntu.com/ubuntu bionic-security main" | sudo tee -a /etc/apt/sources.list
-          sudo apt update && apt-cache policy libssl1.0-dev
-          sudo apt-get install libssl1.0-dev
 
       - name: Prepare for dev
         run: make setup-dev
