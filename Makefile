@@ -6,7 +6,7 @@ TAG=$(shell git describe --abbrev=0)
 PTAG=$(shell git describe --tags --abbrev=0 @^)
 CL=$(shell git log --oneline $(PTAG)..@)
 
-all: purge-output windows linux macos out-full out-linux out-macos out-win ripgrep build-package compress-examples rename-bin
+all: purge-output rg-version-update windows linux macos out-full out-linux out-macos out-win ripgrep build-package compress-examples rename-bin
 
 version: changelog
 	touch release/$(TAG)_$(VERSION)-$(MOMENT)
@@ -116,8 +116,11 @@ compress-examples:
 
 # intercept: intercept-win intercept-linux intercept-macos
 
-build-package:
+build-package: rg-version-update
 	zip -9 -T -x "*.DS_Store*" "*interceptm*" "*intercept.exe*" "*interceptl*" -r output/setup-buildpack.zip release/
+
+rg-version-update:
+	yes | cp -rf release-rg/* release/rg/
 
 setup-dev:
 	curl -S -O -J -L https://github.com/xfhg/intercept/releases/latest/download/setup-buildpack.zip
