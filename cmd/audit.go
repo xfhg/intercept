@@ -1,10 +1,12 @@
 package cmd
 
 import (
+	"bufio"
 	"fmt"
 	"io/ioutil"
 	"os"
 	"os/exec"
+	"strconv"
 	"strings"
 
 	"github.com/gookit/color"
@@ -20,11 +22,14 @@ var (
 
 type allRules struct {
 	Banner           string `yaml:"banner"`
+
 	ExceptionMessage string `yaml:"exceptionmessage"`
 	ExitCritical     string `yaml:"exitcritical"`
 	ExitWarning      string `yaml:"exitwarning"`
 	ExitClean        string `yaml:"exitclean"`
+	
 	Rules            []struct {
+		
 		ID          int      `yaml:"id"`
 		Name        string   `yaml:"name"`
 		Description string   `yaml:"description"`
@@ -34,8 +39,11 @@ type allRules struct {
 		Environment string   `yaml:"environment"`
 		Enforcement bool     `yaml:"enforcement"`
 		Fatal       bool     `yaml:"fatal"`
+		OutputJSON       bool `yaml:"outputjson"`
 		Patterns    []string `yaml:"patterns"`
+
 	} `yaml:"Rules"`
+	
 	Exceptions []int `yaml:"exceptions"`
 }
 
@@ -44,6 +52,7 @@ var (
 	colorRedBold    = color.New(color.Red, color.OpBold)
 	colorGreenBold  = color.New(color.Green, color.OpBold)
 	colorYellowBold = color.New(color.Yellow, color.OpBold)
+	colorBlueBold 	= color.New(color.Blue, color.OpBold)
 )
 
 func loadUpRules() *allRules {
@@ -163,6 +172,32 @@ var auditCmd = &cobra.Command{
 						fmt.Println("│ ")
 					}
 
+					if value.OutputJSON {
+						
+						jsonOutputFile := strings.Join([]string{pwddir, "/",  strconv.Itoa(value.ID) ,  ".json"}, "")
+						jsonoutfile, erroutjson := os.Create(jsonOutputFile)
+						if erroutjson != nil {
+							LogError(erroutjson)
+						}
+						defer jsonoutfile.Close()
+						writer := bufio.NewWriter(jsonoutfile)
+						defer writer.Flush()
+
+						codePatternScanJSON := []string{"--pcre2", "-p", "-i", "-C2", "-U", "--json", "-f", searchPatternFile, scanPath}
+						xcmdJSON := exec.Command(rgbin, codePatternScanJSON...)
+						xcmdJSON.Stdout = jsonoutfile
+						xcmdJSON.Stderr = os.Stderr
+						errrJSON := xcmdJSON.Run()
+
+						if errrJSON != nil {
+							if xcmdJSON.ProcessState.ExitCode() == 2 {
+								LogError(errrJSON)
+							} else {
+								colorBlueBold.Println("│ ")
+							}
+						}
+					}
+
 				}
 
 			case "collect":
@@ -190,6 +225,32 @@ var auditCmd = &cobra.Command{
 				} else {
 					fmt.Println("│ ")
 				}
+
+				if value.OutputJSON {
+						
+						jsonOutputFile := strings.Join([]string{pwddir, "/",  strconv.Itoa(value.ID) ,  ".json"}, "")
+						jsonoutfile, erroutjson := os.Create(jsonOutputFile)
+						if erroutjson != nil {
+							LogError(erroutjson)
+						}
+						defer jsonoutfile.Close()
+						writer := bufio.NewWriter(jsonoutfile)
+						defer writer.Flush()
+
+						codePatternScanJSON := []string{"--pcre2", "--no-heading", "-i", "-o", "-U", "--json", "-f", searchPatternFile, scanPath}
+						xcmdJSON := exec.Command(rgbin, codePatternScanJSON...)
+						xcmdJSON.Stdout = jsonoutfile
+						xcmdJSON.Stderr = os.Stderr
+						errrJSON := xcmdJSON.Run()
+
+						if errrJSON != nil {
+							if xcmdJSON.ProcessState.ExitCode() == 2 {
+								LogError(errrJSON)
+							} else {
+								colorBlueBold.Println("│ ")
+							}
+						}
+					}
 
 			default:
 
