@@ -40,4 +40,4 @@ jobs:
         run: make
 
       - name: Run basic tests
-        run: ./tests/venom run tests/suite.yml
+        run: make test-linux
