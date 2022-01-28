@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"bufio"
+	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"os"
@@ -20,16 +21,22 @@ var (
 	warning  = false
 )
 
+type allStats struct {
+	Total int `json:"Total"`
+	Clean int `json:"Clean"`
+	Dirty int `json:"Dirty"`
+	Fatal int `json:"Fatal"`
+}
+
 type allRules struct {
-	Banner           string `yaml:"banner"`
+	Banner string `yaml:"banner"`
 
 	ExceptionMessage string `yaml:"exceptionmessage"`
 	ExitCritical     string `yaml:"exitcritical"`
 	ExitWarning      string `yaml:"exitwarning"`
 	ExitClean        string `yaml:"exitclean"`
-	
-	Rules            []struct {
-		
+
+	Rules []struct {
 		ID          int      `yaml:"id"`
 		Name        string   `yaml:"name"`
 		Description string   `yaml:"description"`
@@ -39,20 +46,21 @@ type allRules struct {
 		Environment string   `yaml:"environment"`
 		Enforcement bool     `yaml:"enforcement"`
 		Fatal       bool     `yaml:"fatal"`
-		OutputJSON       bool `yaml:"outputjson"`
+		OutputJSON  bool     `yaml:"outputjson"`
 		Patterns    []string `yaml:"patterns"`
-
 	} `yaml:"Rules"`
-	
+
 	Exceptions []int `yaml:"exceptions"`
 }
 
 var (
+	stats           allStats
 	rules           *allRules
 	colorRedBold    = color.New(color.Red, color.OpBold)
 	colorGreenBold  = color.New(color.Green, color.OpBold)
 	colorYellowBold = color.New(color.Yellow, color.OpBold)
-	colorBlueBold 	= color.New(color.Blue, color.OpBold)
+	colorBlueBold   = color.New(color.Blue, color.OpBold)
+	colorBold       = color.New(color.OpBold)
 )
 
 func loadUpRules() *allRules {
@@ -77,10 +85,13 @@ var auditCmd = &cobra.Command{
 
 		rules = loadUpRules()
 
+		stats = allStats{0, 0, 0, 0}
+
 		pwddir := GetWd()
 
 		rgbin := CoreExists()
 
+		fmt.Println("│ PWD : ", pwddir)
 		fmt.Println("│ RG Path : ", rgbin)
 		fmt.Println("│ Scan Path : ", scanPath)
 
@@ -143,6 +154,8 @@ var auditCmd = &cobra.Command{
 							LogError(errr)
 						} else {
 							colorGreenBold.Println("│ Clean")
+							stats.Clean++
+							stats.Total++
 							fmt.Println("│ ")
 						}
 					} else {
@@ -155,6 +168,7 @@ var auditCmd = &cobra.Command{
 							colorRedBold.Println("│ ", value.Error)
 							colorRedBold.Println("│")
 							fatal = true
+							stats.Fatal++
 						} else {
 
 							colorRedBold.Println("│")
@@ -170,11 +184,13 @@ var auditCmd = &cobra.Command{
 						colorRedBold.Println("│ Suggested Solution : ", value.Solution)
 						colorRedBold.Println("│")
 						fmt.Println("│ ")
+						stats.Total++
+						stats.Dirty++
 					}
 
 					if value.OutputJSON {
-						
-						jsonOutputFile := strings.Join([]string{pwddir, "/",  strconv.Itoa(value.ID) ,  ".json"}, "")
+
+						jsonOutputFile := strings.Join([]string{pwddir, "/", strconv.Itoa(value.ID), ".json"}, "")
 						jsonoutfile, erroutjson := os.Create(jsonOutputFile)
 						if erroutjson != nil {
 							LogError(erroutjson)
@@ -227,30 +243,30 @@ var auditCmd = &cobra.Command{
 				}
 
 				if value.OutputJSON {
-						
-						jsonOutputFile := strings.Join([]string{pwddir, "/",  strconv.Itoa(value.ID) ,  ".json"}, "")
-						jsonoutfile, erroutjson := os.Create(jsonOutputFile)
-						if erroutjson != nil {
-							LogError(erroutjson)
-						}
-						defer jsonoutfile.Close()
-						writer := bufio.NewWriter(jsonoutfile)
-						defer writer.Flush()
 
-						codePatternScanJSON := []string{"--pcre2", "--no-heading", "-i", "-o", "-U", "--json", "-f", searchPatternFile, scanPath}
-						xcmdJSON := exec.Command(rgbin, codePatternScanJSON...)
-						xcmdJSON.Stdout = jsonoutfile
-						xcmdJSON.Stderr = os.Stderr
-						errrJSON := xcmdJSON.Run()
+					jsonOutputFile := strings.Join([]string{pwddir, "/", strconv.Itoa(value.ID), ".json"}, "")
+					jsonoutfile, erroutjson := os.Create(jsonOutputFile)
+					if erroutjson != nil {
+						LogError(erroutjson)
+					}
+					defer jsonoutfile.Close()
+					writer := bufio.NewWriter(jsonoutfile)
+					defer writer.Flush()
 
-						if errrJSON != nil {
-							if xcmdJSON.ProcessState.ExitCode() == 2 {
-								LogError(errrJSON)
-							} else {
-								colorBlueBold.Println("│ ")
-							}
+					codePatternScanJSON := []string{"--pcre2", "--no-heading", "-i", "-o", "-U", "--json", "-f", searchPatternFile, scanPath}
+					xcmdJSON := exec.Command(rgbin, codePatternScanJSON...)
+					xcmdJSON.Stdout = jsonoutfile
+					xcmdJSON.Stderr = os.Stderr
+					errrJSON := xcmdJSON.Run()
+
+					if errrJSON != nil {
+						if xcmdJSON.ProcessState.ExitCode() == 2 {
+							LogError(errrJSON)
+						} else {
+							colorBlueBold.Println("│ ")
 						}
 					}
+				}
 
 			default:
 
@@ -260,6 +276,27 @@ var auditCmd = &cobra.Command{
 
 		_ = os.Remove(searchPatternFile)
 
+		fmt.Println("│")
+		fmt.Println("│")
+		fmt.Println("│")
+
+		colorBold.Println("├  Stats : ")
+		colorBold.Println("│ \t Total Policies Scanned :\t", stats.Total)
+		colorGreenBold.Println("│ \t Clean Policy Checks :\t\t", stats.Clean)
+		colorYellowBold.Println("│ \t Policy Irregularities :\t", stats.Dirty)
+		colorRedBold.Println("│ \t Fatal Policy Breach :\t\t", stats.Fatal)
+
+		jsonstats, _jerr := json.Marshal(stats)
+		if _jerr != nil {
+			LogError(_jerr)
+		}
+
+		_jwerr := ioutil.WriteFile("stats.json", jsonstats, 0644)
+		if _jwerr != nil {
+			LogError(_jwerr)
+		}
+
+		fmt.Println("│")
 		fmt.Println("│")
 		fmt.Println("│")
 		fmt.Println("│")
