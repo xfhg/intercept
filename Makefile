@@ -72,11 +72,13 @@ out-full: purge version compress-bin
 
 out-linux: clean purge version linux
 	cp bin/interceptl release/interceptl
+	go install
 	cp .ignore release/.ignore
 	cd release/ ; zip -9 -T -x "*.DS_Store*" "*.exe" "*rgm*" "*interceptm*" -r ../output/core-intercept-rg-x86_64-linux.zip *
 
 out-macos: clean purge version macos
 	cp bin/interceptm release/interceptm
+	go install
 	cp .ignore release/.ignore
 	cd release/ ; zip -9 -T -x "*.DS_Store*" "*.exe" "*rgl*" "*interceptl*" -r ../output/core-intercept-rg-x86_64-darwin.zip *
 
@@ -140,6 +142,7 @@ test-linux:
 	curl -S -O -J -L https://github.com/ovh/venom/releases/latest/download/venom.linux-amd64
 	mv venom.linux-amd64 venom
 	chmod +x venom
+	go install
 	./venom run tests/suite.yml
 	rm venom
 
