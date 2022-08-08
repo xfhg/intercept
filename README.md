@@ -544,17 +544,22 @@ venom run tests/suite.yml
 
 #### Scanned with [Sonatype Nancy](https://github.com/sonatype-nexus-community/nancy)
 
+```sh
+make nancy
+```
+
 ```
 ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
 ┃ Summary                       ┃
 ┣━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━┫
-┃ Audited Dependencies    ┃ 143 ┃
+┃ Audited Dependencies    ┃ 62  ┃
 ┣━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━┫
 ┃ Vulnerable Dependencies ┃ 0   ┃
 ┗━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━┛
 ```
 
 from Sonatype OSS Index
+
 
 ## Latest Changes:
 

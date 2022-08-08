@@ -4,16 +4,16 @@ VERSION=$(shell git rev-parse --short HEAD)
 RANDOM=$(shell awk 'BEGIN{srand();printf("%d", 65536*rand())}')
 TAG=$(shell git describe --abbrev=0)
 PTAG=$(shell git describe --tags --abbrev=0 @^)
-CL=$(shell git log --oneline $(PTAG)..@)
 
-all: purge-output rg-version-update windows linux macos out-full out-linux out-macos out-win ripgrep build-package compress-examples rename-bin
+
+all: purge-output rg-version-update windows linux macos nancy out-full out-linux out-macos out-win ripgrep build-package compress-examples rename-bin
 
 version: changelog
 	touch release/$(TAG)_$(VERSION)-$(MOMENT)
 	echo $(TAG) > output/_version
 
 changelog:
-	echo "$(CL)" > output/_changelog
+	echo "release $(TAG)" > output/_changelog
 
 global: windows linux macos
 	go install
@@ -152,6 +152,13 @@ test-win:
 	chmod +x venom.exe
 	./venom.exe run tests/suite.yml
 	rm venom.exe
+
+nancy: 
+	rm -rf nancy-*
+	curl -S -O -J -L https://github.com/sonatype-nexus-community/nancy/releases/latest/download/nancy-v1.0.37-linux-amd64	
+	chmod +x nancy-v1.0.37-linux-amd64
+	go list -json -deps | ./nancy-v1.0.37-linux-amd64 sleuth
+	rm -rf nancy-*
 
 ## dev-macos: temp quick dev task
 dev-macos: clean purge macos dev-test
