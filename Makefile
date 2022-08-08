@@ -163,9 +163,9 @@ dev-test:
 	./tests/venom run tests/suite.yml
 
 compress-bin:
-	upx -9 bin/interceptl
-	upx -9 bin/interceptm
-	upx -9 bin/intercept.exe
+	upx -9 bin/interceptl || upx-ucl -9 bin/interceptl
+	upx -9 bin/interceptm || upx-ucl -9 bin/interceptm
+	upx -9 bin/intercept.exe || upx-ucl -9 bin/intercept.exe
 
 get-compressor-apt:
 	sudo apt-get install -y upx
