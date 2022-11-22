@@ -6,7 +6,7 @@ TAG=$(shell git describe --abbrev=0)
 PTAG=$(shell git describe --tags --abbrev=0 @^)
 
 
-all: purge-output rg-version-update windows linux macos nancy out-full out-linux out-macos out-win ripgrep build-package compress-examples rename-bin
+all: purge-output rg-version-update build-tool windows linux macos out-full out-linux out-macos out-win ripgrep build-package compress-examples rename-bin
 
 version: changelog
 	touch release/$(TAG)_$(VERSION)-$(MOMENT)
@@ -130,6 +130,9 @@ setup-dev:
 	chmod -R a+x release/
 	mkdir output/
 	rm setup-buildpack.zip
+
+build-tool:
+	sudo apt-get install -y upx
 
 test-macos:
 	curl -S -O -J -L https://github.com/ovh/venom/releases/latest/download/venom.darwin-amd64
