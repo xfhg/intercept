@@ -1,6 +1,8 @@
 package cmd
 
 import (
+	"crypto/md5"
+	"encoding/hex"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -13,6 +15,7 @@ import (
 )
 
 var addCfgFile string
+var hashCfgFile string
 var defaultCfgFile string
 
 var configCmd = &cobra.Command{
@@ -89,6 +92,28 @@ var configCmd = &cobra.Command{
 			if err != nil {
 				LogError(err)
 			}
+
+			HexDigest := md5.Sum(bs)
+			HexDigestConfig := hex.EncodeToString(HexDigest[:])
+
+			if hashCfgFile != "" {
+
+				fmt.Println("│")
+				fmt.Println("│ MD5 Valid checksum :\t", hashCfgFile)
+				fmt.Println("│ MD5 Config checksum :\t", HexDigestConfig)
+
+				if HexDigestConfig != hashCfgFile {
+					colorRedBold.Println("│")
+					colorRedBold.Println("│ Error")
+					colorRedBold.Println("│")
+					log.Fatal("Aborting : MD5 checksum does not match")
+				} else {
+					fmt.Println("│")
+					colorGreenBold.Println("│ MD5 Config Match")
+					fmt.Println("│")
+				}
+			}
+
 			if err := yaml.Unmarshal(bs, &override); err != nil {
 				LogError(err)
 			}
@@ -130,6 +155,28 @@ var configCmd = &cobra.Command{
 			if err != nil {
 				LogError(err)
 			}
+
+			HexDigest := md5.Sum(nf)
+			HexDigestConfig := hex.EncodeToString(HexDigest[:])
+
+			if hashCfgFile != "" {
+
+				fmt.Println("│")
+				fmt.Println("│ MD5 Valid checksum :\t", hashCfgFile)
+				fmt.Println("│ MD5 Config checksum :\t", HexDigestConfig)
+
+				if HexDigestConfig != hashCfgFile {
+					colorRedBold.Println("│")
+					colorRedBold.Println("│ Error")
+					colorRedBold.Println("│")
+					log.Fatal("Aborting : MD5 checksum does not match")
+				} else {
+					fmt.Println("│")
+					colorGreenBold.Println("│ MD5 Config Match")
+					fmt.Println("│")
+				}
+			}
+
 			if err := yaml.Unmarshal(nf, &newfile); err != nil {
 				LogError(err)
 			}
@@ -157,6 +204,7 @@ func init() {
 
 	configCmd.PersistentFlags().BoolP("reset", "r", false, "Reset config file")
 	configCmd.PersistentFlags().StringVarP(&addCfgFile, "add", "a", "", "Add config file (yaml)")
+	configCmd.PersistentFlags().StringVarP(&hashCfgFile, "hash", "k", "", "Config file MD5 Hash")
 
 	rootCmd.AddCommand(configCmd)
 
