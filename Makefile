@@ -163,8 +163,8 @@ nancy:
 	go list -json -deps | ./nancy-v1.0.37-linux-amd64 sleuth
 	rm -rf nancy-*
 
-## dev-macos: temp quick dev task
-dev-macos: clean purge macos dev-test
+## dev-macos: temp quick dev task // dev-test
+dev-macos: clean purge macos 
 	cp bin/interceptm release/interceptm
 	cp .ignore release/.ignore
 	go install

@@ -6,7 +6,7 @@
 
 # INTERCEPT
 
-Stupidly easy to use, small footprint **Policy as Code** subsecond command-line scanner that leverages the power of the fastest multi-line search tool to scan your codebase. It can be used as a linter, guard rail control or simple data collector and inspector. Consider it a cross-platform weaponized **ripgrep**.
+Easy to integrate, small footprint **Policy as Code** subsecond command-line scanner that leverages the power of the fastest multi-line search tool to scan your codebase. It can be used as a linter, guard rail control or simple data collector and inspector. Consider it a cross-platform weaponized **ripgrep**.
 
 <br>
 
@@ -22,6 +22,12 @@ Stupidly easy to use, small footprint **Policy as Code** subsecond command-line 
 ![GitHub issues](https://img.shields.io/github/issues-raw/xfhg/intercept)
 ![GitHub pull requests](https://img.shields.io/github/issues-pr-raw/xfhg/intercept)
 
+<br>
+<br>
+
+**v1 comming soon with SARIF output and Azure DevOps integration**
+
+<br>
 <br>
 
 ## Features
