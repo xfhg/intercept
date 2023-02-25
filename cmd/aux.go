@@ -78,9 +78,10 @@ func PrintClose() {
 
 	fmt.Println("│")
 	fmt.Println("│")
-	fmt.Println("│ INTERCEPT")
+	colorBlueBold.Println("├ INTERCEPT")
+	fmt.Println("│ https://intercept.cc")
 	if buildVersion != "" {
-		fmt.Println("│", buildVersion)
+		fmt.Println("├", buildVersion)
 	}
 	fmt.Println("└")
 	fmt.Println("")
