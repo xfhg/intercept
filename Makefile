@@ -23,8 +23,9 @@ mod-needs-update:
 
 mod:
 	go get -u
-	go mod tidy
 	go mod verify
+	go mod tidy
+	go mod vendor
 
 windows: clean
 	CGO_ENABLED=0 GOOS=windows GOARCH=amd64 go build -ldflags="-s -w -X 'github.com/xfhg/intercept/cmd.buildVersion=$(TAG)'" -mod=readonly -o bin/intercept.exe
