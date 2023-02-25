@@ -16,9 +16,12 @@ import (
 )
 
 var (
-	scanPath string
-	fatal    = false
-	warning  = false
+	scanPath  string
+	scanFast  string
+	scanTags  string
+	scanBreak string
+	fatal     = false
+	warning   = false
 )
 
 type allStats struct {
@@ -46,7 +49,9 @@ type allRules struct {
 		Environment string   `yaml:"environment"`
 		Enforcement bool     `yaml:"enforcement"`
 		Fatal       bool     `yaml:"fatal"`
-		OutputJSON  bool     `yaml:"outputjson"`
+		Tags        string   `yaml:"tags,omitempty"`
+		OutputJSON  bool     `yaml:"outputjson,omitempty"`
+		Confidence  string   `yaml:"confidence,omitempty"`
 		Patterns    []string `yaml:"patterns"`
 	} `yaml:"Rules"`
 
@@ -75,13 +80,16 @@ func loadUpRules() *allRules {
 
 var auditCmd = &cobra.Command{
 	Use:   "audit",
-	Short: "INTERCEPT / AUDIT - Scan a target path against configured policy rules and exceptions",
+	Short: "INTERCEPT / AUDIT - Scan a target path against configured policy rules",
 	Long:  ``,
 	Run: func(cmd *cobra.Command, args []string) {
 
 		if cfgEnv == "" {
 			cfgEnv = "先锋"
 		}
+
+		_ = os.Remove("intercept-output.json")
+		_ = os.Remove("intercept-sarif.json")
 
 		rules = loadUpRules()
 
@@ -92,7 +100,7 @@ var auditCmd = &cobra.Command{
 		rgbin := CoreExists()
 
 		fmt.Println("│ PWD : ", pwddir)
-		fmt.Println("│ RG Path : ", rgbin)
+		fmt.Println("│ RGP : ", rgbin)
 		fmt.Println("│ Scan Path : ", scanPath)
 
 		if auditNox {
@@ -131,6 +139,8 @@ var auditCmd = &cobra.Command{
 				fmt.Println("├ Rule #", value.ID)
 				fmt.Println("│ Rule name : ", value.Name)
 				fmt.Println("│ Rule description : ", value.Description)
+				fmt.Println("│ Confidence : ", value.Confidence)
+				fmt.Println("│ Tags : ", value.Tags)
 				fmt.Println("│ ")
 
 				exception := ContainsInt(rules.Exceptions, value.ID)
@@ -143,7 +153,7 @@ var auditCmd = &cobra.Command{
 
 				} else {
 
-					codePatternScan := []string{"--pcre2", "-p", "-i", "-C2", "-U", "-f", searchPatternFile, scanPath}
+					codePatternScan := []string{"--pcre2", "-p", "-o", "-A0", "-B0", "-C0", "-i", "-U", "-f", searchPatternFile, scanPath}
 					xcmd := exec.Command(rgbin, codePatternScan...)
 					xcmd.Stdout = os.Stdout
 					xcmd.Stderr = os.Stderr
@@ -199,7 +209,7 @@ var auditCmd = &cobra.Command{
 						writer := bufio.NewWriter(jsonoutfile)
 						defer writer.Flush()
 
-						codePatternScanJSON := []string{"--pcre2", "-p", "-i", "-C2", "-U", "--json", "-f", searchPatternFile, scanPath}
+						codePatternScanJSON := []string{"--pcre2", "--no-heading", "-o", "-p", "-i", "-U", "--json", "-f", searchPatternFile, scanPath}
 						xcmdJSON := exec.Command(rgbin, codePatternScanJSON...)
 						xcmdJSON.Stdout = jsonoutfile
 						xcmdJSON.Stderr = os.Stderr
@@ -210,8 +220,14 @@ var auditCmd = &cobra.Command{
 								LogError(errrJSON)
 							} else {
 								colorBlueBold.Println("│ ")
+								colorBlueBold.Println("│ JSON OK")
+								colorBlueBold.Println("│ ")
 							}
+						} else {
+							ProcessOutput(strings.Join([]string{strconv.Itoa(value.ID), ".json"}, ""), strconv.Itoa(value.ID), value.Name, value.Description, value.Error, value.Solution, value.Fatal)
+							GenerateSarif()
 						}
+
 					}
 
 				}
@@ -263,9 +279,10 @@ var auditCmd = &cobra.Command{
 						if xcmdJSON.ProcessState.ExitCode() == 2 {
 							LogError(errrJSON)
 						} else {
-							colorBlueBold.Println("│ ")
+							colorBlueBold.Println("│")
 						}
 					}
+
 				}
 
 			default:
@@ -280,7 +297,7 @@ var auditCmd = &cobra.Command{
 		fmt.Println("│")
 		fmt.Println("│")
 
-		colorBold.Println("├  Stats : ")
+		colorBold.Println("├  Quick Stats : ")
 		colorBold.Println("│ \t Total Policies Scanned :\t", stats.Total)
 		colorGreenBold.Println("│ \t Clean Policy Checks :\t\t", stats.Clean)
 		colorYellowBold.Println("│ \t Policy Irregularities :\t", stats.Dirty)
@@ -303,20 +320,29 @@ var auditCmd = &cobra.Command{
 
 		if fatal {
 
+			colorRedBold.Println("│")
 			colorRedBold.Println("├ ", rules.ExitCritical)
+			colorRedBold.Println("│")
 			PrintClose()
-			colorRedBold.Println("► break signal ")
 			fmt.Println("")
-			os.Exit(1)
+			if scanBreak != "true" {
+				colorRedBold.Println("► break signal ")
+				os.Exit(1)
+			}
+			os.Exit(0)
+
 		}
 
 		if warning {
-
+			colorYellowBold.Println("│")
 			colorYellowBold.Println("├ ", rules.ExitWarning)
+			colorYellowBold.Println("│")
 
 		} else {
 
+			colorGreenBold.Println("│")
 			colorGreenBold.Println("├ ", rules.ExitClean)
+			colorGreenBold.Println("│")
 
 		}
 
@@ -328,6 +354,11 @@ func init() {
 
 	auditCmd.PersistentFlags().StringVarP(&scanPath, "target", "t", ".", "scanning Target path")
 	auditCmd.PersistentFlags().BoolP("no-exceptions", "x", false, "disables the option to deactivate rules by eXception")
+
+	auditCmd.PersistentFlags().StringVarP(&scanFast, "fast", "f", "false", "minimal console output")
+	auditCmd.PersistentFlags().StringVarP(&scanTags, "tags", "i", "", "include only rules with the specified tag")
+
+	auditCmd.PersistentFlags().StringVarP(&scanBreak, "no-break", "b", "false", "disable exit 1 for fatal rules")
 
 	rootCmd.AddCommand(auditCmd)
 
