@@ -19,8 +19,9 @@
 bin/
 output/
 release/
+
 sandbox/
-examples/*
+examples/
 policy/
 
 .DS_Store

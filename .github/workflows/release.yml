@@ -69,4 +69,3 @@ jobs:
             bin/intercept-windows_amd64.exe
             output/_version
             output/_changelog
-            output/_examples.zip

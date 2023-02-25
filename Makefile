@@ -6,7 +6,7 @@ TAG=$(shell git describe --abbrev=0)
 PTAG=$(shell git describe --tags --abbrev=0 @^)
 
 
-all: purge-output rg-version-update build-tool windows linux macos out-full out-linux out-macos out-win ripgrep build-package compress-examples rename-bin
+all: purge-output rg-version-update build-tool windows linux macos out-full out-linux out-macos out-win ripgrep build-package rename-bin
 
 version: changelog
 	touch release/$(TAG)_$(VERSION)-$(MOMENT)
@@ -104,8 +104,8 @@ ripgrep: purge-ripgrep ripgrep-win ripgrep-linux ripgrep-macos
 add-ignore:
 	cp release/.ignore bin/.ignore
 
-compress-examples:
-	zip -9 -T -x "*.DS_Store*" -r output/_examples.zip examples/
+# compress-examples:
+# 	zip -9 -T -x "*.DS_Store*" -r output/_examples.zip examples/
 
 # intercept-win: add-ignore
 # 	cd bin/ ; zip -9 -T -x "*.DS_Store*" "*interceptl*" "*interceptm*"  -r ../output/core-intercept-x86_64-win.zip *
