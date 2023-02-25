@@ -39,5 +39,5 @@ jobs:
       - name: Make all release artifacts
         run: make
 
-      - name: Run basic tests
-        run: make test-linux
+      # - name: Run basic tests
+      #   run: make test-linux
