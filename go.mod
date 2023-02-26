@@ -5,7 +5,7 @@ go 1.20
 require (
 	github.com/blang/semver v3.5.1+incompatible
 	github.com/gookit/color v1.5.2
-	github.com/hashicorp/go-getter v1.7.0
+	github.com/hashicorp/go-getter/v2 v2.2.0
 	github.com/hashicorp/go-getter/v2 v2.2.0
 	github.com/itchyny/gojq v0.12.11
 	github.com/kardianos/osext v0.0.0-20190222173326-2bc1f35cddc0
