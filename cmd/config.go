@@ -5,7 +5,6 @@ import (
 	"encoding/hex"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"log"
 	"os"
 	"strings"
@@ -75,7 +74,7 @@ var configCmd = &cobra.Command{
 		if FileExists(defaultCfgFile) && (fromFile || fromURL) {
 			// merge
 			var master map[string]interface{}
-			bs, err := ioutil.ReadFile(defaultCfgFile)
+			bs, err := os.ReadFile(defaultCfgFile)
 			if err != nil {
 				LogError(err)
 			}
@@ -85,9 +84,9 @@ var configCmd = &cobra.Command{
 
 			var override map[string]interface{}
 			if fromURL {
-				bs, err = ioutil.ReadAll(downloadedCfgFile)
+				bs, err = io.ReadAll(downloadedCfgFile)
 			} else {
-				bs, err = ioutil.ReadFile(addCfgFile)
+				bs, err = os.ReadFile(addCfgFile)
 			}
 			if err != nil {
 				LogError(err)
@@ -132,7 +131,7 @@ var configCmd = &cobra.Command{
 			if err != nil {
 				LogError(err)
 			}
-			if err := ioutil.WriteFile("config.yaml", bs, 0644); err != nil {
+			if err := os.WriteFile("config.yaml", bs, 0644); err != nil {
 				LogError(err)
 			}
 
@@ -147,9 +146,9 @@ var configCmd = &cobra.Command{
 			var err error
 
 			if fromURL {
-				nf, err = ioutil.ReadAll(downloadedCfgFile)
+				nf, err = io.ReadAll(downloadedCfgFile)
 			} else {
-				nf, err = ioutil.ReadFile(addCfgFile)
+				nf, err = os.ReadFile(addCfgFile)
 			}
 
 			if err != nil {
@@ -184,7 +183,7 @@ var configCmd = &cobra.Command{
 			if err != nil {
 				LogError(err)
 			}
-			if err := ioutil.WriteFile("config.yaml", nf, 0644); err != nil {
+			if err := os.WriteFile("config.yaml", nf, 0644); err != nil {
 				LogError(err)
 			}
 			fmt.Println("│")

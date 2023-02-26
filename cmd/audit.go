@@ -4,7 +4,7 @@ import (
 	"bufio"
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
+
 	"os"
 	"os/exec"
 	"strconv"
@@ -127,7 +127,7 @@ var auditCmd = &cobra.Command{
 		for _, value := range rules.Rules {
 
 			searchPattern := []byte(strings.Join(value.Patterns, "\n") + "\n")
-			_ = ioutil.WriteFile(searchPatternFile, searchPattern, 0644)
+			_ = os.WriteFile(searchPatternFile, searchPattern, 0644)
 
 			switch value.Type {
 
@@ -304,7 +304,7 @@ var auditCmd = &cobra.Command{
 			LogError(_jerr)
 		}
 
-		_jwerr := ioutil.WriteFile("stats.json", jsonstats, 0644)
+		_jwerr := os.WriteFile("stats.json", jsonstats, 0644)
 		if _jwerr != nil {
 			LogError(_jwerr)
 		}

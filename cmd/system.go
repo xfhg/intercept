@@ -71,7 +71,7 @@ func selfUpdate() {
 		return
 	}
 	if buildVersion != "" {
-		current = buildVersion[1:len(buildVersion)]
+		current = buildVersion[1:]
 	} else {
 		current = "0.0.1"
 	}
@@ -185,7 +185,16 @@ func updateCore() {
 
 	d := []string{"search_regex", "config.yaml"}
 	err = WriteLinesOnFile(d, filepath.Join(coreDst, ".ignore"))
+
+	if err != nil {
+		LogError(err)
+	}
+
 	err = WriteLinesOnFile(d, filepath.Join(GetWd(), ".ignore"))
+
+	if err != nil {
+		LogError(err)
+	}
 
 	spinner.Stop()
 

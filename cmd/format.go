@@ -3,7 +3,7 @@ package cmd
 import (
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"log"
 	"os"
 	"strings"
@@ -65,7 +65,7 @@ func ProcessOutput(filename string, ruleId string, ruleName string, ruleDescript
 	}
 	defer file.Close()
 
-	content, err := ioutil.ReadAll(file)
+	content, err := io.ReadAll(file)
 	if err != nil {
 		fmt.Println(err)
 		return
@@ -98,7 +98,7 @@ func ProcessOutput(filename string, ruleId string, ruleName string, ruleDescript
 		return
 	}
 
-	err = ioutil.WriteFile(filename, []byte(string(output)), 0644)
+	err = os.WriteFile(filename, []byte(string(output)), 0644)
 	if err != nil {
 		fmt.Println(err)
 		return
@@ -138,7 +138,7 @@ func ProcessOutput(filename string, ruleId string, ruleName string, ruleDescript
 		}
 
 		// Write the JSON to a file
-		err = ioutil.WriteFile("intercept.output.json", emptyJSON, 0644)
+		err = os.WriteFile("intercept.output.json", emptyJSON, 0644)
 		if err != nil {
 			panic(err)
 		}
@@ -195,7 +195,7 @@ func ProcessOutput(filename string, ruleId string, ruleName string, ruleDescript
 		fmt.Println(ferr)
 		return
 	}
-	err = ioutil.WriteFile(filename, []byte(string(finaloutput)), 0644)
+	err = os.WriteFile(filename, []byte(string(finaloutput)), 0644)
 	if err != nil {
 		fmt.Println(err)
 		return
@@ -206,7 +206,7 @@ func ProcessOutput(filename string, ruleId string, ruleName string, ruleDescript
 		fmt.Println(ferr)
 		return
 	}
-	err = ioutil.WriteFile("intercept.output.json", []byte(string(compiledoutput)), 0644)
+	err = os.WriteFile("intercept.output.json", []byte(string(compiledoutput)), 0644)
 	if err != nil {
 		fmt.Println(err)
 		return
@@ -279,7 +279,7 @@ func GenerateSarif() {
 
 func loadInterceptResults() (InterceptOutput, error) {
 
-	jsonResult, err := ioutil.ReadFile("intercept.output.json")
+	jsonResult, err := os.ReadFile("intercept.output.json")
 	if err != nil {
 		panic(err)
 	}
