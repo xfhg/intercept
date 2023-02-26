@@ -130,8 +130,6 @@ github.com/hashicorp/go-cleanhttp
 ## explicit; go 1.13
 github.com/hashicorp/go-getter
 github.com/hashicorp/go-getter/helper/url
-# github.com/hashicorp/go-getter/v2 v2.2.0
-## explicit; go 1.18
 # github.com/hashicorp/go-safetemp v1.0.0
 ## explicit
 github.com/hashicorp/go-safetemp

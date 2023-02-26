@@ -58,7 +58,6 @@ func ProcessOutput(filename string, ruleId string, ruleName string, ruleDescript
 		fmt.Println(err)
 		return
 	}
-	// Open the input file
 	file, err := os.Open(filename)
 	if err != nil {
 		fmt.Println(err)
@@ -66,17 +65,14 @@ func ProcessOutput(filename string, ruleId string, ruleName string, ruleDescript
 	}
 	defer file.Close()
 
-	// Read the contents of the file into a string
 	content, err := ioutil.ReadAll(file)
 	if err != nil {
 		fmt.Println(err)
 		return
 	}
 
-	// Split the string into individual JSON objects
 	objects := strings.Split(string(content), "\n")
 
-	// Remove any empty strings from the slice
 	var cleanedObjects []string
 	for _, object := range objects {
 		if object != "" {
@@ -84,10 +80,8 @@ func ProcessOutput(filename string, ruleId string, ruleName string, ruleDescript
 		}
 	}
 
-	// Create a new slice for the combined JSON array
 	var jsonArray []interface{}
 
-	// Parse each JSON object and add it to the array
 	for _, object := range cleanedObjects {
 		var jsonObject interface{}
 		err := json.Unmarshal([]byte(object), &jsonObject)
@@ -98,14 +92,12 @@ func ProcessOutput(filename string, ruleId string, ruleName string, ruleDescript
 		jsonArray = append(jsonArray, jsonObject)
 	}
 
-	// Encode the combined JSON array as a string
 	output, err := json.Marshal(jsonArray)
 	if err != nil {
 		fmt.Println(err)
 		return
 	}
 
-	// Write the output to a new file
 	err = ioutil.WriteFile(filename, []byte(string(output)), 0644)
 	if err != nil {
 		fmt.Println(err)
@@ -116,13 +108,13 @@ func ProcessOutput(filename string, ruleId string, ruleName string, ruleDescript
 
 	var outfile *os.File
 
-	if FileExists("intercept-output.json") {
-		outfile, err = os.OpenFile("intercept-output.json", os.O_RDWR, 0644)
+	if FileExists("intercept.output.json") {
+		outfile, err = os.OpenFile("intercept.output.json", os.O_RDWR, 0644)
 		if err != nil {
 			panic(err)
 		}
 	} else {
-		outfile, err = os.Create("intercept-output.json")
+		outfile, err = os.Create("intercept.output.json")
 		if err != nil {
 			panic(err)
 		}
@@ -130,7 +122,6 @@ func ProcessOutput(filename string, ruleId string, ruleName string, ruleDescript
 
 	defer outfile.Close()
 
-	// Get the file size
 	fileInfo, err := outfile.Stat()
 	if err != nil {
 		panic(err)
@@ -138,19 +129,16 @@ func ProcessOutput(filename string, ruleId string, ruleName string, ruleDescript
 	fileSize := fileInfo.Size()
 
 	if fileSize == 0 {
-		// File is empty
-		// fmt.Println("File is empty")
 
 		emptyArray := []interface{}{}
 
-		// Marshal the empty slice to JSON
 		emptyJSON, err := json.Marshal(emptyArray)
 		if err != nil {
 			panic(err)
 		}
 
 		// Write the JSON to a file
-		err = ioutil.WriteFile("intercept-output.json", emptyJSON, 0644)
+		err = ioutil.WriteFile("intercept.output.json", emptyJSON, 0644)
 		if err != nil {
 			panic(err)
 		}
@@ -163,9 +151,6 @@ func ProcessOutput(filename string, ruleId string, ruleName string, ruleDescript
 	if finalerr != nil {
 		panic(finalerr)
 	}
-	// fmt.Printf("Found %d JSON objects in file\n", len(finalobjects))
-
-	////////////////////////////////////////////////////////////////
 
 	query, err := gojq.Parse(" .[] | select(.type == \"match\") ")
 	if err != nil {
@@ -174,7 +159,7 @@ func ProcessOutput(filename string, ruleId string, ruleName string, ruleDescript
 
 	var filteredJsonArray []interface{}
 
-	iter := query.Run(jsonArray) // or query.RunWithContext
+	iter := query.Run(jsonArray)
 	for {
 		v, ok := iter.Next()
 		if !ok {
@@ -216,14 +201,12 @@ func ProcessOutput(filename string, ruleId string, ruleName string, ruleDescript
 		return
 	}
 
-	////////////////////////////////////////////////////////////////
-
 	compiledoutput, ferr := json.Marshal(finalobjects)
 	if ferr != nil {
 		fmt.Println(ferr)
 		return
 	}
-	err = ioutil.WriteFile("intercept-output.json", []byte(string(compiledoutput)), 0644)
+	err = ioutil.WriteFile("intercept.output.json", []byte(string(compiledoutput)), 0644)
 	if err != nil {
 		fmt.Println(err)
 		return
@@ -237,31 +220,25 @@ func GenerateSarif() {
 		panic(err)
 	}
 
-	// create a new report object
 	report, err := sarif.New(sarif.Version210)
 	if err != nil {
 		panic(err)
 	}
 
-	// create a run
 	run := sarif.NewRunWithInformationURI("intercept", "https://intercept.cc")
 
-	// for each result, add the
 	for _, r := range interceptResults {
 
-		// create a property bag for the non standard stuff
 		pb := sarif.NewPropertyBag()
 		pb.Add("impact", r.RuleError)
 		pb.Add("resolution", r.RuleSolution)
 
-		// create a new rule for each rule id
 		run.AddRule(strings.Join([]string{"intercept.cc.policy.", r.RuleID, ": ", r.RuleName}, "")).
 			WithDescription(r.RuleDescription).
 			WithHelpURI("https://intercept.cc").
 			WithProperties(pb.Properties).
 			WithMarkdownHelp("# INTERCEPT")
 
-		// add the location as a unique artifact
 		run.AddDistinctArtifact(r.Data.Path.Text)
 
 		ResultLevel := func() string {
@@ -277,7 +254,6 @@ func GenerateSarif() {
 			Text: &snippetText,
 		}
 
-		// add each of the results with the details of where the issue occurred
 		run.CreateResultForRule(strings.Join([]string{"intercept.cc.policy.", r.RuleID, ": ", r.RuleName}, "")).
 			WithLevel(strings.ToLower(ResultLevel)).
 			WithMessage(sarif.NewTextMessage(r.RuleDescription)).
@@ -295,10 +271,7 @@ func GenerateSarif() {
 
 	report.AddRun(run)
 
-	// print the report to stdout
-	//_ = report.PrettyWrite(os.Stdout)
-
-	if err := report.WriteFile("intercept-sarif.json"); err != nil {
+	if err := report.WriteFile("intercept.sarif.json"); err != nil {
 		panic(err)
 	}
 
@@ -306,7 +279,7 @@ func GenerateSarif() {
 
 func loadInterceptResults() (InterceptOutput, error) {
 
-	jsonResult, err := ioutil.ReadFile("intercept-output.json")
+	jsonResult, err := ioutil.ReadFile("intercept.output.json")
 	if err != nil {
 		panic(err)
 	}

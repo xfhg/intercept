@@ -50,7 +50,7 @@ type allRules struct {
 		Enforcement bool     `yaml:"enforcement"`
 		Fatal       bool     `yaml:"fatal"`
 		Tags        string   `yaml:"tags,omitempty"`
-		OutputJSON  bool     `yaml:"outputjson,omitempty"`
+		Impact      string   `yaml:"impact,omitempty"`
 		Confidence  string   `yaml:"confidence,omitempty"`
 		Patterns    []string `yaml:"patterns"`
 	} `yaml:"Rules"`
@@ -88,8 +88,8 @@ var auditCmd = &cobra.Command{
 			cfgEnv = "先锋"
 		}
 
-		_ = os.Remove("intercept-output.json")
-		_ = os.Remove("intercept-sarif.json")
+		_ = os.Remove("intercept.output.json")
+		_ = os.Remove("intercept.sarif.json")
 
 		rules = loadUpRules()
 
@@ -198,35 +198,31 @@ var auditCmd = &cobra.Command{
 						stats.Dirty++
 					}
 
-					if value.OutputJSON {
+					jsonOutputFile := strings.Join([]string{pwddir, "/", strconv.Itoa(value.ID), ".json"}, "")
+					jsonoutfile, erroutjson := os.Create(jsonOutputFile)
+					if erroutjson != nil {
+						LogError(erroutjson)
+					}
+					defer jsonoutfile.Close()
+					writer := bufio.NewWriter(jsonoutfile)
+					defer writer.Flush()
 
-						jsonOutputFile := strings.Join([]string{pwddir, "/", strconv.Itoa(value.ID), ".json"}, "")
-						jsonoutfile, erroutjson := os.Create(jsonOutputFile)
-						if erroutjson != nil {
-							LogError(erroutjson)
-						}
-						defer jsonoutfile.Close()
-						writer := bufio.NewWriter(jsonoutfile)
-						defer writer.Flush()
+					codePatternScanJSON := []string{"--pcre2", "--no-heading", "-o", "-p", "-i", "-U", "--json", "-f", searchPatternFile, scanPath}
+					xcmdJSON := exec.Command(rgbin, codePatternScanJSON...)
+					xcmdJSON.Stdout = jsonoutfile
+					xcmdJSON.Stderr = os.Stderr
+					errrJSON := xcmdJSON.Run()
 
-						codePatternScanJSON := []string{"--pcre2", "--no-heading", "-o", "-p", "-i", "-U", "--json", "-f", searchPatternFile, scanPath}
-						xcmdJSON := exec.Command(rgbin, codePatternScanJSON...)
-						xcmdJSON.Stdout = jsonoutfile
-						xcmdJSON.Stderr = os.Stderr
-						errrJSON := xcmdJSON.Run()
-
-						if errrJSON != nil {
-							if xcmdJSON.ProcessState.ExitCode() == 2 {
-								LogError(errrJSON)
-							} else {
-								colorBlueBold.Println("│ ")
-								colorBlueBold.Println("│ JSON OK")
-								colorBlueBold.Println("│ ")
-							}
+					if errrJSON != nil {
+						if xcmdJSON.ProcessState.ExitCode() == 2 {
+							LogError(errrJSON)
 						} else {
-							ProcessOutput(strings.Join([]string{strconv.Itoa(value.ID), ".json"}, ""), strconv.Itoa(value.ID), value.Name, value.Description, value.Error, value.Solution, value.Fatal)
-							GenerateSarif()
+							colorRedBold.Println("│ ")
 						}
+					} else {
+						ProcessOutput(strings.Join([]string{strconv.Itoa(value.ID), ".json"}, ""), strconv.Itoa(value.ID), value.Name, value.Description, value.Error, value.Solution, value.Fatal)
+						GenerateSarif()
+						colorBlueBold.Println("│ ")
 
 					}
 
@@ -239,6 +235,7 @@ var auditCmd = &cobra.Command{
 				fmt.Println("│ ")
 				fmt.Println("├ Collection : ", value.Name)
 				fmt.Println("│ Description : ", value.Description)
+				fmt.Println("│ Tags : ", value.Tags)
 				fmt.Println("│ ")
 
 				codePatternCollect := []string{"--pcre2", "--no-heading", "-i", "-o", "-U", "-f", searchPatternFile, scanPath}
@@ -258,31 +255,30 @@ var auditCmd = &cobra.Command{
 					fmt.Println("│ ")
 				}
 
-				if value.OutputJSON {
+				jsonOutputFile := strings.Join([]string{pwddir, "/", strconv.Itoa(value.ID), ".json"}, "")
+				jsonoutfile, erroutjson := os.Create(jsonOutputFile)
+				if erroutjson != nil {
+					LogError(erroutjson)
+				}
+				defer jsonoutfile.Close()
+				writer := bufio.NewWriter(jsonoutfile)
+				defer writer.Flush()
 
-					jsonOutputFile := strings.Join([]string{pwddir, "/", strconv.Itoa(value.ID), ".json"}, "")
-					jsonoutfile, erroutjson := os.Create(jsonOutputFile)
-					if erroutjson != nil {
-						LogError(erroutjson)
+				codePatternScanJSON := []string{"--pcre2", "--no-heading", "-i", "-o", "-U", "--json", "-f", searchPatternFile, scanPath}
+				xcmdJSON := exec.Command(rgbin, codePatternScanJSON...)
+				xcmdJSON.Stdout = jsonoutfile
+				xcmdJSON.Stderr = os.Stderr
+				errrJSON := xcmdJSON.Run()
+
+				if errrJSON != nil {
+					if xcmdJSON.ProcessState.ExitCode() == 2 {
+						LogError(errrJSON)
+					} else {
+						colorBlueBold.Println("│")
 					}
-					defer jsonoutfile.Close()
-					writer := bufio.NewWriter(jsonoutfile)
-					defer writer.Flush()
-
-					codePatternScanJSON := []string{"--pcre2", "--no-heading", "-i", "-o", "-U", "--json", "-f", searchPatternFile, scanPath}
-					xcmdJSON := exec.Command(rgbin, codePatternScanJSON...)
-					xcmdJSON.Stdout = jsonoutfile
-					xcmdJSON.Stderr = os.Stderr
-					errrJSON := xcmdJSON.Run()
-
-					if errrJSON != nil {
-						if xcmdJSON.ProcessState.ExitCode() == 2 {
-							LogError(errrJSON)
-						} else {
-							colorBlueBold.Println("│")
-						}
-					}
-
+				} else {
+					ProcessOutput(strings.Join([]string{strconv.Itoa(value.ID), ".json"}, ""), strconv.Itoa(value.ID), value.Name, value.Description, "", "", false)
+					colorRedBold.Println("│ ")
 				}
 
 			default:

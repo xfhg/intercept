@@ -6,7 +6,6 @@ require (
 	github.com/blang/semver v3.5.1+incompatible
 	github.com/gookit/color v1.5.2
 	github.com/hashicorp/go-getter v1.7.0
-	github.com/hashicorp/go-getter/v2 v2.2.0
 	github.com/itchyny/gojq v0.12.11
 	github.com/kardianos/osext v0.0.0-20190222173326-2bc1f35cddc0
 	github.com/lens-vm/jsonmerge v0.0.0-20210328131518-91ae88d1bfff
@@ -17,7 +16,6 @@ require (
 	github.com/spf13/viper v1.15.0
 	github.com/theckman/yacspin v0.13.12
 	gopkg.in/yaml.v2 v2.4.0
-	gopkg.in/yaml.v3 v3.0.1
 )
 
 require (
@@ -77,4 +75,5 @@ require (
 	google.golang.org/grpc v1.53.0 // indirect
 	google.golang.org/protobuf v1.28.1 // indirect
 	gopkg.in/ini.v1 v1.67.0 // indirect
+	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
