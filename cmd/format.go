@@ -2,9 +2,7 @@ package cmd
 
 import (
 	"encoding/json"
-	"fmt"
 	"io"
-	"log"
 	"os"
 	"strings"
 
@@ -55,19 +53,19 @@ func ProcessOutput(filename string, ruleId string, ruleName string, ruleDescript
 
 	ruleMetajsonData, err := json.Marshal(ruleMetaData)
 	if err != nil {
-		fmt.Println(err)
+		LogError(err)
 		return
 	}
 	file, err := os.Open(filename)
 	if err != nil {
-		fmt.Println(err)
+		LogError(err)
 		return
 	}
 	defer file.Close()
 
 	content, err := io.ReadAll(file)
 	if err != nil {
-		fmt.Println(err)
+		LogError(err)
 		return
 	}
 
@@ -86,7 +84,7 @@ func ProcessOutput(filename string, ruleId string, ruleName string, ruleDescript
 		var jsonObject interface{}
 		err := json.Unmarshal([]byte(object), &jsonObject)
 		if err != nil {
-			fmt.Println(err)
+			LogError(err)
 			return
 		}
 		jsonArray = append(jsonArray, jsonObject)
@@ -94,13 +92,13 @@ func ProcessOutput(filename string, ruleId string, ruleName string, ruleDescript
 
 	output, err := json.Marshal(jsonArray)
 	if err != nil {
-		fmt.Println(err)
+		LogError(err)
 		return
 	}
 
 	err = os.WriteFile(filename, []byte(string(output)), 0644)
 	if err != nil {
-		fmt.Println(err)
+		LogError(err)
 		return
 	}
 
@@ -111,12 +109,12 @@ func ProcessOutput(filename string, ruleId string, ruleName string, ruleDescript
 	if FileExists("intercept.output.json") {
 		outfile, err = os.OpenFile("intercept.output.json", os.O_RDWR, 0644)
 		if err != nil {
-			panic(err)
+			LogError(err)
 		}
 	} else {
 		outfile, err = os.Create("intercept.output.json")
 		if err != nil {
-			panic(err)
+			LogError(err)
 		}
 	}
 
@@ -124,7 +122,7 @@ func ProcessOutput(filename string, ruleId string, ruleName string, ruleDescript
 
 	fileInfo, err := outfile.Stat()
 	if err != nil {
-		panic(err)
+		LogError(err)
 	}
 	fileSize := fileInfo.Size()
 
@@ -134,13 +132,13 @@ func ProcessOutput(filename string, ruleId string, ruleName string, ruleDescript
 
 		emptyJSON, err := json.Marshal(emptyArray)
 		if err != nil {
-			panic(err)
+			LogError(err)
 		}
 
 		// Write the JSON to a file
 		err = os.WriteFile("intercept.output.json", emptyJSON, 0644)
 		if err != nil {
-			panic(err)
+			LogError(err)
 		}
 
 	}
@@ -149,12 +147,12 @@ func ProcessOutput(filename string, ruleId string, ruleName string, ruleDescript
 
 	finalerr := json.NewDecoder(outfile).Decode(&finalobjects)
 	if finalerr != nil {
-		panic(finalerr)
+		LogError(finalerr)
 	}
 
 	query, err := gojq.Parse(" .[] | select(.type == \"match\") ")
 	if err != nil {
-		log.Fatalln(err)
+		LogError(err)
 	}
 
 	var filteredJsonArray []interface{}
@@ -166,23 +164,23 @@ func ProcessOutput(filename string, ruleId string, ruleName string, ruleDescript
 			break
 		}
 		if err, ok := v.(error); ok {
-			log.Fatalln(err)
+			LogError(err)
 		}
 
 		structured, err := json.Marshal(v)
 		if err != nil {
-			panic(err)
+			LogError(err)
 		}
 
 		new, err := jsonmerge.MergePatch(structured, ruleMetajsonData)
 		if err != nil {
-			panic(err)
+			LogError(err)
 		}
 
 		var newV interface{}
 		newerr := json.Unmarshal([]byte(new), &newV)
 		if newerr != nil {
-			panic(newerr)
+			LogError(newerr)
 		}
 
 		filteredJsonArray = append(filteredJsonArray, newV)
@@ -192,23 +190,23 @@ func ProcessOutput(filename string, ruleId string, ruleName string, ruleDescript
 	}
 	finaloutput, ferr := json.Marshal(filteredJsonArray)
 	if ferr != nil {
-		fmt.Println(ferr)
+		LogError(ferr)
 		return
 	}
 	err = os.WriteFile(filename, []byte(string(finaloutput)), 0644)
 	if err != nil {
-		fmt.Println(err)
+		LogError(err)
 		return
 	}
 
 	compiledoutput, ferr := json.Marshal(finalobjects)
 	if ferr != nil {
-		fmt.Println(ferr)
+		LogError(ferr)
 		return
 	}
 	err = os.WriteFile("intercept.output.json", []byte(string(compiledoutput)), 0644)
 	if err != nil {
-		fmt.Println(err)
+		LogError(err)
 		return
 	}
 
@@ -217,12 +215,12 @@ func ProcessOutput(filename string, ruleId string, ruleName string, ruleDescript
 func GenerateSarif() {
 	interceptResults, err := loadInterceptResults()
 	if err != nil {
-		panic(err)
+		LogError(err)
 	}
 
 	report, err := sarif.New(sarif.Version210)
 	if err != nil {
-		panic(err)
+		LogError(err)
 	}
 
 	run := sarif.NewRunWithInformationURI("intercept", "https://intercept.cc")
@@ -272,7 +270,7 @@ func GenerateSarif() {
 	report.AddRun(run)
 
 	if err := report.WriteFile("intercept.sarif.json"); err != nil {
-		panic(err)
+		LogError(err)
 	}
 
 }
@@ -281,7 +279,7 @@ func loadInterceptResults() (InterceptOutput, error) {
 
 	jsonResult, err := os.ReadFile("intercept.output.json")
 	if err != nil {
-		panic(err)
+		LogError(err)
 	}
 
 	var results InterceptOutput

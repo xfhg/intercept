@@ -38,7 +38,7 @@ var configCmd = &cobra.Command{
 
 			}
 			fmt.Println("│")
-			fmt.Println("│ Config clear")
+			colorGreenBold.Println("│ Config clear")
 
 		}
 
@@ -137,6 +137,7 @@ var configCmd = &cobra.Command{
 
 			fmt.Println("│")
 			fmt.Println("│ Config Updated")
+			fmt.Println("│")
 			fmt.Println("└")
 
 		} else if fromFile || fromURL {
@@ -161,7 +162,7 @@ var configCmd = &cobra.Command{
 			if hashCfgFile != "" {
 
 				fmt.Println("│")
-				fmt.Println("│ MD5 Valid checksum :\t", hashCfgFile)
+				fmt.Println("│ MD5 Expected checksum :\t", hashCfgFile)
 				fmt.Println("│ MD5 Config checksum :\t", HexDigestConfig)
 
 				if HexDigestConfig != hashCfgFile {
@@ -171,7 +172,7 @@ var configCmd = &cobra.Command{
 					log.Fatal("Aborting : MD5 checksum does not match")
 				} else {
 					fmt.Println("│")
-					colorGreenBold.Println("│ MD5 Config Match")
+					colorGreenBold.Println("│ MD5 Config Hash Match")
 					fmt.Println("│")
 				}
 			}
@@ -187,12 +188,14 @@ var configCmd = &cobra.Command{
 				LogError(err)
 			}
 			fmt.Println("│")
-			fmt.Println("│ New Config created")
+			colorGreenBold.Println("│ New Config created")
+			fmt.Println("│")
 			fmt.Println("└")
 
 		} else {
 			fmt.Println("│")
 			fmt.Println("│ No updates detected")
+			fmt.Println("│")
 			fmt.Println("└")
 		}
 

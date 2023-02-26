@@ -8,6 +8,7 @@ import (
 	"os"
 	"path/filepath"
 	"runtime"
+	"strings"
 
 	"github.com/kardianos/osext"
 	homedir "github.com/mitchellh/go-homedir"
@@ -73,6 +74,23 @@ func ContainsInt(s []int, e int) bool {
 	return false
 }
 
+func FindMatchingString(s1 string, s2 string, delim string) bool {
+
+	s1 = strings.ToUpper(s1)
+	s2 = strings.ToUpper(s2)
+
+	a1 := strings.Split(s1, delim)
+	a2 := strings.Split(s2, delim)
+	for _, str1 := range a1 {
+		for _, str2 := range a2 {
+			if str1 == str2 {
+				return true
+			}
+		}
+	}
+	return false
+}
+
 // PrintClose prints the command ending
 func PrintClose() {
 
@@ -80,6 +98,7 @@ func PrintClose() {
 	fmt.Println("│")
 	colorBlueBold.Println("├ INTERCEPT")
 	fmt.Println("│ https://intercept.cc")
+	fmt.Println("│")
 	if buildVersion != "" {
 		fmt.Println("├", buildVersion)
 	}

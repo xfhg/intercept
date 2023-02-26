@@ -17,7 +17,6 @@ import (
 
 var (
 	scanPath  string
-	scanFast  string
 	scanTags  string
 	scanBreak string
 	fatal     = false
@@ -101,7 +100,10 @@ var auditCmd = &cobra.Command{
 
 		fmt.Println("│ PWD : ", pwddir)
 		fmt.Println("│ RGP : ", rgbin)
-		fmt.Println("│ Scan Path : ", scanPath)
+		fmt.Println("│ ")
+		fmt.Println("│ Scan PATH : ", scanPath)
+		fmt.Println("│ Scan ENV : ", cfgEnv)
+		fmt.Println("│ Scan TAG : ", scanTags)
 
 		if auditNox {
 			fmt.Println("│ Exceptions Disabled - All Policies Activated")
@@ -126,6 +128,13 @@ var auditCmd = &cobra.Command{
 
 		for _, value := range rules.Rules {
 
+			tagfound := FindMatchingString(scanTags, value.Tags, ",")
+			if tagfound || scanTags == "" {
+				fmt.Println("│ ")
+			} else {
+				continue
+			}
+
 			searchPattern := []byte(strings.Join(value.Patterns, "\n") + "\n")
 			_ = os.WriteFile(searchPatternFile, searchPattern, 0644)
 
@@ -139,6 +148,7 @@ var auditCmd = &cobra.Command{
 				fmt.Println("├ Rule #", value.ID)
 				fmt.Println("│ Rule name : ", value.Name)
 				fmt.Println("│ Rule description : ", value.Description)
+				fmt.Println("│ Impacted Env : ", value.Environment)
 				fmt.Println("│ Confidence : ", value.Confidence)
 				fmt.Println("│ Tags : ", value.Tags)
 				fmt.Println("│ ")
@@ -170,9 +180,9 @@ var auditCmd = &cobra.Command{
 						}
 					} else {
 
-						if (strings.Contains(value.Environment, cfgEnv) ||
-							strings.Contains(value.Environment, "all") ||
-							value.Environment == "") && value.Fatal {
+						envfound := FindMatchingString(cfgEnv, value.Environment, ",")
+						if (envfound || strings.Contains(value.Environment, "all") || value.Environment == "") && value.Fatal {
+
 							colorRedBold.Println("│")
 							colorRedBold.Println("│ FATAL : ")
 							colorRedBold.Println("│ ", value.Error)
@@ -350,10 +360,7 @@ func init() {
 
 	auditCmd.PersistentFlags().StringVarP(&scanPath, "target", "t", ".", "scanning Target path")
 	auditCmd.PersistentFlags().BoolP("no-exceptions", "x", false, "disables the option to deactivate rules by eXception")
-
-	auditCmd.PersistentFlags().StringVarP(&scanFast, "fast", "f", "false", "minimal console output")
 	auditCmd.PersistentFlags().StringVarP(&scanTags, "tags", "i", "", "include only rules with the specified tag")
-
 	auditCmd.PersistentFlags().StringVarP(&scanBreak, "no-break", "b", "false", "disable exit 1 for fatal rules")
 
 	rootCmd.AddCommand(auditCmd)
