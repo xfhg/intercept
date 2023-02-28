@@ -6,7 +6,7 @@
 
 # INTERCEPT v1 _ PRE-RELEASE
 
-intercept is a devsecops tool designed to provide Static Application Security Testing (SAST) capabilities to software development teams. The tool aims to help developers identify and address security vulnerabilities in their code early in the software development life cycle, reducing the risk of security breaches and ensuring compliance with industry regulations. Intercept leverages a range of security scanning techniques to analyze code, including pattern matching, code analysis, and vulnerability scanning. The tool is designed to be easy to use, with a simple sub-second command-line interface and customizable configuration options. With Intercept, developers can integrate security testing into their development workflows and make security a seamless part of their software development process.
+intercept is a devsecops tool designed to provide Static Application Security Testing (SAST) capabilities to software development teams. The tool aims to help developers identify and address security vulnerabilities in their code early in the software development life cycle, reducing the risk of security breaches and ensuring compliance with industry regulations. Intercept leverages a range of security scanning techniques to analyze code, including pattern matching, code analysis, and vulnerability scanning. The tool is designed to be easy to integrate, with a simple sub-second command-line interface and customizable configuration options. With intercept, developers can integrate security testing into their development workflows and make security a critical yet seamless part of their software development process.
 
 <br>
 
@@ -14,13 +14,19 @@ intercept is a devsecops tool designed to provide Static Application Security Te
 ![GitHub release (latest by date)](https://img.shields.io/github/v/release/xfhg/intercept)
 ![GitHub Release Date](https://img.shields.io/github/release-date/xfhg/intercept)
 ![GitHub last commit](https://img.shields.io/github/last-commit/xfhg/intercept)
-![GitHub commits since latest release (by date)](https://img.shields.io/github/commits-since/xfhg/intercept/latest)
 
+![GitHub commits since latest release (by date)](https://img.shields.io/github/commits-since/xfhg/intercept/latest)
 ![GitHub code size in bytes](https://img.shields.io/github/languages/code-size/xfhg/intercept)
 ![GitHub go.mod Go version](https://img.shields.io/github/go-mod/go-version/xfhg/intercept)
+
+[![CodeQL](https://github.com/xfhg/intercept/actions/workflows/codeql.yml/badge.svg)](https://github.com/xfhg/intercept/actions/workflows/codeql.yml)
 ![GitHub issues](https://img.shields.io/github/issues-raw/xfhg/intercept)
 ![GitHub pull requests](https://img.shields.io/github/issues-pr-raw/xfhg/intercept)
 
+[![Intercept Test](https://github.com/xfhg/intercept/actions/workflows/test.yml/badge.svg)](https://github.com/xfhg/intercept/actions/workflows/test.yml)
+[![Intercept Release](https://github.com/xfhg/intercept/actions/workflows/release.yml/badge.svg)](https://github.com/xfhg/intercept/actions/workflows/release.yml)
+
+--- 
 
 ## Features
 
@@ -48,7 +54,7 @@ Policy as code can be used to enforce a wide range of policies, including securi
 
 Intercept offers an extensive library of policies consisting of over a thousand regular expressions that can be used to detect sensitive data leakage and enforce security best practices in software development. This vast collection of pre-defined policies makes it easy for developers to get started with secret scanning and quickly identify potential issues in their code. The policies cover a range of security concerns, such as hard-coded passwords, API keys, and other secrets, and are continuously updated to keep up with the latest security threats and best practices. With the ability to customize policies or add new ones, developers can ensure that their applications are protected against known and emerging threats, reducing the risk of sensitive data leakage and improving the overall security posture of their organization.
 
-# Policy Enforcement Levels
+## Policy Enforcement Levels
 
 Enforcement levels are a first class concept in allowing pass/fail behavior to be associated separately from the policy logic. This enables any policy to be a warning, allow exceptions, or be absolutely mandatory. These levels can be coupled to environments, different uses of the same policy can have different enforcement levels per environment.
 
@@ -92,7 +98,11 @@ We are excited to announce that Intercept is now available in a pre-release vers
 
 Mess around with it :
 
+<p align="center">
+
 [![Open in Gitpod](https://gitpod.io/button/open-in-gitpod.svg)](https://gitpod.io/#https://github.com/xfhg/intercept)
+
+</p>
 
 
 
