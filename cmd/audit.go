@@ -101,9 +101,9 @@ var auditCmd = &cobra.Command{
 		fmt.Println("│ PWD : ", pwddir)
 		fmt.Println("│ RGP : ", rgbin)
 		fmt.Println("│ ")
-		fmt.Println("│ Scan PATH : ", scanPath)
-		fmt.Println("│ Scan ENV : ", cfgEnv)
-		fmt.Println("│ Scan TAG : ", scanTags)
+		fmt.Println("│ Scan PATH\t: ", scanPath)
+		fmt.Println("│ Scan ENV\t: ", cfgEnv)
+		fmt.Println("│ Scan TAG\t: ", scanTags)
 
 		if auditNox {
 			fmt.Println("│ Exceptions Disabled - All Policies Activated")
