@@ -225,6 +225,10 @@ func GenerateSarif() {
 
 	run := sarif.NewRunWithInformationURI("intercept", "https://intercept.cc")
 
+	if buildVersion != "" {
+		run.Tool.Driver.SemanticVersion = &buildVersion
+	}
+
 	for _, r := range interceptResults {
 
 		pb := sarif.NewPropertyBag()
@@ -235,7 +239,7 @@ func GenerateSarif() {
 			WithDescription(r.RuleDescription).
 			WithHelpURI("https://intercept.cc").
 			WithProperties(pb.Properties).
-			WithMarkdownHelp("# INTERCEPT")
+			WithMarkdownHelp("# INTERCEPT.CC").WithTextHelp(r.RuleSolution)
 
 		run.AddDistinctArtifact(r.Data.Path.Text)
 

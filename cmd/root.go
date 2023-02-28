@@ -62,7 +62,7 @@ func initConfig() {
 
 	if err := viper.ReadInConfig(); err == nil {
 
-		fmt.Println("├ Policy :", viper.ConfigFileUsed())
+		fmt.Println("├ Loaded PaC :", viper.ConfigFileUsed())
 
 	}
 
