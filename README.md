@@ -67,9 +67,9 @@ Main benefits:
 1. Grab the latest [RELEASE](https://github.com/xfhg/intercept/releases) of intercept bundle for your platform 
 
 ```
-intercept-darwin_amd64
-intercept-linux_amd64
-intercept-windows_amd64.exe
+core-intercept-rg-x86_64-darwin.zip
+core-intercept-rg-x86_64-linux.zip
+core-intercept-rg-x86_64-windows.zip
 ```
 
 2. Make sure you have the latest setup
@@ -279,7 +279,6 @@ It supports searching with either memory maps or by searching incrementally with
 
 Timings were collected on a system with an Intel
 i7-6900K 3.2 GHz.
-
 A straight-up comparison between ripgrep, ugrep and GNU grep on a single large file cached in memory (**~13GB**, [`OpenSubtitles.raw.en.gz`](http://opus.nlpl.eu/download.php?f=OpenSubtitles/v2018/mono/OpenSubtitles.raw.en.gz)):
 
 | Tool | Command | Line count | Time |
