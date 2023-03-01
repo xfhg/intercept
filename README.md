@@ -181,7 +181,7 @@ intercept audit -t examples/target -e "development"
 ```
 - Rule Tag filter
 ```
-intercept audit -t examples/target -i "AWS"
+intercept audit -t examples/target -i "AWS,OWASP"
 ```
 - Disable pipeline break
 ```
