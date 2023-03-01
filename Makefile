@@ -53,6 +53,7 @@ purge:
 	rm -f release/interceptl
 	rm -f release/interceptm
 	rm -f release/intercept.exe
+	rm -f release/intercept*
 	rm -f release/v*
 	rm -f release/_*
 	rm -f release/config*
@@ -81,18 +82,18 @@ out-linux: clean purge version linux
 	cp bin/interceptl release/interceptl
 	go install
 	cp .ignore release/.ignore
-	cd release/ ; zip -9 -T -x "*.DS_Store*" "*.exe" "*rgm*" "*interceptm*" -r ../output/core-intercept-rg-x86_64-linux.zip *
+	cd release/ ; zip -9 -T -x "*.DS_Store*" "*.exe" "*rgm*" "*interceptm*" -r ../output/core-intercept-rg-x86_64-linux.zip * ; zip -T -u ../output/core-intercept-rg-x86_64-linux.zip .ignore
 
 out-macos: clean purge version macos
 	cp bin/interceptm release/interceptm
 	go install
 	cp .ignore release/.ignore
-	cd release/ ; zip -9 -T -x "*.DS_Store*" "*.exe" "*rgl*" "*interceptl*" -r ../output/core-intercept-rg-x86_64-darwin.zip *
+	cd release/ ; zip -9 -T -x "*.DS_Store*" "*.exe" "*rgl*" "*interceptl*" -r ../output/core-intercept-rg-x86_64-darwin.zip * ; zip -T -u ../output/core-intercept-rg-x86_64-darwin.zip .ignore
 
 out-win: clean purge version windows
 	cp bin/intercept.exe release/intercept.exe
 	cp .ignore release/.ignore
-	cd release/ ; zip -9 -T -x "*.DS_Store*" "*interceptm*" "*rgl*" "*rgm*" "*interceptl*" -r ../output/core-intercept-rg-x86_64-windows.zip *
+	cd release/ ; zip -9 -T -x "*.DS_Store*" "*interceptm*" "*rgl*" "*rgm*" "*interceptl*" -r ../output/core-intercept-rg-x86_64-windows.zip * ; zip -T -u ../output/core-intercept-rg-x86_64-windows.zip .ignore
 
 ripgrep-full:
 	cd release/ ; zip -9 -T -x "*.DS_Store*" "*intercept*" -r ../output/intercept-ripgrep.zip rg/
