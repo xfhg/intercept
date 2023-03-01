@@ -100,20 +100,26 @@ intercept audit -t examples/target
 6. Check the different output flavours
 
 ```
-stdout
-intercept.output.json
-intercept.sarif.json
+stdout human readable report
+individual json rule output with matches
+all findings compiled into intercept.output.json
+fully compliant SARIF output into intercept.sarif.json
 ```
 
 7. Tune the scan with extra flags like ENVIRONMENT or TAGS filter
 
 ```
-intercept audit -t
+intercept audit -t examples/target -e "development" -i "AWS"
 ```
 
 ## Policy File Structure
 
  [Policy Schema](https://github.com/xfhg/intercept/tree/master/policy/schema.json) 
+
+These are 2 types of policies available :
+
+- **scan** : where we enforce breaking rules on matched patterns
+- **collect** : where we just collect matched patterns
 
 Easy to read and compose the rules file have this minimal required structure:
 ```
@@ -125,10 +131,9 @@ Rules:
   - name: Private key committed in code
     id: 100
     description: Private key committed to code version control
-    solution: Remove it, rewrite git history and use Vault / AWS Secrets Manager to secure your private keys
     error: This violation immediately blocks your code deployment
     type: scan
-    confidence: low
+    confidence: high
     enforcement: true
     environment: all
     fatal: true
@@ -155,35 +160,43 @@ ExitClean: "Clean report"
 ```
 
 
-And can be tuned into :
+And can be enriched into :
 ```
 ```
 
-## Extra Configuration Flags
+## Extra Configuration & Flags
 
 - MD5 Hash for configuration file 
 ```
+intercept config -a examples/minimal.yaml -k e4ab151755bddfba106010477adc1fd0
 ```
 - Download of configuration file
 ```
+intercept config -a https://xxx.com/artifact/policy.yaml -k e4ab151755bddfba106010477adc1fd0
 ```
 - Enviroment enforcement (check policy enforcement levels)
 ```
+intercept audit -t examples/target -e "development"
 ```
 - Rule Tag filter
 ```
+intercept audit -t examples/target -i "AWS"
 ```
 - Confidence filter
 ```
+not implemented yet
 ```
 - No pipeline break
 ```
+intercept audit -t examples/target -b true
 ```
 - No exceptions 
 ```
+intercept audit -t examples/target -x
 ```
 - Ignoring files and folders
 ```
+use .ignore file
 ```
 
 
