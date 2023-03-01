@@ -162,6 +162,7 @@ ExitClean: "Clean report"
 
 And can be enriched into :
 ```
+WIP
 ```
 
 ## Extra Configuration & Flags
@@ -181,10 +182,6 @@ intercept audit -t examples/target -e "development"
 - Rule Tag filter
 ```
 intercept audit -t examples/target -i "AWS"
-```
-- Confidence filter
-```
-not implemented yet
 ```
 - No pipeline break
 ```
