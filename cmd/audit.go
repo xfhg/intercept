@@ -361,7 +361,7 @@ func init() {
 	auditCmd.PersistentFlags().StringVarP(&scanPath, "target", "t", ".", "scanning Target path")
 	auditCmd.PersistentFlags().BoolP("no-exceptions", "x", false, "disables the option to deactivate rules by eXception")
 	auditCmd.PersistentFlags().StringVarP(&scanTags, "tags", "i", "", "include only rules with the specified tag")
-	auditCmd.PersistentFlags().StringVarP(&scanBreak, "no-break", "b", "true", "disable exit 1 for fatal rules")
+	auditCmd.PersistentFlags().StringVarP(&scanBreak, "break", "b", "true", "disable exit 1 for fatal rules")
 
 	rootCmd.AddCommand(auditCmd)
 

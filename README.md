@@ -183,9 +183,9 @@ intercept audit -t examples/target -e "development"
 ```
 intercept audit -t examples/target -i "AWS"
 ```
-- No pipeline break
+- Disable pipeline break
 ```
-intercept audit -t examples/target -b true
+intercept audit -t examples/target -b false
 ```
 - No exceptions 
 ```
