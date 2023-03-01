@@ -36,6 +36,12 @@ linux: clean
 macos: clean
 	CGO_ENABLED=0 GOOS=darwin GOARCH=amd64 go build -ldflags="-s -w -X 'github.com/xfhg/intercept/cmd.buildVersion=$(TAG)'" -mod=readonly -o bin/interceptm
 
+# macos-arm: clean
+# 	CGO_ENABLED=0 GOOS=darwin GOARCH=arm64 go build -ldflags="-s -w -X 'github.com/xfhg/intercept/cmd.buildVersion=$(TAG)'" -mod=readonly -o bin/interceptma
+
+# linux-arm: clean
+# 	CGO_ENABLED=0 GOOS=linux GOARCH=arm64 go build -ldflags="-s -w -X 'github.com/xfhg/intercept/cmd.buildVersion=$(TAG)'" -mod=readonly -o bin/interceptla
+
 clean: mod
 	go clean
 	rm -f bin/interceptl
@@ -169,6 +175,11 @@ dev-macos: clean purge macos
 	cp bin/interceptm release/interceptm
 	cp .ignore release/.ignore
 	go install
+
+# dev-arm: clean purge macos-arm
+# 	cp bin/interceptma release/interceptma
+# 	cp .ignore release/.ignore
+
 
 dev-test:
 	./tests/venom run tests/suite.yml

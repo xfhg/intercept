@@ -7,23 +7,14 @@
 
 *.code-workspace
 
-# Dependency directories (remove the comment below to include it)
-# vendor/
-
 bin/
 output/
 release/
 
 sandbox/
-examples/
-policy/
 
 .DS_Store
-
 config.yaml
-
 tests/venom
-
 venom*
-
 search_regex
