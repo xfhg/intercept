@@ -120,7 +120,7 @@ var auditCmd = &cobra.Command{
 		}
 		fmt.Println("│ ")
 		if len(rules.Rules) < 1 {
-			fmt.Println("│ No Policy rules detected")
+			colorYellowBold.Println("│ No Policy rules detected")
 			fmt.Println("│ Run the command - intercept config - to setup policies")
 			PrintClose()
 			os.Exit(0)

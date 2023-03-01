@@ -235,7 +235,7 @@ You can set three enforcement levels:
 
 # Playground
 
-Mess around with it :
+Build & mess around with it :
 
 ```
 make clean 
