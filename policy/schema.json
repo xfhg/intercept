@@ -1,0 +1,89 @@
+{
+    "$schema": "http://json-schema.org/draft-06/schema#",
+    "$ref": "#/definitions/Intercept",
+    "definitions": {
+        "Intercept": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "Banner": {
+                    "type": "string"
+                },
+                "Rules": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/Rule"
+                    }
+                },
+                "ExitCritical": {
+                    "type": "string"
+                },
+                "ExitWarning": {
+                    "type": "string"
+                },
+                "ExitClean": {
+                    "type": "string"
+                }
+            },
+            "required": [
+                "Banner",
+                "ExitClean",
+                "ExitCritical",
+                "ExitWarning",
+                "Rules"
+            ],
+            "title": "Intercept"
+        },
+        "Rule": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "name": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "error": {
+                    "type": "string"
+                },
+                "tags": {
+                    "type": "string"
+                },
+                "type": {
+                    "type": "string"
+                },
+                "fatal": {
+                    "type": "boolean"
+                },
+                "enforcement": {
+                    "type": "boolean"
+                },
+                "environment": {
+                    "type": "string"
+                },
+                "confidence": {
+                    "type": "string"
+                },
+                "patterns": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                }
+            },
+            "required": [
+                "description",
+                "id",
+                "name",
+                "patterns",
+                "tags",
+                "type"
+            ],
+            "title": "Rule"
+        }
+    }
+}
