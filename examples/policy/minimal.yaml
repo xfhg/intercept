@@ -1,0 +1,34 @@
+Banner: |
+
+  | Minimum 1 SCAN and 1 COLLECT RULE
+
+Rules:
+  - name: Private key committed in code
+    id: 100
+    description: Private key committed to code version control
+    error: This violation immediately blocks your code deployment
+    tags: KEY
+    type: scan
+    fatal: true
+    enforcement: true
+    environment: all
+    confidence: high
+    patterns:
+      - \s*(-----BEGIN PRIVATE KEY-----)
+      - \s*(-----BEGIN RSA PRIVATE KEY-----)
+      - \s*(-----BEGIN DSA PRIVATE KEY-----)
+      - \s*(-----BEGIN EC PRIVATE KEY-----)
+      - \s*(-----BEGIN OPENSSH PRIVATE KEY-----)
+      - \s*(-----BEGIN PGP PRIVATE KEY BLOCK-----)
+
+  - name: Collect sparse TF resources outside of modules.
+    id: 900
+    description: The following resources were detected outside of compliant module usage
+    type: collect
+    tags: AWS,AZURE
+    patterns:
+      - (resource)\s*"(.*)"
+
+ExitCritical: "Critical irregularities found in your code"
+ExitWarning: "Irregularities found in your code"
+ExitClean: "Clean report"

@@ -29,7 +29,7 @@
 ## Features
 
 
-- **Pattern matching:** intercept uses regex pattern matching technique to scan code for known vulnerabilities and customised patterns, reducing the time and effort required to identify and fix these common issues.
+- **Pattern matching:** intercept uses regex pattern matching technique to scan code for known vulnerabilities and customised patterns, reducing the time and effort required to identify and fix these common issues. [Targetting more than 1500 patterns](https://github.com/xfhg/intercept/tree/master/policy/stable.yaml) 
 - **Customizable rules:** intercept allows users to customize all security rules used to scan their code, making it possible to tailor the scanning process to the specific requirements of their application or organization.
 - **Integration with CI/CD:** intercept can easily be integrated into continuous integration and continuous deployment (CI/CD) pipelines, allowing security testing to be performed automatically as part of the development process.
 - **Detailed reporting:** intercept provides detailed reports on vulnerabilities and security issues, fully compliant SARIF output, including severity ratings and remediation advice, making it easy for developers to prioritize and address security concerns early on.
@@ -57,6 +57,8 @@ Main benefits:
 ## Secret Scanning
 
 **intercept** offers an extensive library of policies consisting of over a thousand regular expressions that can be used to detect sensitive data leakage and enforce security best practices in software development. This vast collection of pre-defined policies makes it easy for developers to get started with secret scanning and quickly identify potential issues in their code. The policies cover a range of security concerns, such as hard-coded passwords, API keys, and other secrets, and are continuously updated to keep up with the latest security threats and best practices. With the ability to customize policies or add new ones, developers can ensure that their applications are protected against known and emerging threats, reducing the risk of sensitive data leakage and improving the overall security posture of their organization.
+
+### [More than 1500 patterns available](https://github.com/xfhg/intercept/tree/master/policy/stable.yaml) 
 
 <br>
 <br>
@@ -132,11 +134,12 @@ Rules:
     id: 100
     description: Private key committed to code version control
     error: This violation immediately blocks your code deployment
+    tags: KEY
     type: scan
-    confidence: high
+    fatal: true
     enforcement: true
     environment: all
-    fatal: true
+    confidence: high
     patterns:
       - \s*(-----BEGIN PRIVATE KEY-----)
       - \s*(-----BEGIN RSA PRIVATE KEY-----)
@@ -160,10 +163,6 @@ ExitClean: "Clean report"
 ```
 
 
-And can be enriched into :
-```
-WIP
-```
 
 ## Extra Configuration & Flags
 
