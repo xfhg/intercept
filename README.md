@@ -6,7 +6,7 @@
 
 # INTERCEPT v1
 
-**intercept** is a devsecops cli tool designed to provide Static Application Security Testing (SAST) capabilities to software development teams. The tool aims to help developers identify and address security vulnerabilities in their code early in the software development life cycle, reducing the risk of security breaches and ensuring compliance with industry regulations. intercept leverages a range of security scanning techniques to analyze code, including pattern matching, code analysis, and vulnerability scanning. The tool is designed to be easy to integrate, with a simple sub-second command-line interface and customizable configuration options. With intercept, developers can integrate security testing into their development workflows and make security a critical yet seamless part of their software development process.
+**intercept** is a devsecops cli tool designed to provide Static Application Security Testing (SAST) capabilities to software development teams. The tool aims to help developers identify and address security vulnerabilities in their code early in the software development life cycle, reducing the risk of security breaches and ensuring compliance with industry regulations. intercept leverages a range of security scanning techniques to analyze code, including pattern matching, code analysis, and vulnerability scanning. It is designed to be easy to integrate, with a simple sub-second command-line interface and customizable configuration options. With intercept, developers can integrate security testing into their development workflows and make security a critical yet seamless part of their software development process.
 
 <br>
 
@@ -116,8 +116,6 @@ intercept audit -t examples/target -e "development" -i "AWS"
 
 ## Policy File Structure
 
- [Policy Schema](https://github.com/xfhg/intercept/tree/master/policy/schema.json) 
-
 These are 2 types of policies available :
 
 - **scan** : where we enforce breaking rules on matched patterns
@@ -161,8 +159,10 @@ ExitWarning: "Irregularities found in your code"
 ExitClean: "Clean report"
 
 ```
+[Policy Schema](https://github.com/xfhg/intercept/tree/master/policy/schema.json) 
 
-
+<br>
+<br>
 
 ## Extra Configuration & Flags
 
@@ -194,6 +194,9 @@ intercept audit -t examples/target -x
 ```
 use .ignore file
 ```
+<br>
+<br>
+<br>
 
 
 # Policy Enforcement Levels
@@ -248,11 +251,15 @@ make
 
 </p>
 
----
+<br>
+<br>
+<br>
+
+
 
 ## Standing on the shoulders of giants - [ripgrep](https://github.com/BurntSushi/ripgrep)
 
-- It is built on top of Rust's regex engine. Rust's regex engine uses finite automata, SIMD and aggressive literal optimizations to make searching very fast. (PCRE2 support can be opted into with the -P/--pcre2 flag.)
+- It is built on top of Rust's regex engine. Rust's regex engine uses finite automata, SIMD and aggressive literal optimizations to make searching very fast. (PCRE2 support)
 - Rust's regex library maintains performance with full Unicode support by building UTF-8 decoding directly into its deterministic finite automaton engine.
 It supports searching with either memory maps or by searching incrementally with an intermediate buffer. The former is better for single files and the latter is better for large directories. ripgrep chooses the best searching strategy for you automatically.
 - Applies your ignore patterns in .gitignore files using a RegexSet. That means a single file path can be matched against multiple glob patterns simultaneously.
@@ -260,6 +267,7 @@ It supports searching with either memory maps or by searching incrementally with
 
 - **same engine used on vscode search**
 
+<br>
 
 | Tool                  | Command                                                 | Line count | Time       |
 | --------------------- | ------------------------------------------------------- | ---------- | ---------- |
@@ -298,6 +306,9 @@ A straight-up comparison between ripgrep, ugrep and GNU grep on a single large f
 </details>
 
 <br>
+<br>
+<br>
+<br>
 
 
-
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fxfhg%2Fintercept.svg?type=large)](https://app.fossa.com/projects/git%2Bgithub.com%2Fxfhg%2Fintercept?ref=badge_large)
