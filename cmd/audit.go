@@ -130,7 +130,7 @@ var auditCmd = &cobra.Command{
 			os.Exit(0)
 		}
 
-		if scanTurbo == "false" || len(rules.Rules) < 50 {
+		if scanTurbo == "false" && len(rules.Rules) < 50 {
 
 			for _, value := range rules.Rules {
 
