@@ -100,6 +100,8 @@ var auditCmd = &cobra.Command{
 
 		rgbin := CoreExists()
 
+		startTime := time.Now()
+
 		fmt.Println("│ PWD : ", pwddir)
 		fmt.Println("│ RGP : ", rgbin)
 		fmt.Println("│ ")
@@ -360,8 +362,8 @@ var auditCmd = &cobra.Command{
 
 		} else {
 
-			currentTime := time.Now()
-			formattedTime := currentTime.Format("2006-01-02 15:04:05")
+			startTime = time.Now()
+			formattedTime := startTime.Format("2006-01-02 15:04:05")
 			fmt.Println("├ S ", formattedTime)
 			fmt.Print("│")
 			var wg sync.WaitGroup
@@ -374,9 +376,10 @@ var auditCmd = &cobra.Command{
 			}
 			wg.Wait()
 		}
-		currentTime := time.Now()
-		formattedTime := currentTime.Format("2006-01-02 15:04:05")
-		fmt.Println("│")
+		endTime := time.Now()
+		duration := endTime.Sub(startTime)
+		formattedTime := endTime.Format("2006-01-02 15:04:05")
+		fmt.Println("│ ", duration)
 		fmt.Println("├ F ", formattedTime)
 		PrintClose()
 

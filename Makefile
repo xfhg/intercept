@@ -8,12 +8,16 @@ PTAG=$(shell git describe --tags --abbrev=0 @^)
 
 all: purge-output rg-version-update build-tool windows linux macos out-full out-linux out-macos out-win ripgrep build-package rename-bin
 
-version: changelog
+version: changelog changelogmd
 	touch release/$(TAG)_$(VERSION)-$(MOMENT)
 	echo $(TAG) > output/_version
 
 changelog:
-	echo "release $(TAG)" > output/_changelog
+	@echo "# Changelog" > output/_changelog
+	@git tag --sort=-creatordate | grep -E '^v[0-9]+\.[0-9]+\.[0-9]+$$' | grep -E '^v[0-9]+\.0\.0$$' | while read -r tag; do \
+		echo -e "\n## $$tag" >> output/_changelog; \
+		git log --no-merges --pretty=format:"- %s" $$tag...`git describe --abbrev=0 --always --tags $$tag^` >> output/_changelog; \
+	done
 
 global: windows linux macos
 	go install
@@ -192,6 +196,13 @@ compress-bin:
 
 get-compressor-apt:
 	sudo apt-get install -y upx
+
+changelogmd:
+	@echo "# CHANGELOG" > CHANGELOG.md
+	@git tag --sort=-creatordate | grep -E '^v[0-9]+\.[0-9]+\.[0-9]+$$' | grep -E '^v[0-9]+\.0\.0$$' | while read -r tag; do \
+		echo -e "\n## $$tag" >> CHANGELOG.md; \
+		git log --no-merges --pretty=format:"- %s" $$tag...`git describe --abbrev=0 --always --tags $$tag^` >> CHANGELOG.md; \
+	done
 
 ## help: prints this help message
 help:
