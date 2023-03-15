@@ -37,7 +37,8 @@
 - **No daemons, low footprint, self-updatable binary**
 - **Ultra flexible fine-grained regex policies**
 - **No custom policy language, reduced complexity**
-- **Open source, Free as in beer**
+- **Weaponised** ripgrep
+- **Open source, free as in beer**
 
 <br>
 
