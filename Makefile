@@ -57,6 +57,7 @@ clean: mod
 	rm -f bin/interceptm
 	rm -f bin/intercept.exe
 	rm -f bin/.ignore
+	rm -f bin/intercept-*
 
 purge:
 	rm -f release/interceptl
@@ -80,7 +81,7 @@ rename-bin:
 	mv bin/interceptm bin/intercept-darwin_amd64
 	mv bin/intercept.exe bin/intercept-windows_amd64.exe
 
-out-full: purge version preserve-raw compress-bin
+out-full: purge version release-raw compress-bin
 	cp bin/interceptl release/interceptl
 	cp bin/interceptm release/interceptm
 	cp bin/intercept.exe release/intercept.exe
@@ -120,6 +121,7 @@ out-win: clean purge version windows
 
 add-ignore:
 	cp release/.ignore bin/.ignore
+	cp output/_version bin/_version
 
 # compress-examples:
 # 	zip -9 -T -x "*.DS_Store*" -r output/_examples.zip examples/
@@ -189,9 +191,9 @@ dev-test:
 	./tests/venom run tests/suite.yml
 
 preserve-raw:
-	cp bin/interceptl bin/raw-intercept-linux_amd64
-	cp bin/interceptm bin/raw-intercept-darwin_amd64
-	cp bin/intercept.exe bin/raw-intercept-windows_amd64.exe
+	cp -f bin/interceptl bin/raw-intercept-linux_amd64
+	cp -f bin/interceptm bin/raw-intercept-darwin_amd64
+	cp -f bin/intercept.exe bin/raw-intercept-windows_amd64.exe
 
 compress-bin:
 	upx -9 bin/interceptl || upx-ucl -9 bin/interceptl
@@ -200,6 +202,11 @@ compress-bin:
 
 get-compressor-apt:
 	sudo apt-get install -y upx
+
+release-raw: preserve-raw add-ignore
+	tar -czvf release/intercept-linux_amd64.tar.gz -C bin raw-intercept-linux_amd64 .ignore _version
+	tar -czvf release/intercept-darwin_amd64.tar.gz -C bin raw-intercept-darwin_amd64 .ignore _version
+	tar -czvf release/intercept-windows_amd64.tar.gz -C bin raw-intercept-windows_amd64.exe .ignore _version
 
 changelogmd:
 	@echo "# CHANGELOG" > CHANGELOG.md
