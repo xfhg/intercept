@@ -193,7 +193,8 @@ func WriteLinesOnFile(lines []string, filepath string) error {
 // LogError does that
 func LogError(err error) {
 	colorRedBold.Println("│")
-	colorRedBold.Println("│ Error")
+	colorRedBold.Println("│ Error: ")
+	colorRedBold.Println("│ ", err)
 	colorRedBold.Println("│")
 	PrintClose()
 	log.Fatal(err)

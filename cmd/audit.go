@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"encoding/json"
 	"fmt"
+	"runtime"
 	"sync"
 	"time"
 
@@ -99,6 +100,8 @@ var auditCmd = &cobra.Command{
 		pwddir := GetWd()
 
 		rgbin := CoreExists()
+
+		rgembed, _ := prepareEmbeddedExecutable()
 
 		startTime := time.Now()
 
@@ -366,15 +369,33 @@ var auditCmd = &cobra.Command{
 			formattedTime := startTime.Format("2006-01-02 15:04:05")
 			fmt.Println("├ S ", formattedTime)
 			fmt.Print("│")
+
+			numWorkers := len(rules.Rules)
+			numCPU := runtime.NumCPU()
+
 			var wg sync.WaitGroup
-			wg.Add(len(rules.Rules))
-			for _, policy := range rules.Rules {
-				go func(policy Rule) {
-					defer wg.Done()
-					ripTurbo(rgbin, pwddir, scanPath, policy)
-				}(policy)
+			wg.Add(numWorkers)
+
+			sem := make(chan struct{}, numCPU*2)
+
+			rulesChan := make(chan Rule, len(rules.Rules))
+
+			for i := 0; i < numCPU; i++ {
+				go func(workerID int) {
+					for rule := range rulesChan {
+						worker(workerID, sem, &wg, rgembed, pwddir, scanPath, rule)
+					}
+				}(i)
 			}
+
+			for _, policy := range rules.Rules {
+				rulesChan <- policy
+			}
+
+			close(rulesChan)
+
 			wg.Wait()
+
 		}
 		endTime := time.Now()
 		duration := endTime.Sub(startTime)
