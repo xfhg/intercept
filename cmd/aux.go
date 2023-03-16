@@ -6,8 +6,6 @@ import (
 	"log"
 	"net/http"
 	"os"
-	"path/filepath"
-	"runtime"
 	"strings"
 
 	"github.com/kardianos/osext"
@@ -25,37 +23,37 @@ func FileExists(filename string) bool {
 	}
 }
 
-// CoreExists return path of core binaries on this platform
-func CoreExists() string {
+// // CoreExists return path of core binaries on this platform
+// func CoreExists() string {
 
-	rgbin := ""
+// 	rgbin := ""
 
-	executablePath := GetExecutablePath()
+// 	executablePath := GetExecutablePath()
 
-	switch runtime.GOOS {
-	case "windows":
-		rgbin = filepath.Join("rg", "rg.exe")
-	case "darwin":
-		rgbin = filepath.Join("rg", "rgm")
-	case "linux":
-		rgbin = filepath.Join("rg", "rgl")
-	default:
-		colorRedBold.Println("│ OS not supported")
-		PrintClose()
-		os.Exit(1)
-	}
+// 	switch runtime.GOOS {
+// 	case "windows":
+// 		rgbin = filepath.Join("rg", "rg.exe")
+// 	case "darwin":
+// 		rgbin = filepath.Join("rg", "rgm")
+// 	case "linux":
+// 		rgbin = filepath.Join("rg", "rgl")
+// 	default:
+// 		colorRedBold.Println("│ OS not supported")
+// 		PrintClose()
+// 		os.Exit(1)
+// 	}
 
-	fullcorePath := filepath.Join(executablePath, rgbin)
+// 	fullcorePath := filepath.Join(executablePath, rgbin)
 
-	if !FileExists(fullcorePath) {
-		colorRedBold.Println("│ RG not found")
-		colorRedBold.Println("│ Run the command - intercept system - ")
-		PrintClose()
-		os.Exit(1)
-	}
-	return fullcorePath
+// 	if !FileExists(fullcorePath) {
+// 		colorRedBold.Println("│ RG not found")
+// 		colorRedBold.Println("│ Run the command - intercept system - ")
+// 		PrintClose()
+// 		os.Exit(1)
+// 	}
+// 	return fullcorePath
 
-}
+// }
 
 // PrintStart prints the command banner
 func PrintStart() {

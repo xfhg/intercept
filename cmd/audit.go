@@ -99,14 +99,12 @@ var auditCmd = &cobra.Command{
 
 		pwddir := GetWd()
 
-		rgbin := CoreExists()
-
 		rgembed, _ := prepareEmbeddedExecutable()
 
 		startTime := time.Now()
 
 		fmt.Println("│ PWD : ", pwddir)
-		fmt.Println("│ RGP : ", rgbin)
+		fmt.Println("│ RGP : ", rgembed)
 		fmt.Println("│ ")
 		fmt.Println("│ Scan PATH\t: ", scanPath)
 		fmt.Println("│ Scan ENV\t: ", cfgEnv)
@@ -173,7 +171,7 @@ var auditCmd = &cobra.Command{
 					} else {
 
 						codePatternScan := []string{"--pcre2", "-p", "-o", "-A0", "-B0", "-C0", "-i", "-U", "-f", searchPatternFile, scanPath}
-						xcmd := exec.Command(rgbin, codePatternScan...)
+						xcmd := exec.Command(rgembed, codePatternScan...)
 						xcmd.Stdout = os.Stdout
 						xcmd.Stderr = os.Stderr
 						errr := xcmd.Run()
@@ -227,7 +225,7 @@ var auditCmd = &cobra.Command{
 						defer writer.Flush()
 
 						codePatternScanJSON := []string{"--pcre2", "--no-heading", "-o", "-p", "-i", "-U", "--json", "-f", searchPatternFile, scanPath}
-						xcmdJSON := exec.Command(rgbin, codePatternScanJSON...)
+						xcmdJSON := exec.Command(rgembed, codePatternScanJSON...)
 						xcmdJSON.Stdout = jsonoutfile
 						xcmdJSON.Stderr = os.Stderr
 						errrJSON := xcmdJSON.Run()
@@ -259,7 +257,7 @@ var auditCmd = &cobra.Command{
 					fmt.Println("│ ")
 
 					codePatternCollect := []string{"--pcre2", "--no-heading", "-i", "-o", "-U", "-f", searchPatternFile, scanPath}
-					xcmd := exec.Command(rgbin, codePatternCollect...)
+					xcmd := exec.Command(rgembed, codePatternCollect...)
 					xcmd.Stdout = os.Stdout
 					xcmd.Stderr = os.Stderr
 					err := xcmd.Run()
@@ -285,7 +283,7 @@ var auditCmd = &cobra.Command{
 					defer writer.Flush()
 
 					codePatternScanJSON := []string{"--pcre2", "--no-heading", "-i", "-o", "-U", "--json", "-f", searchPatternFile, scanPath}
-					xcmdJSON := exec.Command(rgbin, codePatternScanJSON...)
+					xcmdJSON := exec.Command(rgembed, codePatternScanJSON...)
 					xcmdJSON.Stdout = jsonoutfile
 					xcmdJSON.Stderr = os.Stderr
 					errrJSON := xcmdJSON.Run()
