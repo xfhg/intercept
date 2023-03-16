@@ -80,7 +80,7 @@ rename-bin:
 	mv bin/interceptm bin/intercept-darwin_amd64
 	mv bin/intercept.exe bin/intercept-windows_amd64.exe
 
-out-full: purge version compress-bin
+out-full: purge version preserve-raw compress-bin
 	cp bin/interceptl release/interceptl
 	cp bin/interceptm release/interceptm
 	cp bin/intercept.exe release/intercept.exe
@@ -187,6 +187,11 @@ dev-macos: clean purge prepare macos
 
 dev-test:
 	./tests/venom run tests/suite.yml
+
+preserve-raw:
+	cp bin/interceptl bin/raw-intercept-linux_amd64
+	cp bin/interceptm bin/raw-intercept-darwin_amd64
+	cp bin/intercept.exe bin/raw-intercept-windows_amd64.exe
 
 compress-bin:
 	upx -9 bin/interceptl || upx-ucl -9 bin/interceptl
