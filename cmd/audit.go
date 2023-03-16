@@ -368,11 +368,10 @@ var auditCmd = &cobra.Command{
 			fmt.Println("├ S ", formattedTime)
 			fmt.Print("│")
 
-			numWorkers := len(rules.Rules)
 			numCPU := runtime.NumCPU()
 
 			var wg sync.WaitGroup
-			wg.Add(numWorkers)
+			wg.Add(len(rules.Rules))
 
 			sem := make(chan struct{}, numCPU*2)
 
@@ -381,7 +380,14 @@ var auditCmd = &cobra.Command{
 			for i := 0; i < numCPU; i++ {
 				go func(workerID int) {
 					for rule := range rulesChan {
-						worker(workerID, sem, &wg, rgembed, pwddir, scanPath, rule)
+						sem <- struct{}{} // Acquire a token
+
+						tagfound := FindMatchingString(scanTags, rule.Tags, ",")
+						if tagfound || scanTags == "" {
+							worker(workerID, sem, &wg, rgembed, pwddir, scanPath, rule)
+						} else {
+							wg.Done() // Call wg.Done() if the worker skips the rule
+						}
 					}
 				}(i)
 			}
@@ -393,7 +399,6 @@ var auditCmd = &cobra.Command{
 			close(rulesChan)
 
 			wg.Wait()
-
 		}
 		endTime := time.Now()
 		duration := endTime.Sub(startTime)

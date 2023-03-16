@@ -166,6 +166,9 @@ ExitClean: "Clean report"
 <br>
 
 ## Extra Configuration & Flags
+all flags under the same instruction can be combined
+
+<br>
 
 - MD5 Hash for configuration file 
 ```
@@ -245,8 +248,6 @@ You can set three enforcement levels:
 Build & mess around with it :
 
 ```
-make clean 
-make setup-dev
 make
 ```
 
@@ -255,7 +256,7 @@ make
 [![Open in Gitpod](https://gitpod.io/button/open-in-gitpod.svg)](https://gitpod.io/#https://github.com/xfhg/intercept)
 
 </p>
-
+(gitpod latest images still dont fancy the go1.20 , it's ok to compile intercept using 1.19 by editing the go.mod so you can play around inside gitpod)
 <br>
 <br>
 <br>
@@ -312,6 +313,22 @@ A straight-up comparison between ripgrep, ugrep and GNU grep on a single large f
 
 <br>
 <br>
+<br>
+<br>
+
+
+## Code optimized by
+
+<p align="center">
+
+<img src="static/openai.svg" width="275">
+
+</p>
+<br>
+<br>
+
+## Licensing & Compliance
+
 <br>
 <br>
 
