@@ -62,8 +62,14 @@ jobs:
             bin/intercept-linux_amd64
             bin/intercept-windows_amd64.exe
             bin/raw-intercept-darwin_amd64
-            release/intercept-linux_amd64.tar.gz
-            release/intercept-darwin_amd64.tar.gz
-            release/intercept-windows_amd64.tar.gz
+            bin/intercept-linux_amd64.tar.gz
+            bin/intercept-darwin_amd64.tar.gz
+            bin/intercept-windows_amd64.tar.gz
+            bin/intercept-linux_amd64.sha256
+            bin/intercept-windows_amd64.exe.sha256
+            bin/raw-intercept-darwin_amd64.sha256
+            bin/intercept-linux_amd64.tar.gz.sha256
+            bin/intercept-darwin_amd64.tar.gz.sha256
+            bin/intercept-windows_amd64.tar.gz.sha256
             output/_version
             output/_changelog
