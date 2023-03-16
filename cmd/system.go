@@ -1,15 +1,11 @@
 package cmd
 
 import (
-	"context"
 	"fmt"
 	"os"
-	"path/filepath"
-	"runtime"
 	"time"
 
 	"github.com/blang/semver"
-	"github.com/hashicorp/go-getter"
 	"github.com/rhysd/go-github-selfupdate/selfupdate"
 	"github.com/spf13/cobra"
 	"github.com/theckman/yacspin"
@@ -27,19 +23,12 @@ var systemCmd = &cobra.Command{
 			fmt.Println("│ Use : ")
 			fmt.Println("│")
 			fmt.Println("│ --update to download the latest intercept binary ")
-			fmt.Println("│ --setup to download the latest core tools package for your platform")
 
 		}
 
 		if systemUpdate {
 
 			selfUpdate()
-
-		}
-
-		if systemSetup {
-
-			updateCore()
 
 		}
 
@@ -50,7 +39,6 @@ var systemCmd = &cobra.Command{
 
 func init() {
 
-	systemCmd.PersistentFlags().BoolP("setup", "s", false, "Setup core tools")
 	systemCmd.PersistentFlags().BoolP("update", "u", false, "Update to the lastest version")
 
 	rootCmd.AddCommand(systemCmd)
@@ -122,80 +110,5 @@ func selfUpdate() {
 
 	fmt.Println("│")
 	fmt.Println("│ Successfully updated to version", latest.Version)
-
-}
-
-func updateCore() {
-
-	fmt.Println("│")
-	fmt.Println("├ Core Tools Setup")
-	fmt.Println("│")
-
-	core := "https://github.com/xfhg/intercept/releases/latest/download/"
-	coreDst := GetExecutablePath()
-
-	switch runtime.GOOS {
-	case "windows":
-		core += "i-ripgrep-x86_64-windows.zip"
-	case "darwin":
-		core += "i-ripgrep-x86_64-darwin.zip"
-	case "linux":
-		core += "i-ripgrep-x86_64-linux.zip"
-	default:
-		colorRedBold.Println("│ OS not supported")
-		PrintClose()
-		os.Exit(1)
-	}
-
-	cfg := yacspin.Config{
-		Frequency:       100 * time.Millisecond,
-		CharSet:         yacspin.CharSets[32],
-		Suffix:          " Downloading Core",
-		SuffixAutoColon: true,
-		Message:         core,
-		StopCharacter:   "│ ✓",
-		StopColors:      []string{"fgGreen"},
-	}
-
-	spinner, err := yacspin.New(cfg)
-	if err != nil {
-		LogError(err)
-	}
-	spinner.Start()
-
-	client := &getter.Client{
-		Ctx:  context.Background(),
-		Dst:  coreDst,
-		Dir:  true,
-		Src:  core,
-		Mode: getter.ClientModeDir,
-	}
-
-	if err := client.Get(); err != nil {
-		spinner.StopColors("fgRed")
-		spinner.StopCharacter("│ x")
-		spinner.Message("Error getting path")
-		spinner.Stop()
-		fmt.Fprintf(os.Stderr, "│ Error getting path %s : %v", client.Src, err)
-		PrintClose()
-		os.Exit(1)
-	}
-
-	spinner.Message("Creating .ignore file")
-
-	d := []string{"search_regex", "config.yaml"}
-	err = WriteLinesOnFile(d, filepath.Join(coreDst, ".ignore"))
-
-	if err != nil {
-		LogError(err)
-	}
-
-	err = WriteLinesOnFile(d, filepath.Join(GetWd(), ".ignore"))
-
-	if err != nil {
-		LogError(err)
-	}
-
-	spinner.Stop()
 
 }

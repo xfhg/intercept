@@ -78,7 +78,7 @@ core-intercept-rg-x86_64-windows.zip
 2. Make sure you have the latest setup
 
 ```
-intercept system --setup --update
+intercept system --update
 ```
 
 3. Load some [EXAMPLES](https://github.com/xfhg/intercept/tree/master/examples) policies and target files
