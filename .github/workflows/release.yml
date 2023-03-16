@@ -60,10 +60,7 @@ jobs:
             output/core-intercept-rg-x86_64-windows.zip
             output/x-intercept.zip
             bin/intercept-linux_amd64
-            bin/intercept-darwin_amd64
             bin/intercept-windows_amd64.exe
-            bin/raw-intercept-linux_amd64
             bin/raw-intercept-darwin_amd64
-            bin/raw-intercept-windows_amd64.exe
             output/_version
             output/_changelog
