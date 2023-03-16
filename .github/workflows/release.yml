@@ -55,7 +55,6 @@ jobs:
             Release ${{ steps.get_version.outputs.VERSION }}
           gzip: "false"
           files: >
-            # 
             output/core-intercept-rg-x86_64-linux.zip
             output/core-intercept-rg-x86_64-darwin.zip
             output/core-intercept-rg-x86_64-windows.zip
