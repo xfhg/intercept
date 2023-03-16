@@ -5,7 +5,7 @@
 tasks:
   - init: make clean
     command: make clean
-  - init: make setup-dev
-    command: make setup-dev
+  - init: make 
+    command: make 
 
 
