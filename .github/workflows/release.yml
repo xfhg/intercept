@@ -34,8 +34,8 @@ jobs:
       - name: Get the compressor
         run: sudo apt-get update -y ; sudo apt-get install -y upx
 
-      - name: Prepare for dev
-        run: make setup-dev
+      # - name: Prepare for dev
+      #   run: make setup-dev
 
       - name: Make all release artifacts
         run: make
@@ -55,13 +55,10 @@ jobs:
             Release ${{ steps.get_version.outputs.VERSION }}
           gzip: "false"
           files: >
-            output/i-ripgrep-x86_64-linux.zip
-            output/i-ripgrep-x86_64-darwin.zip
-            output/i-ripgrep-x86_64-windows.zip
+            # 
             output/core-intercept-rg-x86_64-linux.zip
             output/core-intercept-rg-x86_64-darwin.zip
             output/core-intercept-rg-x86_64-windows.zip
-            output/setup-buildpack.zip
             output/x-intercept.zip
             bin/intercept-linux_amd64
             bin/intercept-darwin_amd64

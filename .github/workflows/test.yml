@@ -30,8 +30,8 @@ jobs:
               dep ensure
           fi
 
-      - name: Prepare for dev
-        run: make setup-dev
+      # - name: Prepare for dev
+      #   run: make setup-dev
 
       - name: Get the compressor
         run: sudo apt-get update -y ; sudo apt-get install -y upx
@@ -39,5 +39,7 @@ jobs:
       - name: Make all release artifacts
         run: make
 
+      - name: Check artifacts
+        run: ls -la release/
       # - name: Run basic tests
       #   run: make test-linux

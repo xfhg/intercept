@@ -6,7 +6,15 @@ import (
 	"os/exec"
 	"strconv"
 	"strings"
+	"sync"
 )
+
+func worker(id int, sem chan struct{}, wg *sync.WaitGroup, rgbin string, pwddir string, scanPath string, policy Rule) {
+	defer wg.Done()
+	sem <- struct{}{}
+	ripTurbo(rgbin, pwddir, scanPath, policy)
+	<-sem
+}
 
 func ripTurbo(rgbin string, pwddir string, scanPath string, policy Rule) {
 
@@ -28,6 +36,7 @@ func ripTurbo(rgbin string, pwddir string, scanPath string, policy Rule) {
 	xcmdJSON := exec.Command(rgbin, codePatternScanJSON...)
 	xcmdJSON.Stdout = jsonoutfile
 	xcmdJSON.Stderr = os.Stdin
+
 	errrJSON := xcmdJSON.Run()
 
 	os.Remove(searchPatternFile)

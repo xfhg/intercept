@@ -6,7 +6,7 @@ TAG=$(shell git describe --abbrev=0)
 PTAG=$(shell git describe --tags --abbrev=0 @^)
 
 
-all: purge-output rg-version-update build-tool windows linux macos out-full out-linux out-macos out-win ripgrep build-package rename-bin
+all: purge-output prepare build-tool windows linux macos out-full out-linux out-macos out-win rename-bin
 
 version: changelog changelogmd
 	touch release/$(TAG)_$(VERSION)-$(MOMENT)
@@ -45,6 +45,11 @@ macos: clean
 
 # linux-arm: clean
 # 	CGO_ENABLED=0 GOOS=linux GOARCH=arm64 go build -ldflags="-s -w -X 'github.com/xfhg/intercept/cmd.buildVersion=$(TAG)'" -mod=readonly -o bin/interceptla
+
+prepare:
+	mkdir -p release/
+	chmod -R a+x release/
+	mkdir -p output/
 
 clean: mod
 	go clean
@@ -99,19 +104,19 @@ out-win: clean purge version windows
 	cp .ignore release/.ignore
 	cd release/ ; zip -9 -T -x "*.DS_Store*" "*interceptm*" "*rgl*" "*rgm*" "*interceptl*" -r ../output/core-intercept-rg-x86_64-windows.zip * ; zip -T -u ../output/core-intercept-rg-x86_64-windows.zip .ignore
 
-ripgrep-full:
-	cd release/ ; zip -9 -T -x "*.DS_Store*" "*intercept*" -r ../output/intercept-ripgrep.zip rg/
+# ripgrep-full:
+# 	cd release/ ; zip -9 -T -x "*.DS_Store*" "*intercept*" -r ../output/intercept-ripgrep.zip rg/
 
-ripgrep-win:
-	cd release/ ; zip -9 -T -x "*.DS_Store*" "*intercept*" "*rgl*" "*rgm*" -r ../output/i-ripgrep-x86_64-windows.zip rg/
+# ripgrep-win:
+# 	cd release/ ; zip -9 -T -x "*.DS_Store*" "*intercept*" "*rgl*" "*rgm*" -r ../output/i-ripgrep-x86_64-windows.zip rg/
 
-ripgrep-macos:
-	cd release/ ; zip -9 -T -x "*.DS_Store*" "*intercept*" "*rgl*" "*.exe" -r ../output/i-ripgrep-x86_64-darwin.zip rg/
+# ripgrep-macos:
+# 	cd release/ ; zip -9 -T -x "*.DS_Store*" "*intercept*" "*rgl*" "*.exe" -r ../output/i-ripgrep-x86_64-darwin.zip rg/
 
-ripgrep-linux:
-	cd release/ ; zip -9 -T -x "*.DS_Store*" "*intercept*" "*.exe" "*rgm*" -r ../output/i-ripgrep-x86_64-linux.zip rg/
+# ripgrep-linux:
+# 	cd release/ ; zip -9 -T -x "*.DS_Store*" "*intercept*" "*.exe" "*rgm*" -r ../output/i-ripgrep-x86_64-linux.zip rg/
 
-ripgrep: purge-ripgrep ripgrep-win ripgrep-linux ripgrep-macos
+# ripgrep: purge-ripgrep ripgrep-win ripgrep-linux ripgrep-macos
 
 add-ignore:
 	cp release/.ignore bin/.ignore
@@ -130,53 +135,47 @@ add-ignore:
 
 # intercept: intercept-win intercept-linux intercept-macos
 
-build-package: rg-version-update
-	zip -9 -T -x "*.DS_Store*" "*interceptm*" "*intercept.exe*" "*interceptl*" -r output/setup-buildpack.zip release/
+# build-package: rg-version-update
+# 	zip -9 -T -x "*.DS_Store*" "*interceptm*" "*intercept.exe*" "*interceptl*" -r output/setup-buildpack.zip release/
 
-rg-version-update:
-	yes | cp -rf release-rg/* release/rg/
+# rg-version-update:
+# 	yes | cp -rf release-rg/* release/rg/
 
-setup-dev:
-	curl -S -O -J -L https://github.com/xfhg/intercept/releases/latest/download/setup-buildpack.zip
-	unzip setup-*
-	chmod -R a+x release/
-	mkdir output/
-	rm setup-buildpack.zip
+# setup-dev:
+# 	rm -f setup-buildpack.zip
+# 	curl -S -O -J -L https://github.com/xfhg/intercept/releases/latest/download/setup-buildpack.zip
+# 	unzip setup-*
+# 	chmod -R a+x release/
+# 	mkdir output/
+# 	rm-f setup-buildpack.zip
 
 build-tool:
 	sudo apt-get install -y upx
 
-test-macos:
-	curl -S -O -J -L https://github.com/ovh/venom/releases/latest/download/venom.darwin-amd64
-	mv venom.darwin-amd64 venom
-	chmod +x venom
-	./venom run tests/suite.yml
-	rm venom
+# test-macos:
+# 	curl -S -O -J -L https://github.com/ovh/venom/releases/latest/download/venom.darwin-amd64
+# 	mv venom.darwin-amd64 venom
+# 	chmod +x venom
+# 	./venom run tests/suite.yml
+# 	rm venom
 
-test-linux:
-	curl -S -O -J -L https://github.com/ovh/venom/releases/latest/download/venom.linux-amd64
-	mv venom.linux-amd64 venom
-	chmod +x venom
-	go install
-	./venom run tests/suite.yml
-	rm venom
+# test-linux:
+# 	curl -S -O -J -L https://github.com/ovh/venom/releases/latest/download/venom.linux-amd64
+# 	mv venom.linux-amd64 venom
+# 	chmod +x venom
+# 	go install
+# 	./venom run tests/suite.yml
+# 	rm venom
 
-test-win:
-	curl -S -O -J -L https://github.com/ovh/venom/releases/latest/download/venom.windows-amd64
-	mv venom.windows-amd64 venom.exe
-	chmod +x venom.exe
-	./venom.exe run tests/suite.yml
-	rm venom.exe
-
-nancy: 
-	rm -rf nancy-*
-	curl -S -O -J -L https://github.com/sonatype-nexus-community/nancy/releases/latest/download/nancy-v1.0.37-linux-amd64	
-	chmod +x nancy-v1.0.37-linux-amd64
-	go list -json -deps | ./nancy-v1.0.37-linux-amd64 sleuth
-	rm -rf nancy-*
+# test-win:
+# 	curl -S -O -J -L https://github.com/ovh/venom/releases/latest/download/venom.windows-amd64
+# 	mv venom.windows-amd64 venom.exe
+# 	chmod +x venom.exe
+# 	./venom.exe run tests/suite.yml
+# 	rm venom.exe
 
 ## dev-macos: temp quick dev task // dev-test
-dev-macos: clean purge macos 
+dev-macos: clean purge prepare macos 
 	cp bin/interceptm release/interceptm
 	cp .ignore release/.ignore
 	go install

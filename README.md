@@ -4,7 +4,7 @@
 
 </p>
 
-# INTERCEPT v1.0.1
+# INTERCEPT v1.1.1
 
 **intercept** is a devsecops cli tool designed to provide Static Application Security Testing (SAST) capabilities to software development teams. The tool aims to help developers identify and address security vulnerabilities in their code early in the software development life cycle, reducing the risk of security breaches and ensuring compliance with industry regulations. intercept leverages a range of security scanning techniques to analyze code, including pattern matching, code analysis, and vulnerability scanning. It is designed to be easy to integrate, with a simple sub-second command-line interface and customizable configuration options. With intercept, developers can integrate security testing into their development workflows and make security a critical yet seamless part of their software development process.
 
@@ -78,7 +78,7 @@ core-intercept-rg-x86_64-windows.zip
 2. Make sure you have the latest setup
 
 ```
-intercept system --setup --update
+intercept system --update
 ```
 
 3. Load some [EXAMPLES](https://github.com/xfhg/intercept/tree/master/examples) policies and target files
@@ -166,6 +166,9 @@ ExitClean: "Clean report"
 <br>
 
 ## Extra Configuration & Flags
+all flags under the same instruction can be combined
+
+<br>
 
 - MD5 Hash for configuration file 
 ```
@@ -245,8 +248,6 @@ You can set three enforcement levels:
 Build & mess around with it :
 
 ```
-make clean 
-make setup-dev
 make
 ```
 
@@ -255,7 +256,7 @@ make
 [![Open in Gitpod](https://gitpod.io/button/open-in-gitpod.svg)](https://gitpod.io/#https://github.com/xfhg/intercept)
 
 </p>
-
+(gitpod latest images still dont fancy the go1.20 , it's ok to compile intercept using 1.19 by editing the go.mod so you can play around inside gitpod)
 <br>
 <br>
 <br>
@@ -312,6 +313,22 @@ A straight-up comparison between ripgrep, ugrep and GNU grep on a single large f
 
 <br>
 <br>
+<br>
+<br>
+
+
+## Code optimized by
+
+<p align="center">
+
+<img src="static/openai.svg" width="275">
+
+</p>
+<br>
+<br>
+
+## Licensing & Compliance
+
 <br>
 <br>
 

@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"encoding/json"
 	"fmt"
+	"runtime"
 	"sync"
 	"time"
 
@@ -98,12 +99,12 @@ var auditCmd = &cobra.Command{
 
 		pwddir := GetWd()
 
-		rgbin := CoreExists()
+		rgembed, _ := prepareEmbeddedExecutable()
 
 		startTime := time.Now()
 
 		fmt.Println("│ PWD : ", pwddir)
-		fmt.Println("│ RGP : ", rgbin)
+		fmt.Println("│ RGP : ", rgembed)
 		fmt.Println("│ ")
 		fmt.Println("│ Scan PATH\t: ", scanPath)
 		fmt.Println("│ Scan ENV\t: ", cfgEnv)
@@ -170,7 +171,7 @@ var auditCmd = &cobra.Command{
 					} else {
 
 						codePatternScan := []string{"--pcre2", "-p", "-o", "-A0", "-B0", "-C0", "-i", "-U", "-f", searchPatternFile, scanPath}
-						xcmd := exec.Command(rgbin, codePatternScan...)
+						xcmd := exec.Command(rgembed, codePatternScan...)
 						xcmd.Stdout = os.Stdout
 						xcmd.Stderr = os.Stderr
 						errr := xcmd.Run()
@@ -224,7 +225,7 @@ var auditCmd = &cobra.Command{
 						defer writer.Flush()
 
 						codePatternScanJSON := []string{"--pcre2", "--no-heading", "-o", "-p", "-i", "-U", "--json", "-f", searchPatternFile, scanPath}
-						xcmdJSON := exec.Command(rgbin, codePatternScanJSON...)
+						xcmdJSON := exec.Command(rgembed, codePatternScanJSON...)
 						xcmdJSON.Stdout = jsonoutfile
 						xcmdJSON.Stderr = os.Stderr
 						errrJSON := xcmdJSON.Run()
@@ -256,7 +257,7 @@ var auditCmd = &cobra.Command{
 					fmt.Println("│ ")
 
 					codePatternCollect := []string{"--pcre2", "--no-heading", "-i", "-o", "-U", "-f", searchPatternFile, scanPath}
-					xcmd := exec.Command(rgbin, codePatternCollect...)
+					xcmd := exec.Command(rgembed, codePatternCollect...)
 					xcmd.Stdout = os.Stdout
 					xcmd.Stderr = os.Stderr
 					err := xcmd.Run()
@@ -282,7 +283,7 @@ var auditCmd = &cobra.Command{
 					defer writer.Flush()
 
 					codePatternScanJSON := []string{"--pcre2", "--no-heading", "-i", "-o", "-U", "--json", "-f", searchPatternFile, scanPath}
-					xcmdJSON := exec.Command(rgbin, codePatternScanJSON...)
+					xcmdJSON := exec.Command(rgembed, codePatternScanJSON...)
 					xcmdJSON.Stdout = jsonoutfile
 					xcmdJSON.Stderr = os.Stderr
 					errrJSON := xcmdJSON.Run()
@@ -366,14 +367,37 @@ var auditCmd = &cobra.Command{
 			formattedTime := startTime.Format("2006-01-02 15:04:05")
 			fmt.Println("├ S ", formattedTime)
 			fmt.Print("│")
+
+			numCPU := runtime.NumCPU()
+
 			var wg sync.WaitGroup
 			wg.Add(len(rules.Rules))
-			for _, policy := range rules.Rules {
-				go func(policy Rule) {
-					defer wg.Done()
-					ripTurbo(rgbin, pwddir, scanPath, policy)
-				}(policy)
+
+			sem := make(chan struct{}, numCPU*2)
+
+			rulesChan := make(chan Rule, len(rules.Rules))
+
+			for i := 0; i < numCPU; i++ {
+				go func(workerID int) {
+					for rule := range rulesChan {
+						sem <- struct{}{} // Acquire a token
+
+						tagfound := FindMatchingString(scanTags, rule.Tags, ",")
+						if tagfound || scanTags == "" {
+							worker(workerID, sem, &wg, rgembed, pwddir, scanPath, rule)
+						} else {
+							wg.Done() // Call wg.Done() if the worker skips the rule
+						}
+					}
+				}(i)
 			}
+
+			for _, policy := range rules.Rules {
+				rulesChan <- policy
+			}
+
+			close(rulesChan)
+
 			wg.Wait()
 		}
 		endTime := time.Now()
