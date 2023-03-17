@@ -9,7 +9,7 @@ require (
 	github.com/kardianos/osext v0.0.0-20190222173326-2bc1f35cddc0
 	github.com/lens-vm/jsonmerge v0.0.0-20210328131518-91ae88d1bfff
 	github.com/mitchellh/go-homedir v1.1.0
-	github.com/owenrumney/go-sarif/v2 v2.1.2
+	github.com/owenrumney/go-sarif/v2 v2.1.3
 	github.com/rhysd/go-github-selfupdate v1.2.3
 	github.com/spf13/cobra v1.6.1
 	github.com/spf13/viper v1.15.0
