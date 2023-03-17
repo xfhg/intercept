@@ -29,6 +29,6 @@ Rules:
     patterns:
       - (resource)\s*"(.*)"
 
-ExitCritical: "Critical irregularities found in your code"
-ExitWarning: "Irregularities found in your code"
 ExitClean: "Clean report"
+ExitWarning: "Irregularities found in your code"
+ExitCritical: "Critical irregularities found in your code"

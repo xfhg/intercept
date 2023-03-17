@@ -380,13 +380,13 @@ var auditCmd = &cobra.Command{
 			for i := 0; i < numCPU; i++ {
 				go func(workerID int) {
 					for rule := range rulesChan {
-						sem <- struct{}{} // Acquire a token
+						sem <- struct{}{}
 
 						tagfound := FindMatchingString(scanTags, rule.Tags, ",")
 						if tagfound || scanTags == "" {
 							worker(workerID, sem, &wg, rgembed, pwddir, scanPath, rule)
 						} else {
-							wg.Done() // Call wg.Done() if the worker skips the rule
+							wg.Done()
 						}
 					}
 				}(i)

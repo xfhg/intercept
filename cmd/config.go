@@ -1,7 +1,7 @@
 package cmd
 
 import (
-	"crypto/md5"
+	"crypto/sha256"
 	"encoding/hex"
 	"fmt"
 	"io"
@@ -92,23 +92,23 @@ var configCmd = &cobra.Command{
 				LogError(err)
 			}
 
-			HexDigest := md5.Sum(bs)
+			HexDigest := sha256.Sum256(bs)
 			HexDigestConfig := hex.EncodeToString(HexDigest[:])
 
 			if hashCfgFile != "" {
 
 				fmt.Println("│")
-				fmt.Println("│ MD5 Valid checksum :\t", hashCfgFile)
-				fmt.Println("│ MD5 Config checksum :\t", HexDigestConfig)
+				fmt.Println("│ SHA256 Valid checksum :\t", hashCfgFile)
+				fmt.Println("│ SHA256 Config checksum :\t", HexDigestConfig)
 
 				if HexDigestConfig != hashCfgFile {
 					colorRedBold.Println("│")
 					colorRedBold.Println("│ Error")
 					colorRedBold.Println("│")
-					log.Fatal("Aborting : MD5 checksum does not match")
+					log.Fatal("Aborting : SHA256 checksum does not match")
 				} else {
 					fmt.Println("│")
-					colorGreenBold.Println("│ MD5 Config Match")
+					colorGreenBold.Println("│ SHA256 Config Match")
 					fmt.Println("│")
 				}
 			}
@@ -156,23 +156,23 @@ var configCmd = &cobra.Command{
 				LogError(err)
 			}
 
-			HexDigest := md5.Sum(nf)
+			HexDigest := sha256.Sum256(nf)
 			HexDigestConfig := hex.EncodeToString(HexDigest[:])
 
 			if hashCfgFile != "" {
 
 				fmt.Println("│")
-				fmt.Println("│ MD5 Expected checksum :\t", hashCfgFile)
-				fmt.Println("│ MD5 Config checksum :\t", HexDigestConfig)
+				fmt.Println("│ SHA256 Expected checksum :\t", hashCfgFile)
+				fmt.Println("│ SHA256 Config checksum :\t", HexDigestConfig)
 
 				if HexDigestConfig != hashCfgFile {
 					colorRedBold.Println("│")
 					colorRedBold.Println("│ Error")
 					colorRedBold.Println("│")
-					log.Fatal("Aborting : MD5 checksum does not match")
+					log.Fatal("Aborting : SHA256 checksum does not match")
 				} else {
 					fmt.Println("│")
-					colorGreenBold.Println("│ MD5 Config Hash Match")
+					colorGreenBold.Println("│ SHA256 Config Hash Match")
 					fmt.Println("│")
 				}
 			}
@@ -206,7 +206,7 @@ func init() {
 
 	configCmd.PersistentFlags().BoolP("reset", "r", false, "Reset config file")
 	configCmd.PersistentFlags().StringVarP(&addCfgFile, "add", "a", "", "Add config file (yaml)")
-	configCmd.PersistentFlags().StringVarP(&hashCfgFile, "hash", "k", "", "Config file MD5 Hash")
+	configCmd.PersistentFlags().StringVarP(&hashCfgFile, "hash", "k", "", "Config file SHA256 Hash")
 
 	rootCmd.AddCommand(configCmd)
 

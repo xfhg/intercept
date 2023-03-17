@@ -1,7 +1,7 @@
 Banner: |
 
   | INTERCEPT SECRET SCANNING 
-  | 1500++ SECRET PATTERNS
+  | 1500++ SECRET PATTERNS UP FOR GRABS
 
 ExitCritical: "Critical irregularities found in your code"
 ExitWarning: "Irregularities found in your code"

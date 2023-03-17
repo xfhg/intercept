@@ -102,8 +102,6 @@ func ProcessOutput(filename string, ruleId string, ruleName string, ruleDescript
 		return
 	}
 
-	////////////////////////////////////////////////////////////////
-
 	var outfile *os.File
 
 	if FileExists("intercept.output.json") {
@@ -135,7 +133,6 @@ func ProcessOutput(filename string, ruleId string, ruleName string, ruleDescript
 			LogError(err)
 		}
 
-		// Write the JSON to a file
 		err = os.WriteFile("intercept.output.json", emptyJSON, 0644)
 		if err != nil {
 			LogError(err)
