@@ -6,7 +6,5 @@ We take security seriously, and we're committed to ensuring that our tool remain
 
 | Version | Secure             |
 | ------- | ------------------ |
-| v1.x    | :white_check_mark: |
+| v1.x.x   | :white_check_mark: |
 | < v1.0   | :x:                |
-
-
