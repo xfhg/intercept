@@ -4,7 +4,7 @@ go 1.20
 
 require (
 	github.com/blang/semver v3.5.1+incompatible
-	github.com/gookit/color v1.5.2
+	github.com/gookit/color v1.5.3
 	github.com/itchyny/gojq v0.12.12
 	github.com/kardianos/osext v0.0.0-20190222173326-2bc1f35cddc0
 	github.com/lens-vm/jsonmerge v0.0.0-20210328131518-91ae88d1bfff
