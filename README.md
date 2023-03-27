@@ -81,7 +81,7 @@ core-intercept-rg-x86_64-windows.zip
 intercept system --update
 ```
 
-3. Load some [EXAMPLES](https://github.com/xfhg/intercept/tree/master/examples) policies and target files
+3. Load some [EXAMPLE](https://github.com/xfhg/intercept/tree/master/examples) policies and target files
 
 ```
 start with the minimal.yaml
