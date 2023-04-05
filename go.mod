@@ -11,7 +11,7 @@ require (
 	github.com/mitchellh/go-homedir v1.1.0
 	github.com/owenrumney/go-sarif/v2 v2.1.3
 	github.com/rhysd/go-github-selfupdate v1.2.3
-	github.com/spf13/cobra v1.6.1
+	github.com/spf13/cobra v1.7.0
 	github.com/spf13/viper v1.15.0
 	github.com/theckman/yacspin v0.13.12
 	gopkg.in/yaml.v2 v2.4.0
