@@ -4,9 +4,9 @@
 
 </p>
 
-# INTERCEPT v1.1.1
+# INTERCEPT v1.2.0
 
-**intercept** is a devsecops cli tool designed to provide Static Application Security Testing (SAST) capabilities to software development teams. The tool aims to help developers identify and address security vulnerabilities in their code early in the software development life cycle, reducing the risk of security breaches and ensuring compliance with industry regulations. intercept leverages a range of security scanning techniques to analyze code, including pattern matching, code analysis, and vulnerability scanning. It is designed to be easy to integrate, with a simple sub-second command-line interface and customizable configuration options. With intercept, developers can integrate security testing into their development workflows and make security a critical yet seamless part of their software development process.
+**intercept** is a DevSecOps cli tool designed to provide Static Application Security Testing (SAST) capabilities to software development teams. The tool aims to help developers identify and address security vulnerabilities in their code early in the software development life cycle, reducing the risk of security breaches and ensuring compliance with industry regulations. intercept leverages a range of security scanning techniques to analyze code, including pattern matching, code analysis, and vulnerability scanning. It is designed to be easy to integrate, with a simple sub-second command-line interface and customizable configuration options. With intercept, developers can integrate security testing into their development workflows and make security a critical yet seamless part of their software development process.
 
 <br>
 
@@ -29,10 +29,10 @@
 ## Features
 
 
-- **Pattern matching:** intercept uses regex pattern matching technique to scan code for known vulnerabilities and customised patterns, reducing the time and effort required to identify and fix these common issues. [Targetting more than 1500 patterns](https://github.com/xfhg/intercept/tree/master/policy/stable.yaml) 
+- **Pattern matching:** intercept uses regex pattern matching technique to scan code for known vulnerabilities and customised patterns, reducing the time and effort required to identify and fix these common issues. [Targetting more than 1500 patterns](https://github.com/xfhg/intercept/tree/master/policy/unstable.yaml) 
 - **Customizable rules:** intercept allows users to customize all security rules used to scan their code, making it possible to tailor the scanning process to the specific requirements of their application or organization.
 - **Integration with CI/CD:** intercept can easily be integrated into continuous integration and continuous deployment (CI/CD) pipelines, allowing security testing to be performed automatically as part of the development process.
-- **Detailed reporting:** intercept provides detailed reports on vulnerabilities and security issues, fully compliant SARIF output, including severity ratings and remediation advice, making it easy for developers to prioritize and address security concerns early on.
+- **Detailed reporting:** intercept provides detailed reports on vulnerabilities and security issues, _fully compliant SARIF output_, including severity ratings and remediation advice, making it easy for developers to prioritize and address security concerns early on.
 - **Support for any programming language:** intercept supports scanning through any programming languages or file types,  making it a versatile tool for security testing across a range of applications and environments.
 - **No daemons, low footprint, self-updatable binary**
 - **Ultra flexible fine-grained regex policies**
@@ -59,7 +59,7 @@ Main benefits:
 
 **intercept** offers an extensive library of policies consisting of over a thousand regular expressions that can be used to detect sensitive data leakage and enforce security best practices in software development. This vast collection of pre-defined policies makes it easy for developers to get started with secret scanning and quickly identify potential issues in their code. The policies cover a range of security concerns, such as hard-coded passwords, API keys, and other secrets, and are continuously updated to keep up with the latest security threats and best practices. With the ability to customize policies or add new ones, developers can ensure that their applications are protected against known and emerging threats, reducing the risk of sensitive data leakage and improving the overall security posture of their organization.
 
-### [More than 1500 patterns available](https://github.com/xfhg/intercept/tree/master/policy/stable.yaml) 
+#### [More than 1500 patterns available](https://github.com/xfhg/intercept/tree/master/policy/unstable.yaml) 
 
 <br>
 <br>
@@ -117,10 +117,11 @@ intercept audit -t examples/target -e "development" -i "AWS"
 
 ## Policy File Structure
 
-These are 2 types of policies available :
+These are 3 types of policies available :
 
 - **scan** : where we enforce breaking rules on matched patterns
 - **collect** : where we just collect matched patterns
+- **assure** : where we expect matched patterns and detect if missing
 
 Easy to read and compose the rules file have this minimal required structure:
 ```
@@ -154,6 +155,19 @@ Rules:
     tags: AWS,AZURE
     patterns:
       - (resource)\s*"(.*)"
+
+  - name: ASSURE SSL
+    id: 101
+    description: Assure ssl_cyphers only contains GANSO_SSL
+    error: Misconfiguration or omission is fatal
+    tags: KEY
+    type: assure
+    fatal: true
+    enforcement: true
+    environment: all
+    confidence: high
+    patterns:
+      - ssl_cyphers\s*=\s*"GANSO_SSL"
 
 ExitCritical: "Critical irregularities found in your code"
 ExitWarning: "Irregularities found in your code"
@@ -317,7 +331,7 @@ A straight-up comparison between ripgrep, ugrep and GNU grep on a single large f
 <br>
 
 
-## Code optimized by
+## Code + Patterns optimized with
 
 <p align="center">
 
