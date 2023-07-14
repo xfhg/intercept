@@ -127,7 +127,7 @@ Easy to read and compose the rules file have this minimal required structure:
 ```
 Banner: |
 
-  | Minimum 1 SCAN and 1 COLLECT RULE
+  | Example SCAN , ASSURE and COLLECT RULES
 
 Rules:
   - name: Private key committed in code
