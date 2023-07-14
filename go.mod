@@ -7,7 +7,7 @@ require (
 	github.com/gookit/color v1.5.3
 	github.com/itchyny/gojq v0.12.12
 	github.com/kardianos/osext v0.0.0-20190222173326-2bc1f35cddc0
-	github.com/lens-vm/jsonmerge v0.0.0-20210328131518-91ae88d1bfff
+	github.com/lens-vm/jsonmerge v0.1
 	github.com/mitchellh/go-homedir v1.1.0
 	github.com/owenrumney/go-sarif/v2 v2.2.0
 	github.com/rhysd/go-github-selfupdate v1.2.3
