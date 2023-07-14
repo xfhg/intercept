@@ -1172,7 +1172,7 @@ func (c *compiler) funcInput(any, []any) any {
 func (c *compiler) funcModulemeta(v any, _ []any) any {
 	s, ok := v.(string)
 	if !ok {
-		return &funcTypeError{"modulemeta", v}
+		return &func0TypeError{"modulemeta", v}
 	}
 	if c.moduleLoader == nil {
 		return fmt.Errorf("cannot load module: %q", s)
@@ -1196,7 +1196,7 @@ func (c *compiler) funcModulemeta(v any, _ []any) any {
 	if meta == nil {
 		meta = make(map[string]any)
 	}
-	var deps []any
+	deps := []any{}
 	for _, i := range q.Imports {
 		v := i.Meta.ToValue()
 		if v == nil {
@@ -1409,6 +1409,8 @@ func formatToFunc(format string) *Func {
 		return &Func{Name: "_tohtml"}
 	case "@uri":
 		return &Func{Name: "_touri"}
+	case "@urid":
+		return &Func{Name: "_tourid"}
 	case "@csv":
 		return &Func{Name: "_tocsv"}
 	case "@tsv":
