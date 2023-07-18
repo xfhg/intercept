@@ -12,7 +12,6 @@ import (
 
 	"github.com/kardianos/osext"
 	homedir "github.com/mitchellh/go-homedir"
-	"gopkg.in/yaml.v2"
 )
 
 // FileExists check if file exists
@@ -207,8 +206,8 @@ func sha256hash(data []byte) string {
 	return hex.EncodeToString(HexDigest[:])
 }
 
-func unmarshalYAML(data []byte) (map[string]interface{}, error) {
-	var result map[string]interface{}
-	err := yaml.Unmarshal(data, &result)
-	return result, err
-}
+// func unmarshalYAML(data []byte) (map[string]interface{}, error) {
+// 	var result map[string]interface{}
+// 	err := yaml.Unmarshal(data, &result)
+// 	return result, err
+// }

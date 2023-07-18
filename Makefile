@@ -8,16 +8,10 @@ PTAG=$(shell git describe --tags --abbrev=0 @^)
 
 all: purge-output prepare build-tool windows linux macos out-full out-linux out-macos out-win rename-bin sha256sums
 
-version: changelog changelogmd
+version:  
 	touch release/$(TAG)_$(VERSION)-$(MOMENT)
-	echo $(TAG) > output/_version
+	echo $(TAG) > bin/_version
 
-changelog:
-	@echo "# Changelog" > output/_changelog
-	@git tag --sort=-creatordate | grep -E '^v[0-9]+\.[0-9]+\.[0-9]+$$' | grep -E '^v[0-9]+\.0\.0$$' | while read -r tag; do \
-		echo -e "\n## $$tag" >> output/_changelog; \
-		git log --no-merges --pretty=format:"- %s" $$tag...`git describe --abbrev=0 --always --tags $$tag^` >> output/_changelog; \
-	done
 
 global: windows linux macos
 	go install
@@ -57,6 +51,7 @@ clean: mod
 	rm -f bin/interceptm
 	rm -f bin/intercept.exe
 	rm -f bin/.ignore
+	rm -f bin/intercept-*
 
 purge:
 	rm -f release/interceptl
@@ -80,7 +75,7 @@ rename-bin:
 	mv bin/interceptm bin/intercept-darwin_amd64
 	mv bin/intercept.exe bin/intercept-windows_amd64.exe
 
-out-full: purge version preserve-raw compress-bin
+out-full: purge version release-raw compress-bin
 	cp bin/interceptl release/interceptl
 	cp bin/interceptm release/interceptm
 	cp bin/intercept.exe release/intercept.exe
@@ -182,13 +177,6 @@ compress-bin:
 
 get-compressor-apt:
 	sudo apt-get install -y upx
-
-changelogmd:
-	@echo "# CHANGELOG" > CHANGELOG.md
-	@git tag --sort=-creatordate | grep -E '^v[0-9]+\.[0-9]+\.[0-9]+$$' | grep -E '^v[0-9]+\.0\.0$$' | while read -r tag; do \
-		echo -e "\n## $$tag" >> CHANGELOG.md; \
-		git log --no-merges --pretty=format:"- %s" $$tag...`git describe --abbrev=0 --always --tags $$tag^` >> CHANGELOG.md; \
-	done
 
 release-raw: preserve-raw add-ignore
 	tar -czvf bin/intercept-linux_amd64.tar.gz -C bin raw-intercept-linux_amd64 .ignore _version
