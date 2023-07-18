@@ -3,17 +3,35 @@ package cmd
 import (
 	"crypto/sha256"
 	"encoding/hex"
+	"encoding/json"
+	"encoding/xml"
 	"fmt"
 	"io"
 	"log"
 	"net/http"
 	"os"
+	"path/filepath"
 	"strings"
 
 	"github.com/kardianos/osext"
 	homedir "github.com/mitchellh/go-homedir"
-	"gopkg.in/yaml.v2"
 )
+
+func detectFormat(data string) string {
+	// Try to unmarshal as JSON
+	var js map[string]interface{}
+	if json.Unmarshal([]byte(data), &js) == nil {
+		return "application/json"
+	}
+
+	// Try to unmarshal as XML
+	var xm map[string]interface{}
+	if xml.Unmarshal([]byte(data), &xm) == nil {
+		return "application/xml"
+	}
+
+	return "unknown"
+}
 
 // FileExists check if file exists
 func FileExists(filename string) bool {
@@ -207,8 +225,36 @@ func sha256hash(data []byte) string {
 	return hex.EncodeToString(HexDigest[:])
 }
 
-func unmarshalYAML(data []byte) (map[string]interface{}, error) {
-	var result map[string]interface{}
-	err := yaml.Unmarshal(data, &result)
-	return result, err
+// func unmarshalYAML(data []byte) (map[string]interface{}, error) {
+// 	var result map[string]interface{}
+// 	err := yaml.Unmarshal(data, &result)
+// 	return result, err
+// }
+
+func PathSHA256(root string) ([]ScannedFile, error) {
+	var files []ScannedFile
+	err := filepath.Walk(root, func(path string, info os.FileInfo, err error) error {
+		if err != nil {
+			return err
+		}
+		if !info.IsDir() {
+			file, err := os.Open(path)
+			if err != nil {
+				return err
+			}
+			defer file.Close()
+
+			hash := sha256.New()
+			if _, err := io.Copy(hash, file); err != nil {
+				return err
+			}
+
+			files = append(files, ScannedFile{
+				Path:   path,
+				Sha256: fmt.Sprintf("%x", hash.Sum(nil)),
+			})
+		}
+		return nil
+	})
+	return files, err
 }

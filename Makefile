@@ -8,16 +8,11 @@ PTAG=$(shell git describe --tags --abbrev=0 @^)
 
 all: purge-output prepare build-tool windows linux macos out-full out-linux out-macos out-win rename-bin sha256sums
 
-version: changelog changelogmd
+version:  
 	touch release/$(TAG)_$(VERSION)-$(MOMENT)
+	echo $(TAG) > bin/_version
 	echo $(TAG) > output/_version
 
-changelog:
-	@echo "# Changelog" > output/_changelog
-	@git tag --sort=-creatordate | grep -E '^v[0-9]+\.[0-9]+\.[0-9]+$$' | grep -E '^v[0-9]+\.0\.0$$' | while read -r tag; do \
-		echo -e "\n## $$tag" >> output/_changelog; \
-		git log --no-merges --pretty=format:"- %s" $$tag...`git describe --abbrev=0 --always --tags $$tag^` >> output/_changelog; \
-	done
 
 global: windows linux macos
 	go install
@@ -29,7 +24,6 @@ mod:
 	go get -u
 	go mod verify
 	go mod tidy
-	go mod vendor
 
 windows: clean
 	CGO_ENABLED=0 GOOS=windows GOARCH=amd64 go build -ldflags="-s -w -X 'github.com/xfhg/intercept/cmd.buildVersion=$(TAG)'" -mod=readonly -o bin/intercept.exe
@@ -53,20 +47,10 @@ prepare:
 
 clean: mod
 	go clean
-	rm -f bin/interceptl
-	rm -f bin/interceptm
-	rm -f bin/intercept.exe
-	rm -f bin/.ignore
+	rm -rf bin/
 
 purge:
-	rm -f release/interceptl
-	rm -f release/interceptm
-	rm -f release/intercept.exe
-	rm -f release/intercept*
-	rm -f release/v*
-	rm -f release/_*
-	rm -f release/config*
-	rm -f intercept-*.zip
+	rm -f release/*
 
 purge-output:
 	rm -f output/*.zip
@@ -80,7 +64,7 @@ rename-bin:
 	mv bin/interceptm bin/intercept-darwin_amd64
 	mv bin/intercept.exe bin/intercept-windows_amd64.exe
 
-out-full: purge version preserve-raw compress-bin
+out-full: purge version release-raw compress-bin
 	cp bin/interceptl release/interceptl
 	cp bin/interceptm release/interceptm
 	cp bin/intercept.exe release/intercept.exe
@@ -119,7 +103,9 @@ out-win: clean purge version windows
 # ripgrep: purge-ripgrep ripgrep-win ripgrep-linux ripgrep-macos
 
 add-ignore:
-	cp release/.ignore bin/.ignore
+	cp .ignore release/.ignore
+	cp .ignore bin/.ignore
+	cp output/_version bin/_version
 
 # compress-examples:
 # 	zip -9 -T -x "*.DS_Store*" -r output/_examples.zip examples/
@@ -171,9 +157,9 @@ dev-test:
 	./tests/venom run tests/suite.yml
 
 preserve-raw:
-	cp bin/interceptl bin/raw-intercept-linux_amd64
-	cp bin/interceptm bin/raw-intercept-darwin_amd64
-	cp bin/intercept.exe bin/raw-intercept-windows_amd64.exe
+	cp -f bin/interceptl bin/raw-intercept-linux_amd64
+	cp -f bin/interceptm bin/raw-intercept-darwin_amd64
+	cp -f bin/intercept.exe bin/raw-intercept-windows_amd64.exe
 
 compress-bin:
 	upx -9 bin/interceptl || upx-ucl -9 bin/interceptl
@@ -182,13 +168,6 @@ compress-bin:
 
 get-compressor-apt:
 	sudo apt-get install -y upx
-
-changelogmd:
-	@echo "# CHANGELOG" > CHANGELOG.md
-	@git tag --sort=-creatordate | grep -E '^v[0-9]+\.[0-9]+\.[0-9]+$$' | grep -E '^v[0-9]+\.0\.0$$' | while read -r tag; do \
-		echo -e "\n## $$tag" >> CHANGELOG.md; \
-		git log --no-merges --pretty=format:"- %s" $$tag...`git describe --abbrev=0 --always --tags $$tag^` >> CHANGELOG.md; \
-	done
 
 release-raw: preserve-raw add-ignore
 	tar -czvf bin/intercept-linux_amd64.tar.gz -C bin raw-intercept-linux_amd64 .ignore _version

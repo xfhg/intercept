@@ -1,16 +1,14 @@
 package cmd
 
 import (
-	"bufio"
 	"encoding/json"
 	"fmt"
+	"path/filepath"
 	"runtime"
 	"sync"
 	"time"
 
 	"os"
-	"os/exec"
-	"strconv"
 	"strings"
 
 	"github.com/gookit/color"
@@ -27,6 +25,8 @@ var (
 	warning   = false
 )
 
+var line = "├────────────────────────────────────────────────────────────"
+
 type allStats struct {
 	Total int `json:"Total"`
 	Clean int `json:"Clean"`
@@ -34,20 +34,33 @@ type allStats struct {
 	Fatal int `json:"Fatal"`
 }
 
+type ScannedFile struct {
+	Path   string `json:"path"`
+	Sha256 string `json:"sha256"`
+}
+
 type Rule struct {
-	ID          int      `yaml:"id"`
-	Name        string   `yaml:"name"`
-	Description string   `yaml:"description"`
-	Solution    string   `yaml:"solution"`
-	Error       string   `yaml:"error"`
-	Type        string   `yaml:"type"`
-	Environment string   `yaml:"environment"`
-	Enforcement bool     `yaml:"enforcement"`
-	Fatal       bool     `yaml:"fatal"`
-	Tags        string   `yaml:"tags,omitempty"`
-	Impact      string   `yaml:"impact,omitempty"`
-	Confidence  string   `yaml:"confidence,omitempty"`
-	Patterns    []string `yaml:"patterns"`
+	ID             int      `yaml:"id"`
+	Name           string   `yaml:"name"`
+	Description    string   `yaml:"description"`
+	Solution       string   `yaml:"solution"`
+	Error          string   `yaml:"error"`
+	Type           string   `yaml:"type"`
+	Environment    string   `yaml:"environment"`
+	Enforcement    bool     `yaml:"enforcement"`
+	Fatal          bool     `yaml:"fatal"`
+	Tags           string   `yaml:"tags,omitempty"`
+	Impact         string   `yaml:"impact,omitempty"`
+	Confidence     string   `yaml:"confidence,omitempty"`
+	Api_Endpoint   string   `yaml:"api_endpoint,omitempty"`
+	Api_Request    string   `yaml:"api_request,omitempty"`
+	Api_Insecure   bool     `yaml:"api_insecure"`
+	Api_Body       string   `yaml:"api_body,omitempty"`
+	Api_Auth       string   `yaml:"api_auth,omitempty"`
+	Api_Auth_Basic *string  `yaml:"api_auth_basic,omitempty"`
+	Api_Auth_Token *string  `yaml:"api_auth_token,omitempty"`
+	Api_Trace      bool     `yaml:"api_trace,omitempty"`
+	Patterns       []string `yaml:"patterns"`
 }
 
 type allRules struct {
@@ -92,6 +105,7 @@ var auditCmd = &cobra.Command{
 
 		_ = os.Remove("intercept.output.json")
 		_ = os.Remove("intercept.sarif.json")
+		_ = os.Remove("intercept.scannedSHA256.json")
 
 		rules = loadUpRules()
 
@@ -103,6 +117,8 @@ var auditCmd = &cobra.Command{
 
 		startTime := time.Now()
 
+		line := "├────────────────────────────────────────────────────────────"
+
 		fmt.Println("│ PWD : ", pwddir)
 		fmt.Println("│ RGP : ", rgembed)
 		fmt.Println("│ ")
@@ -110,11 +126,47 @@ var auditCmd = &cobra.Command{
 		fmt.Println("│ Scan ENV\t: ", cfgEnv)
 		fmt.Println("│ Scan TAG\t: ", scanTags)
 
+		files, err := PathSHA256(scanPath)
+		if err != nil {
+			LogError(err)
+		}
+
+		jsonData, err := json.Marshal(struct {
+			Scanned []ScannedFile `json:"scanned"`
+		}{
+			Scanned: files,
+		})
+		if err != nil {
+			LogError(err)
+			return
+		}
+
+		err = os.WriteFile("intercept.scannedSHA256.json", jsonData, 0644)
+		if err != nil {
+			LogError(err)
+		}
+
+		fmt.Println("│ ")
+		fmt.Printf("│ Target Size : %d file(s)\n", len(files))
+
+		if len(files) < 20 {
+
+			fmt.Println("│ Target Filelist Checksum :")
+			fmt.Println("│ ")
+
+			for _, file := range files {
+				cleanPath := filepath.Clean(file.Path)
+				fmt.Printf("│ Path: %s :SHA256: %s\n", cleanPath, file.Sha256)
+
+			}
+			fmt.Println("│ ")
+		}
+		fmt.Println("│ ")
+		fmt.Println(line)
+
 		if auditNox {
 			fmt.Println("│ Exceptions Disabled - All Policies Activated")
 		}
-
-		line := "├────────────────────────────────────────────────────────────"
 
 		searchPatternFile := strings.Join([]string{pwddir, "/", "search_regex"}, "")
 
@@ -147,263 +199,22 @@ var auditCmd = &cobra.Command{
 
 				switch value.Type {
 
+				case "api":
+
+					gatheringData(value)
+					processAPIType(value)
+
 				case "assure":
 
-					fmt.Println("│ ")
-					fmt.Println(line)
-					fmt.Println("│ ")
-					fmt.Println("├ ASSURE Rule #", value.ID)
-					fmt.Println("│ Rule name : ", value.Name)
-					fmt.Println("│ Rule description : ", value.Description)
-					fmt.Println("│ Impacted Env : ", value.Environment)
-					fmt.Println("│ Confidence : ", value.Confidence)
-					fmt.Println("│ Tags : ", value.Tags)
-					fmt.Println("│ ")
-
-					exception := ContainsInt(rules.Exceptions, value.ID)
-
-					if exception && !auditNox && !value.Enforcement {
-
-						colorRedBold.Println("│")
-						colorRedBold.Println("│ ", rules.ExceptionMessage)
-						colorRedBold.Println("│")
-
-					} else {
-
-						codePatternScan := []string{"--pcre2", "-p", "-o", "-A0", "-B0", "-C0", "-i", "-U", "-f", searchPatternFile, scanPath}
-						xcmd := exec.Command(rgembed, codePatternScan...)
-						xcmd.Stdout = os.Stdout
-						xcmd.Stderr = os.Stderr
-						errr := xcmd.Run()
-
-						if errr != nil {
-							if xcmd.ProcessState.ExitCode() == 2 {
-								LogError(errr)
-							} else {
-
-								envfound := FindMatchingString(cfgEnv, value.Environment, ",")
-								if (envfound || strings.Contains(value.Environment, "all") || value.Environment == "") && value.Fatal {
-
-									colorRedBold.Println("│")
-									colorRedBold.Println("│ NON COMPLIANT : ")
-									colorRedBold.Println("│ ", value.Error)
-									colorRedBold.Println("│")
-									fatal = true
-									stats.Fatal++
-								} else {
-
-									colorRedBold.Println("│")
-									colorRedBold.Println("│ NOT FOUND")
-									colorRedBold.Println("│ ", value.Error)
-									colorRedBold.Println("│")
-									warning = true
-
-								}
-								colorRedBold.Println("│")
-								colorRedBold.Println("│ ASSURE Rule : ", value.Name)
-								colorRedBold.Println("│ Target Environment : ", value.Environment)
-								colorRedBold.Println("│ Suggested Solution : ", value.Solution)
-								colorRedBold.Println("│")
-								fmt.Println("│ ")
-								stats.Total++
-								stats.Dirty++
-
-							}
-						} else {
-
-							colorGreenBold.Println("│ ")
-							colorGreenBold.Println("│ Compliant")
-							stats.Clean++
-							stats.Total++
-							fmt.Println("│ ")
-
-						}
-
-						jsonOutputFile := strings.Join([]string{pwddir, "/", strconv.Itoa(value.ID), ".json"}, "")
-						jsonoutfile, erroutjson := os.Create(jsonOutputFile)
-						if erroutjson != nil {
-							LogError(erroutjson)
-						}
-						defer jsonoutfile.Close()
-						writer := bufio.NewWriter(jsonoutfile)
-						defer writer.Flush()
-
-						codePatternScanJSON := []string{"--pcre2", "--no-heading", "-o", "-p", "-i", "-U", "--json", "-f", searchPatternFile, scanPath}
-						xcmdJSON := exec.Command(rgembed, codePatternScanJSON...)
-						xcmdJSON.Stdout = jsonoutfile
-						xcmdJSON.Stderr = os.Stderr
-						errrJSON := xcmdJSON.Run()
-
-						if errrJSON != nil {
-							if xcmdJSON.ProcessState.ExitCode() == 2 {
-								LogError(errrJSON)
-							} else {
-
-								ProcessOutput(strings.Join([]string{strconv.Itoa(value.ID), ".json"}, ""), strconv.Itoa(value.ID), value.Name, value.Description, value.Error, value.Solution, value.Fatal)
-								GenerateSarif()
-								colorRedBold.Println("│ ")
-							}
-						} else {
-							colorGreenBold.Print("│")
-							os.Remove(jsonOutputFile)
-
-						}
-
-					}
+					processAssureType(value)
 
 				case "scan":
 
-					fmt.Println("│ ")
-					fmt.Println(line)
-					fmt.Println("│ ")
-					fmt.Println("├ SCAN Rule #", value.ID)
-					fmt.Println("│ Rule name : ", value.Name)
-					fmt.Println("│ Rule description : ", value.Description)
-					fmt.Println("│ Impacted Env : ", value.Environment)
-					fmt.Println("│ Confidence : ", value.Confidence)
-					fmt.Println("│ Tags : ", value.Tags)
-					fmt.Println("│ ")
-
-					exception := ContainsInt(rules.Exceptions, value.ID)
-
-					if exception && !auditNox && !value.Enforcement {
-
-						colorRedBold.Println("│")
-						colorRedBold.Println("│ ", rules.ExceptionMessage)
-						colorRedBold.Println("│")
-
-					} else {
-
-						codePatternScan := []string{"--pcre2", "-p", "-o", "-A0", "-B0", "-C0", "-i", "-U", "-f", searchPatternFile, scanPath}
-						xcmd := exec.Command(rgembed, codePatternScan...)
-						xcmd.Stdout = os.Stdout
-						xcmd.Stderr = os.Stderr
-						errr := xcmd.Run()
-
-						if errr != nil {
-							if xcmd.ProcessState.ExitCode() == 2 {
-								LogError(errr)
-							} else {
-								colorGreenBold.Println("│ Clean")
-								stats.Clean++
-								stats.Total++
-								fmt.Println("│ ")
-							}
-						} else {
-
-							envfound := FindMatchingString(cfgEnv, value.Environment, ",")
-							if (envfound || strings.Contains(value.Environment, "all") || value.Environment == "") && value.Fatal {
-
-								colorRedBold.Println("│")
-								colorRedBold.Println("│ FATAL : ")
-								colorRedBold.Println("│ ", value.Error)
-								colorRedBold.Println("│")
-								fatal = true
-								stats.Fatal++
-							} else {
-
-								colorRedBold.Println("│")
-								colorRedBold.Println("│")
-								colorRedBold.Println("│ ", value.Error)
-								colorRedBold.Println("│")
-								warning = true
-
-							}
-							colorRedBold.Println("│")
-							colorRedBold.Println("│ Rule : ", value.Name)
-							colorRedBold.Println("│ Target Environment : ", value.Environment)
-							colorRedBold.Println("│ Suggested Solution : ", value.Solution)
-							colorRedBold.Println("│")
-							fmt.Println("│ ")
-							stats.Total++
-							stats.Dirty++
-						}
-
-						jsonOutputFile := strings.Join([]string{pwddir, "/", strconv.Itoa(value.ID), ".json"}, "")
-						jsonoutfile, erroutjson := os.Create(jsonOutputFile)
-						if erroutjson != nil {
-							LogError(erroutjson)
-						}
-						defer jsonoutfile.Close()
-						writer := bufio.NewWriter(jsonoutfile)
-						defer writer.Flush()
-
-						codePatternScanJSON := []string{"--pcre2", "--no-heading", "-o", "-p", "-i", "-U", "--json", "-f", searchPatternFile, scanPath}
-						xcmdJSON := exec.Command(rgembed, codePatternScanJSON...)
-						xcmdJSON.Stdout = jsonoutfile
-						xcmdJSON.Stderr = os.Stderr
-						errrJSON := xcmdJSON.Run()
-
-						if errrJSON != nil {
-							if xcmdJSON.ProcessState.ExitCode() == 2 {
-								LogError(errrJSON)
-							} else {
-								colorGreenBold.Print("│")
-								os.Remove(jsonOutputFile)
-							}
-						} else {
-							ProcessOutput(strings.Join([]string{strconv.Itoa(value.ID), ".json"}, ""), strconv.Itoa(value.ID), value.Name, value.Description, value.Error, value.Solution, value.Fatal)
-							GenerateSarif()
-							colorRedBold.Println("│ ")
-
-						}
-
-					}
+					processScanType(value)
 
 				case "collect":
 
-					fmt.Println("│ ")
-					fmt.Println(line)
-					fmt.Println("│ ")
-					fmt.Println("├ COLLECT Rule #", value.ID)
-					fmt.Println("├ Name : ", value.Name)
-					fmt.Println("│ Description : ", value.Description)
-					fmt.Println("│ Tags : ", value.Tags)
-					fmt.Println("│ ")
-
-					codePatternCollect := []string{"--pcre2", "--no-heading", "-i", "-o", "-U", "-f", searchPatternFile, scanPath}
-					xcmd := exec.Command(rgembed, codePatternCollect...)
-					xcmd.Stdout = os.Stdout
-					xcmd.Stderr = os.Stderr
-					err := xcmd.Run()
-
-					if err != nil {
-						if xcmd.ProcessState.ExitCode() == 2 {
-							LogError(err)
-						} else {
-							colorGreenBold.Println("│ Clean")
-							fmt.Println("│ ")
-						}
-					} else {
-						fmt.Println("│ ")
-					}
-
-					jsonOutputFile := strings.Join([]string{pwddir, "/", strconv.Itoa(value.ID), ".json"}, "")
-					jsonoutfile, erroutjson := os.Create(jsonOutputFile)
-					if erroutjson != nil {
-						LogError(erroutjson)
-					}
-					defer jsonoutfile.Close()
-					writer := bufio.NewWriter(jsonoutfile)
-					defer writer.Flush()
-
-					codePatternScanJSON := []string{"--pcre2", "--no-heading", "-i", "-o", "-U", "--json", "-f", searchPatternFile, scanPath}
-					xcmdJSON := exec.Command(rgembed, codePatternScanJSON...)
-					xcmdJSON.Stdout = jsonoutfile
-					xcmdJSON.Stderr = os.Stderr
-					errrJSON := xcmdJSON.Run()
-
-					if errrJSON != nil {
-						if xcmdJSON.ProcessState.ExitCode() == 2 {
-							LogError(errrJSON)
-						} else {
-							colorGreenBold.Print("│")
-							os.Remove(jsonOutputFile)
-						}
-					} else {
-						ProcessOutput(strings.Join([]string{strconv.Itoa(value.ID), ".json"}, ""), strconv.Itoa(value.ID), value.Name, value.Description, "", "", false)
-						colorRedBold.Println("│ ")
-					}
+					processCollectType(value)
 
 				default:
 

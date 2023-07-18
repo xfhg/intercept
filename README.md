@@ -4,7 +4,7 @@
 
 </p>
 
-# INTERCEPT v1.2.0
+# INTERCEPT v1.2.1
 
 **intercept** is a DevSecOps cli tool designed to provide Static Application Security Testing (SAST) capabilities to software development teams. The tool aims to help developers identify and address security vulnerabilities in their code early in the software development life cycle, reducing the risk of security breaches and ensuring compliance with industry regulations. intercept leverages a range of security scanning techniques to analyze code, including pattern matching, code analysis, and vulnerability scanning. It is designed to be easy to integrate, with a simple sub-second command-line interface and customizable configuration options. With intercept, developers can integrate security testing into their development workflows and make security a critical yet seamless part of their software development process.
 
@@ -29,7 +29,7 @@
 ## Features
 
 
-- **Pattern matching:** intercept uses regex pattern matching technique to scan code for known vulnerabilities and customised patterns, reducing the time and effort required to identify and fix these common issues. [Targetting more than 1500 patterns](https://github.com/xfhg/intercept/tree/master/policy/unstable.yaml) 
+- **Pattern matching:** intercept uses regex pattern matching technique to scan code for known vulnerabilities and customised patterns, reducing the time and effort required to identify and fix these common issues. [Chose from more than 1500 patterns](https://github.com/xfhg/intercept/tree/master/policy/unstable.yaml) 
 - **Customizable rules:** intercept allows users to customize all security rules used to scan their code, making it possible to tailor the scanning process to the specific requirements of their application or organization.
 - **Integration with CI/CD:** intercept can easily be integrated into continuous integration and continuous deployment (CI/CD) pipelines, allowing security testing to be performed automatically as part of the development process.
 - **Detailed reporting:** intercept provides detailed reports on vulnerabilities and security issues, _fully compliant SARIF output_, including severity ratings and remediation advice, making it easy for developers to prioritize and address security concerns early on.
@@ -59,7 +59,7 @@ Main benefits:
 
 **intercept** offers an extensive library of policies consisting of over a thousand regular expressions that can be used to detect sensitive data leakage and enforce security best practices in software development. This vast collection of pre-defined policies makes it easy for developers to get started with secret scanning and quickly identify potential issues in their code. The policies cover a range of security concerns, such as hard-coded passwords, API keys, and other secrets, and are continuously updated to keep up with the latest security threats and best practices. With the ability to customize policies or add new ones, developers can ensure that their applications are protected against known and emerging threats, reducing the risk of sensitive data leakage and improving the overall security posture of their organization.
 
-#### [More than 1500 patterns available](https://github.com/xfhg/intercept/tree/master/policy/unstable.yaml) 
+#### [Pre made patterns available](https://github.com/xfhg/intercept/tree/master/policy/unstable.yaml) 
 
 <br>
 <br>
@@ -81,7 +81,7 @@ core-intercept-rg-x86_64-windows.zip
 intercept system --update
 ```
 
-3. Load some [EXAMPLES](https://github.com/xfhg/intercept/tree/master/examples) policies and target files
+3. Load some [EXAMPLE](https://github.com/xfhg/intercept/tree/master/examples) policies and target files
 
 ```
 start with the minimal.yaml
@@ -103,10 +103,11 @@ intercept audit -t examples/target
 6. Check the different output flavours
 
 ```
-stdout human readable report
-individual json rule output with matches
+stdout human readable console report
+individual json rule output with detailed matches
 all findings compiled into intercept.output.json
 fully compliant SARIF output into intercept.sarif.json
+all SHA256 of the scanned files into intercept.scannedSHA256.json
 ```
 
 7. Tune the scan with extra flags like ENVIRONMENT or TAGS filter
@@ -186,7 +187,7 @@ all flags under the same instruction can be combined
 
 - SHA256 Hash for configuration file 
 ```
-intercept config -a examples/minimal.yaml -k 201c8fe265808374f3354768410401216632b9f2f68f9b15c85403da75327396
+intercept config -a examples/yourpolicies.yaml -k 201c8fe265808374f3354768410401216632b9f2f68f9b15c85403da75327396
 ```
 - Download of configuration file
 ```
@@ -331,9 +332,9 @@ A straight-up comparison between ripgrep, ugrep and GNU grep on a single large f
 <br>
 
 
-## Code + Patterns optimized with
+## Patterns optimized with
 
-<p align="left">
+<p>
 
 <img src="static/openai.svg" width="275">
 
