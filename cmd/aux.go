@@ -1,6 +1,8 @@
 package cmd
 
 import (
+	"crypto/sha256"
+	"encoding/hex"
 	"fmt"
 	"io"
 	"log"
@@ -10,6 +12,7 @@ import (
 
 	"github.com/kardianos/osext"
 	homedir "github.com/mitchellh/go-homedir"
+	"gopkg.in/yaml.v2"
 )
 
 // FileExists check if file exists
@@ -196,4 +199,16 @@ func LogError(err error) {
 	colorRedBold.Println("│")
 	PrintClose()
 	log.Fatal(err)
+}
+
+func sha256hash(data []byte) string {
+
+	HexDigest := sha256.Sum256(data)
+	return hex.EncodeToString(HexDigest[:])
+}
+
+func unmarshalYAML(data []byte) (map[string]interface{}, error) {
+	var result map[string]interface{}
+	err := yaml.Unmarshal(data, &result)
+	return result, err
 }

@@ -184,13 +184,13 @@ all flags under the same instruction can be combined
 
 <br>
 
-- MD5 Hash for configuration file 
+- SHA256 Hash for configuration file 
 ```
-intercept config -a examples/minimal.yaml -k e4ab151755bddfba106010477adc1fd0
+intercept config -a examples/minimal.yaml -k 201c8fe265808374f3354768410401216632b9f2f68f9b15c85403da75327396
 ```
 - Download of configuration file
 ```
-intercept config -a https://xxx.com/artifact/policy.yaml -k e4ab151755bddfba106010477adc1fd0
+intercept config -a https://xxx.com/artifact/policy.yaml -k 201c8fe26580(...)
 ```
 - Enviroment enforcement (check policy enforcement levels)
 ```
@@ -333,7 +333,7 @@ A straight-up comparison between ripgrep, ugrep and GNU grep on a single large f
 
 ## Code + Patterns optimized with
 
-<p align="center">
+<p align="left">
 
 <img src="static/openai.svg" width="275">
 

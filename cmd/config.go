@@ -1,8 +1,6 @@
 package cmd
 
 import (
-	"crypto/md5"
-	"encoding/hex"
 	"fmt"
 	"io"
 	"log"
@@ -16,6 +14,12 @@ import (
 var addCfgFile string
 var hashCfgFile string
 var defaultCfgFile string
+
+const (
+	HTTPPrefix     = "http://"
+	HTTPSPrefix    = "https://"
+	ConfigFilename = "config.yaml"
+)
 
 var configCmd = &cobra.Command{
 	Use:   "config",
@@ -42,7 +46,7 @@ var configCmd = &cobra.Command{
 
 		}
 
-		if strings.HasPrefix(addCfgFile, "http://") || strings.HasPrefix(addCfgFile, "https://") {
+		if strings.HasPrefix(addCfgFile, HTTPPrefix) || strings.HasPrefix(addCfgFile, HTTPSPrefix) {
 
 			downloadedCfgFile, err = ReaderFromURL(addCfgFile)
 
@@ -92,14 +96,13 @@ var configCmd = &cobra.Command{
 				LogError(err)
 			}
 
-			HexDigest := md5.Sum(bs)
-			HexDigestConfig := hex.EncodeToString(HexDigest[:])
+			HexDigestConfig := sha256hash(bs)
 
 			if hashCfgFile != "" {
 
 				fmt.Println("│")
-				fmt.Println("│ MD5 Valid checksum :\t", hashCfgFile)
-				fmt.Println("│ MD5 Config checksum :\t", HexDigestConfig)
+				fmt.Println("│ SHA256 Valid checksum :\t", hashCfgFile)
+				fmt.Println("│ SHA256 Config checksum :\t", HexDigestConfig)
 
 				if HexDigestConfig != hashCfgFile {
 					colorRedBold.Println("│")
@@ -131,7 +134,7 @@ var configCmd = &cobra.Command{
 			if err != nil {
 				LogError(err)
 			}
-			if err := os.WriteFile("config.yaml", bs, 0644); err != nil {
+			if err := os.WriteFile(ConfigFilename, bs, 0644); err != nil {
 				LogError(err)
 			}
 
@@ -156,14 +159,13 @@ var configCmd = &cobra.Command{
 				LogError(err)
 			}
 
-			HexDigest := md5.Sum(nf)
-			HexDigestConfig := hex.EncodeToString(HexDigest[:])
+			HexDigestConfig := sha256hash(nf)
 
 			if hashCfgFile != "" {
 
 				fmt.Println("│")
-				fmt.Println("│ MD5 Expected checksum :\t", hashCfgFile)
-				fmt.Println("│ MD5 Config checksum :\t", HexDigestConfig)
+				fmt.Println("│ SHA256 Expected checksum :\t", hashCfgFile)
+				fmt.Println("│ SHA256 Config checksum :\t", HexDigestConfig)
 
 				if HexDigestConfig != hashCfgFile {
 					colorRedBold.Println("│")
@@ -206,7 +208,7 @@ func init() {
 
 	configCmd.PersistentFlags().BoolP("reset", "r", false, "Reset config file")
 	configCmd.PersistentFlags().StringVarP(&addCfgFile, "add", "a", "", "Add config file (yaml)")
-	configCmd.PersistentFlags().StringVarP(&hashCfgFile, "hash", "k", "", "Config file MD5 Hash")
+	configCmd.PersistentFlags().StringVarP(&hashCfgFile, "hash", "k", "", "Config file SHA256 Hash")
 
 	rootCmd.AddCommand(configCmd)
 

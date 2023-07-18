@@ -6,7 +6,7 @@ TAG=$(shell git describe --abbrev=0)
 PTAG=$(shell git describe --tags --abbrev=0 @^)
 
 
-all: purge-output prepare build-tool windows linux macos out-full out-linux out-macos out-win rename-bin
+all: purge-output prepare build-tool windows linux macos out-full out-linux out-macos out-win rename-bin sha256sums
 
 version: changelog changelogmd
 	touch release/$(TAG)_$(VERSION)-$(MOMENT)
@@ -40,11 +40,11 @@ linux: clean
 macos: clean
 	CGO_ENABLED=0 GOOS=darwin GOARCH=amd64 go build -ldflags="-s -w -X 'github.com/xfhg/intercept/cmd.buildVersion=$(TAG)'" -mod=readonly -o bin/interceptm
 
-# macos-arm: clean
-# 	CGO_ENABLED=0 GOOS=darwin GOARCH=arm64 go build -ldflags="-s -w -X 'github.com/xfhg/intercept/cmd.buildVersion=$(TAG)'" -mod=readonly -o bin/interceptma
+macos-arm: clean
+	CGO_ENABLED=0 GOOS=darwin GOARCH=arm64 go build -ldflags="-s -w -X 'github.com/xfhg/intercept/cmd.buildVersion=$(TAG)'" -mod=readonly -o bin/interceptma
 
-# linux-arm: clean
-# 	CGO_ENABLED=0 GOOS=linux GOARCH=arm64 go build -ldflags="-s -w -X 'github.com/xfhg/intercept/cmd.buildVersion=$(TAG)'" -mod=readonly -o bin/interceptla
+linux-arm: clean
+	CGO_ENABLED=0 GOOS=linux GOARCH=arm64 go build -ldflags="-s -w -X 'github.com/xfhg/intercept/cmd.buildVersion=$(TAG)'" -mod=readonly -o bin/interceptla
 
 prepare:
 	mkdir -p release/
@@ -124,23 +124,6 @@ add-ignore:
 # compress-examples:
 # 	zip -9 -T -x "*.DS_Store*" -r output/_examples.zip examples/
 
-# intercept-win: add-ignore
-# 	cd bin/ ; zip -9 -T -x "*.DS_Store*" "*interceptl*" "*interceptm*"  -r ../output/core-intercept-x86_64-win.zip *
-
-# intercept-macos: add-ignore
-# 	cd bin/ ; zip -9 -T -x "*.DS_Store*" "*interceptl*" "*intercept.exe*"  -r ../output/core-intercept-x86_64-macos.zip *
-
-# intercept-linux: add-ignore
-# 	cd bin/ ; zip -9 -T -x "*.DS_Store*" "*interceptm*" "*intercept.exe*" -r ../output/core-intercept-x86_64-linux.zip *
-
-# intercept: intercept-win intercept-linux intercept-macos
-
-# build-package: rg-version-update
-# 	zip -9 -T -x "*.DS_Store*" "*interceptm*" "*intercept.exe*" "*interceptl*" -r output/setup-buildpack.zip release/
-
-# rg-version-update:
-# 	yes | cp -rf release-rg/* release/rg/
-
 # setup-dev:
 # 	rm -f setup-buildpack.zip
 # 	curl -S -O -J -L https://github.com/xfhg/intercept/releases/latest/download/setup-buildpack.zip
@@ -178,12 +161,11 @@ build-tool:
 dev-macos: clean purge prepare macos 
 	cp bin/interceptm release/interceptm
 	cp .ignore release/.ignore
-	go install
 
-# dev-arm: clean purge macos-arm
-# 	cp bin/interceptma release/interceptma
-# 	cp .ignore release/.ignore
 
+dev-macos-arm: clean purge macos-arm
+	cp bin/interceptma release/interceptma
+	cp .ignore release/.ignore
 
 dev-test:
 	./tests/venom run tests/suite.yml
@@ -207,6 +189,18 @@ changelogmd:
 		echo -e "\n## $$tag" >> CHANGELOG.md; \
 		git log --no-merges --pretty=format:"- %s" $$tag...`git describe --abbrev=0 --always --tags $$tag^` >> CHANGELOG.md; \
 	done
+
+release-raw: preserve-raw add-ignore
+	tar -czvf bin/intercept-linux_amd64.tar.gz -C bin raw-intercept-linux_amd64 .ignore _version
+	tar -czvf bin/intercept-darwin_amd64.tar.gz -C bin raw-intercept-darwin_amd64 .ignore _version
+	tar -czvf bin/intercept-windows_amd64.tar.gz -C bin raw-intercept-windows_amd64.exe .ignore _version
+
+sha256sums:
+	@for file in bin/*; do \
+		echo "Generating SHA256 for $$file"; \
+		sha256sum "$$file" > "$$file.sha256"; \
+	done
+
 
 ## help: prints this help message
 help:
