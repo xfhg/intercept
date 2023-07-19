@@ -114,7 +114,9 @@ out-win: clean purge version windows
 # ripgrep: purge-ripgrep ripgrep-win ripgrep-linux ripgrep-macos
 
 add-ignore:
-	cp release/.ignore bin/.ignore
+	cp .ignore release/.ignore
+	cp .ignore bin/.ignore
+	cp output/_version bin/_version
 
 # compress-examples:
 # 	zip -9 -T -x "*.DS_Store*" -r output/_examples.zip examples/
@@ -166,9 +168,9 @@ dev-test:
 	./tests/venom run tests/suite.yml
 
 preserve-raw:
-	cp bin/interceptl bin/raw-intercept-linux_amd64
-	cp bin/interceptm bin/raw-intercept-darwin_amd64
-	cp bin/intercept.exe bin/raw-intercept-windows_amd64.exe
+	cp -f bin/interceptl bin/raw-intercept-linux_amd64
+	cp -f bin/interceptm bin/raw-intercept-darwin_amd64
+	cp -f bin/intercept.exe bin/raw-intercept-windows_amd64.exe
 
 compress-bin:
 	upx -9 bin/interceptl || upx-ucl -9 bin/interceptl
