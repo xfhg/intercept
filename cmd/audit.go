@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"encoding/json"
 	"fmt"
+	"path/filepath"
 	"runtime"
 	"sync"
 	"time"
@@ -32,6 +33,11 @@ type allStats struct {
 	Clean int `json:"Clean"`
 	Dirty int `json:"Dirty"`
 	Fatal int `json:"Fatal"`
+}
+
+type ScannedFile struct {
+	Path   string `json:"path"`
+	Sha256 string `json:"sha256"`
 }
 
 type Rule struct {
@@ -92,6 +98,7 @@ var auditCmd = &cobra.Command{
 
 		_ = os.Remove("intercept.output.json")
 		_ = os.Remove("intercept.sarif.json")
+		_ = os.Remove("intercept.scannedSHA256.json")
 
 		rules = loadUpRules()
 
@@ -109,6 +116,43 @@ var auditCmd = &cobra.Command{
 		fmt.Println("│ Scan PATH\t: ", scanPath)
 		fmt.Println("│ Scan ENV\t: ", cfgEnv)
 		fmt.Println("│ Scan TAG\t: ", scanTags)
+
+		files, err := PathSHA256(scanPath)
+		if err != nil {
+			LogError(err)
+		}
+
+		jsonData, err := json.Marshal(struct {
+			Scanned []ScannedFile `json:"scanned"`
+		}{
+			Scanned: files,
+		})
+		if err != nil {
+			LogError(err)
+			return
+		}
+
+		err = os.WriteFile("intercept.scannedSHA256.json", jsonData, 0644)
+		if err != nil {
+			LogError(err)
+		}
+
+		fmt.Println("│ ")
+		fmt.Printf("│ Target Size : %d file(s)\n", len(files))
+
+		if len(files) < 20 {
+
+			fmt.Println("│ Target Filelist Checksum :")
+			fmt.Println("│ ")
+
+			for _, file := range files {
+				cleanPath := filepath.Clean(file.Path)
+				fmt.Printf("│ Path: %s :SHA256: %s\n", cleanPath, file.Sha256)
+
+			}
+			fmt.Println("│ ")
+		}
+		fmt.Println("│ ")
 
 		if auditNox {
 			fmt.Println("│ Exceptions Disabled - All Policies Activated")

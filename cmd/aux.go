@@ -8,6 +8,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"path/filepath"
 	"strings"
 
 	"github.com/kardianos/osext"
@@ -211,3 +212,31 @@ func sha256hash(data []byte) string {
 // 	err := yaml.Unmarshal(data, &result)
 // 	return result, err
 // }
+
+func PathSHA256(root string) ([]ScannedFile, error) {
+	var files []ScannedFile
+	err := filepath.Walk(root, func(path string, info os.FileInfo, err error) error {
+		if err != nil {
+			return err
+		}
+		if !info.IsDir() {
+			file, err := os.Open(path)
+			if err != nil {
+				return err
+			}
+			defer file.Close()
+
+			hash := sha256.New()
+			if _, err := io.Copy(hash, file); err != nil {
+				return err
+			}
+
+			files = append(files, ScannedFile{
+				Path:   path,
+				Sha256: fmt.Sprintf("%x", hash.Sum(nil)),
+			})
+		}
+		return nil
+	})
+	return files, err
+}
