@@ -288,7 +288,7 @@ var auditCmd = &cobra.Command{
 								colorRedBold.Println("│ ")
 							}
 						} else {
-							colorGreenBold.Print("│")
+							colorGreenBold.Println("│")
 							os.Remove(jsonOutputFile)
 
 						}
@@ -382,7 +382,7 @@ var auditCmd = &cobra.Command{
 							if xcmdJSON.ProcessState.ExitCode() == 2 {
 								LogError(errrJSON)
 							} else {
-								colorGreenBold.Print("│")
+								colorGreenBold.Println("│")
 								os.Remove(jsonOutputFile)
 							}
 						} else {
@@ -441,7 +441,7 @@ var auditCmd = &cobra.Command{
 						if xcmdJSON.ProcessState.ExitCode() == 2 {
 							LogError(errrJSON)
 						} else {
-							colorGreenBold.Print("│")
+							colorGreenBold.Println("│")
 							os.Remove(jsonOutputFile)
 						}
 					} else {
