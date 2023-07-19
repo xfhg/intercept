@@ -11,6 +11,7 @@ all: purge-output prepare build-tool windows linux macos out-full out-linux out-
 version:  
 	touch release/$(TAG)_$(VERSION)-$(MOMENT)
 	echo $(TAG) > bin/_version
+	echo $(TAG) > output/_version
 
 
 global: windows linux macos
