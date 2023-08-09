@@ -202,7 +202,7 @@ var auditCmd = &cobra.Command{
 				case "api":
 
 					gatheringData(value)
-					processAPI(value)
+					processAPIType(value)
 
 				case "assure":
 

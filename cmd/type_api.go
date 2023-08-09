@@ -170,7 +170,7 @@ func gatheringData(value Rule) {
 
 }
 
-func processAPI(value Rule) {
+func processAPIType(value Rule) {
 
 	if cfgEnv == "" {
 		cfgEnv = "先锋"
