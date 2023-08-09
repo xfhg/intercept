@@ -3,6 +3,8 @@ package cmd
 import (
 	"crypto/sha256"
 	"encoding/hex"
+	"encoding/json"
+	"encoding/xml"
 	"fmt"
 	"io"
 	"log"
@@ -14,6 +16,22 @@ import (
 	"github.com/kardianos/osext"
 	homedir "github.com/mitchellh/go-homedir"
 )
+
+func detectFormat(data string) string {
+	// Try to unmarshal as JSON
+	var js map[string]interface{}
+	if json.Unmarshal([]byte(data), &js) == nil {
+		return "application/json"
+	}
+
+	// Try to unmarshal as XML
+	var xm map[string]interface{}
+	if xml.Unmarshal([]byte(data), &xm) == nil {
+		return "application/xml"
+	}
+
+	return "unknown"
+}
 
 // FileExists check if file exists
 func FileExists(filename string) bool {

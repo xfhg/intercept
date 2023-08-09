@@ -61,6 +61,8 @@ func gatheringData(value Rule) {
 		LogError(err)
 	}
 
+	contentType := detectFormat(value.Api_Body)
+
 	switch value.Api_Auth {
 	case "basic":
 		//fmt.Println("│ API BASIC AUTH")
@@ -135,6 +137,7 @@ func gatheringData(value Rule) {
 			resp, err = client.R().
 				EnableTrace().
 				SetAuthToken(token_auth).
+				SetHeader("Content-Type", contentType).
 				SetBody(value.Api_Body).
 				SetOutput("output_" + strconv.Itoa(value.ID)).
 				Post(value.Api_Endpoint)
@@ -144,6 +147,7 @@ func gatheringData(value Rule) {
 			resp, err = client.R().
 				EnableTrace().
 				SetBasicAuth(basic_username, basic_password).
+				SetHeader("Content-Type", contentType).
 				SetBody(value.Api_Body).
 				SetOutput("output_" + strconv.Itoa(value.ID)).
 				Post(value.Api_Endpoint)
