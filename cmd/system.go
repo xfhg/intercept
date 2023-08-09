@@ -71,7 +71,7 @@ func selfUpdate() {
 
 	cfg := yacspin.Config{
 		Frequency:       100 * time.Millisecond,
-		CharSet:         yacspin.CharSets[32],
+		CharSet:         yacspin.CharSets[3],
 		Suffix:          " Downloading Update",
 		SuffixAutoColon: true,
 		Message:         latest.Version.String(),

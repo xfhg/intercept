@@ -1,0 +1,29 @@
+Banner: |
+
+  | New API type
+
+Rules:
+  - name: API value check
+    id: 105
+    description: Sandbox API check
+    error: Misconfiguration or omission
+    tags: KEY
+    type: api
+    api_endpoint: http://localhost:3003/simple
+    api_request: GET
+    api_body: |
+      <xml>instruction<xml>
+    api_auth: basic
+    api_auth_basic: RULE105
+    api_auth_token:
+    fatal: false
+    enforcement: true
+    environment: all
+    confidence: high
+    patterns:
+      - \s*OK\s*
+      - OK
+
+ExitCritical: "Critical irregularities found in your code"
+ExitWarning: "Irregularities found in your code"
+ExitClean: "Clean report"

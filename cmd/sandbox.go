@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/go-resty/resty/v2"
 	"github.com/hashicorp/go-getter"
 	"github.com/spf13/cobra"
 	"github.com/theckman/yacspin"
@@ -28,6 +29,10 @@ var sandboxCmd = &cobra.Command{
 			LogError(err)
 		}
 
+		restyGET()
+
+		PrintClose()
+
 	},
 }
 
@@ -39,6 +44,45 @@ func init() {
 
 	rootCmd.AddCommand(sandboxCmd)
 
+}
+
+func restyGET() {
+
+	client := resty.New()
+
+	cfg := yacspin.Config{
+		Frequency:       100 * time.Millisecond,
+		CharSet:         yacspin.CharSets[3],
+		Suffix:          " Requesting",
+		SuffixAutoColon: true,
+		StopCharacter:   "│ ✓",
+		StopColors:      []string{"fgGreen"},
+	}
+
+	spinner, err := yacspin.New(cfg)
+	if err != nil {
+		LogError(err)
+	}
+
+	// Start the spinner
+	err = spinner.Start()
+	if err != nil {
+		LogError(err)
+	}
+
+	resp, err := client.R().
+		EnableTrace().
+		SetHeader("Accept", "application/json").
+		Get("http://localhost:3003/simple")
+
+	if err != nil {
+		spinner.StopFail()
+		LogError(err)
+	} else {
+		spinner.Stop()
+		fmt.Println("│ Response Status:", resp.Status())
+		fmt.Println("│ Response Body:", resp.String())
+	}
 }
 
 func DownloadJSONFile(src, dst string) error {
@@ -64,7 +108,7 @@ func DownloadJSONFile(src, dst string) error {
 	// Configure the yacspin spinner
 	cfg := yacspin.Config{
 		Frequency:       100 * time.Millisecond,
-		CharSet:         yacspin.CharSets[32],
+		CharSet:         yacspin.CharSets[3],
 		Suffix:          " Downloading",
 		SuffixAutoColon: true,
 		StopCharacter:   "│ ✓",
@@ -104,8 +148,6 @@ func DownloadJSONFile(src, dst string) error {
 	fmt.Println("│")
 	fmt.Println("├ Hash: ", hash)
 	fmt.Println("│")
-
-	PrintClose()
 
 	return nil
 }
