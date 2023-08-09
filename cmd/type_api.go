@@ -33,7 +33,6 @@ func gatheringData(value Rule) {
 	fmt.Println("│ Rule name : ", value.Name)
 	fmt.Println("│ Rule description : ", value.Description)
 	fmt.Println("│ Impacted Env : ", value.Environment)
-	fmt.Println("│ Confidence : ", value.Confidence)
 	fmt.Println("│ Tags : ", value.Tags)
 	fmt.Println("│ ")
 
@@ -91,7 +90,7 @@ func gatheringData(value Rule) {
 		if (value.Api_Auth_Token) != nil {
 			secret, ok := os.LookupEnv("INTERCEPT_" + *value.Api_Auth_Token)
 			if ok {
-				fmt.Println("│ TOKEN AUTH OK")
+
 				token_auth = secret
 
 			} else {
@@ -119,8 +118,6 @@ func gatheringData(value Rule) {
 			resp, err = client.R().
 				EnableTrace().
 				SetAuthToken(token_auth).
-				SetHeader("Content-Type", "application/xml").
-				SetBody(value.Api_Body).
 				SetOutput("output_" + strconv.Itoa(value.ID)).
 				Get(value.Api_Endpoint)
 
@@ -128,8 +125,6 @@ func gatheringData(value Rule) {
 			resp, err = client.R().
 				EnableTrace().
 				SetBasicAuth(basic_username, basic_password).
-				SetHeader("Content-Type", "application/xml").
-				SetBody(value.Api_Body).
 				SetOutput("output_" + strconv.Itoa(value.ID)).
 				Get(value.Api_Endpoint)
 		}
@@ -140,7 +135,6 @@ func gatheringData(value Rule) {
 			resp, err = client.R().
 				EnableTrace().
 				SetAuthToken(token_auth).
-				SetHeader("Content-Type", "application/xml").
 				SetBody(value.Api_Body).
 				SetOutput("output_" + strconv.Itoa(value.ID)).
 				Post(value.Api_Endpoint)
@@ -172,10 +166,7 @@ func gatheringData(value Rule) {
 
 		if value.Api_Trace {
 
-			fmt.Println("│ API Body:", value.Api_Body)
-
-			fmt.Println("│ API Response Body:", resp.String())
-			fmt.Println("│ API Response Body:", resp.Body())
+			fmt.Println("│ API Request Body:", value.Api_Body)
 
 			// Explore response object
 			fmt.Println("│ API Response Info:")
