@@ -119,6 +119,7 @@ func gatheringData(value Rule) {
 			resp, err = client.R().
 				EnableTrace().
 				SetAuthToken(token_auth).
+				SetHeader("Content-Type", "application/xml").
 				SetBody(value.Api_Body).
 				SetOutput("output_" + strconv.Itoa(value.ID)).
 				Get(value.Api_Endpoint)
@@ -127,6 +128,7 @@ func gatheringData(value Rule) {
 			resp, err = client.R().
 				EnableTrace().
 				SetBasicAuth(basic_username, basic_password).
+				SetHeader("Content-Type", "application/xml").
 				SetBody(value.Api_Body).
 				SetOutput("output_" + strconv.Itoa(value.ID)).
 				Get(value.Api_Endpoint)
@@ -138,6 +140,7 @@ func gatheringData(value Rule) {
 			resp, err = client.R().
 				EnableTrace().
 				SetAuthToken(token_auth).
+				SetHeader("Content-Type", "application/xml").
 				SetBody(value.Api_Body).
 				SetOutput("output_" + strconv.Itoa(value.ID)).
 				Post(value.Api_Endpoint)
@@ -168,7 +171,11 @@ func gatheringData(value Rule) {
 		fmt.Println("│ ")
 
 		if value.Api_Trace {
+
+			fmt.Println("│ API Body:", value.Api_Body)
+
 			fmt.Println("│ API Response Body:", resp.String())
+			fmt.Println("│ API Response Body:", resp.Body())
 
 			// Explore response object
 			fmt.Println("│ API Response Info:")

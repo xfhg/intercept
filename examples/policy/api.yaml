@@ -12,8 +12,7 @@ Rules:
     api_endpoint: https://localhost:3003/simple
     api_insecure: true
     api_request: GET
-    api_body: |
-      <xml>instruction<xml>
+    api_body: <xml><rpc version="ganso/8_11"></rpc><xml>
     api_auth: basic
     api_auth_basic: RULE105
     api_auth_token:
