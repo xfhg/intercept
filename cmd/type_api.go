@@ -74,7 +74,7 @@ func gatheringData(value Rule) {
 					if len(authParts) > 1 {
 						basic_username = authParts[0]
 						basic_password = authParts[1]
-						client.R().SetBasicAuth(basic_username, basic_password)
+
 					}
 				} else {
 					LogError(errors.New("API Basic Auth Environment variable must be defined as username:password"))
@@ -93,7 +93,7 @@ func gatheringData(value Rule) {
 			if ok {
 				fmt.Println("│ TOKEN AUTH OK")
 				token_auth = secret
-				client.R().SetAuthToken(token_auth)
+
 			} else {
 
 				LogError(errors.New("API Auth Environment variables not set for this request"))
@@ -106,6 +106,8 @@ func gatheringData(value Rule) {
 		LogError(errors.New("API Auth not defined"))
 	}
 
+	_ = os.Remove("output_" + strconv.Itoa(value.ID))
+
 	err = spinner.Start()
 	if err != nil {
 		LogError(err)
@@ -113,17 +115,44 @@ func gatheringData(value Rule) {
 
 	switch value.Api_Request {
 	case "GET":
-		resp, err = client.R().
-			EnableTrace().
-			SetHeader("Content-Type", "application/xml").
-			SetBody(value.Api_Body).
-			SetOutput("output_" + strconv.Itoa(value.ID)).
-			Get(value.Api_Endpoint)
+		if token_auth != "" {
+			resp, err = client.R().
+				EnableTrace().
+				SetAuthToken(token_auth).
+				SetBody(value.Api_Body).
+				SetOutput("output_" + strconv.Itoa(value.ID)).
+				Get(value.Api_Endpoint)
+
+		} else {
+			resp, err = client.R().
+				EnableTrace().
+				SetBasicAuth(basic_username, basic_password).
+				SetBody(value.Api_Body).
+				SetOutput("output_" + strconv.Itoa(value.ID)).
+				Get(value.Api_Endpoint)
+		}
+
 	case "POST":
-		resp, err = client.R().
-			SetHeader("Content-Type", "application/xml").
-			SetBody(value.Api_Body).
-			Post(value.Api_Endpoint)
+		if token_auth != "" {
+
+			resp, err = client.R().
+				EnableTrace().
+				SetAuthToken(token_auth).
+				SetBody(value.Api_Body).
+				SetOutput("output_" + strconv.Itoa(value.ID)).
+				Post(value.Api_Endpoint)
+
+		} else {
+
+			resp, err = client.R().
+				EnableTrace().
+				SetBasicAuth(basic_username, basic_password).
+				SetBody(value.Api_Body).
+				SetOutput("output_" + strconv.Itoa(value.ID)).
+				Post(value.Api_Endpoint)
+
+		}
+
 	default:
 		LogError(errors.New("Invalid request type"))
 		return
