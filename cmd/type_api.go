@@ -71,9 +71,11 @@ func gatheringData(value Rule) {
 
 				if strings.Contains(secret, ":") {
 					authParts := strings.Split(secret, ":")
-					basic_username = authParts[0]
-					basic_password = authParts[1]
-					client.R().SetBasicAuth(basic_username, basic_password)
+					if len(authParts) > 1 {
+						basic_username = authParts[0]
+						basic_password = authParts[1]
+						client.R().SetBasicAuth(basic_username, basic_password)
+					}
 				} else {
 					LogError(errors.New("API Basic Auth Environment variable must be defined as username:password"))
 				}
