@@ -54,6 +54,7 @@ type Rule struct {
 	Confidence     string   `yaml:"confidence,omitempty"`
 	Api_Endpoint   string   `yaml:"api_endpoint,omitempty"`
 	Api_Request    string   `yaml:"api_request,omitempty"`
+	Api_Insecure   bool     `yaml:"api_insecure"`
 	Api_Body       string   `yaml:"api_body,omitempty"`
 	Api_Auth       string   `yaml:"api_auth,omitempty"`
 	Api_Auth_Basic *string  `yaml:"api_auth_basic,omitempty"`

@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"bufio"
+	"crypto/tls"
 	"errors"
 	"fmt"
 	"os"
@@ -37,8 +38,15 @@ func gatheringData(value Rule) {
 	fmt.Println("│ ")
 
 	fmt.Println("│ API ENDPOINT : ", value.Api_Endpoint)
+	fmt.Println("│ ")
 
 	client := resty.New()
+
+	if value.Api_Insecure {
+		client.SetTLSClientConfig(&tls.Config{InsecureSkipVerify: true})
+		colorYellowBold.Println("│ API INSECURE - NO TLS CHECK")
+		fmt.Println("│ ")
+	}
 
 	cfg := yacspin.Config{
 		Frequency:       100 * time.Millisecond,
@@ -124,7 +132,9 @@ func gatheringData(value Rule) {
 		LogError(err)
 	} else {
 		spinner.Stop()
+		fmt.Println("│ ")
 		fmt.Println("│ API Response Status:", resp.Status())
+		fmt.Println("│ ")
 
 		if value.Api_Trace {
 			fmt.Println("│ API Response Body:", resp.String())
