@@ -48,12 +48,16 @@ func gatheringData(value Rule) {
 	}
 
 	cfg := yacspin.Config{
-		Frequency:       100 * time.Millisecond,
-		CharSet:         yacspin.CharSets[3],
-		Suffix:          " API Gathering Data",
-		SuffixAutoColon: true,
-		StopCharacter:   "│ ✓",
-		StopColors:      []string{"fgGreen"},
+		Frequency:         100 * time.Millisecond,
+		CharSet:           yacspin.CharSets[3],
+		Suffix:            " API Gathering Data ",
+		SuffixAutoColon:   true,
+		StopCharacter:     "│ ✓ ",
+		StopMessage:       "OK",
+		StopColors:        []string{"fgGreen"},
+		StopFailCharacter: "│ ✗ ",
+		StopFailColors:    []string{"fgRed"},
+		StopFailMessage:   "Response Status NOT OK",
 	}
 
 	spinner, err := yacspin.New(cfg)
@@ -159,10 +163,8 @@ func gatheringData(value Rule) {
 		return
 	}
 
-	if err != nil {
-		spinner.StopFail()
-		LogError(err)
-	} else {
+	if resp.IsSuccess() {
+
 		spinner.Stop()
 		fmt.Println("│ ")
 		fmt.Println("│ API Response Status:", resp.Status())
@@ -197,6 +199,15 @@ func gatheringData(value Rule) {
 			fmt.Println("│   RemoteAddr    :", ti.RemoteAddr.String())
 		}
 
+	} else {
+
+		spinner.StopFail()
+		LogError(errors.New(resp.Status()))
+	}
+
+	if err != nil {
+		spinner.StopFail()
+		LogError(err)
 	}
 
 }
@@ -311,5 +322,7 @@ func processAPIType(value Rule) {
 		}
 
 	}
+
+	_ = os.Remove(scanPath)
 
 }

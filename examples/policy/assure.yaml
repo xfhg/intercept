@@ -54,6 +54,27 @@ Rules:
     tags: AWS,AZURE
     patterns:
       - (resource)\s*"(.*)"
+  
+  - name: API value check
+    id: 105
+    description: Sandbox API check
+    error: Misconfiguration or omission
+    tags: KEY
+    type: api
+    api_endpoint: https://localhost:3003/simple
+    api_insecure: true
+    api_request: GET
+    api_body: <xml><rpc version="ganso/8_11"></rpc><xml>
+    api_auth: basic
+    api_auth_basic: RULE105
+    api_auth_token:
+    fatal: false
+    enforcement: true
+    environment: all
+    confidence: high
+    patterns:
+      - \s*OK\s*
+      - OK
 
 ExitCritical: "Critical irregularities found in your code"
 ExitWarning: "Irregularities found in your code"
