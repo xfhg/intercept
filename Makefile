@@ -24,7 +24,6 @@ mod:
 	go get -u
 	go mod verify
 	go mod tidy
-	go mod vendor
 
 windows: clean
 	CGO_ENABLED=0 GOOS=windows GOARCH=amd64 go build -ldflags="-s -w -X 'github.com/xfhg/intercept/cmd.buildVersion=$(TAG)'" -mod=readonly -o bin/intercept.exe
@@ -48,21 +47,10 @@ prepare:
 
 clean: mod
 	go clean
-	rm -f bin/interceptl
-	rm -f bin/interceptm
-	rm -f bin/intercept.exe
-	rm -f bin/.ignore
-	rm -f bin/intercept-*
+	rm -rf bin/
 
 purge:
-	rm -f release/interceptl
-	rm -f release/interceptm
-	rm -f release/intercept.exe
-	rm -f release/intercept*
-	rm -f release/v*
-	rm -f release/_*
-	rm -f release/config*
-	rm -f intercept-*.zip
+	rm -f release/*
 
 purge-output:
 	rm -f output/*.zip
