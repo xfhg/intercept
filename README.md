@@ -284,7 +284,7 @@ You can set three enforcement levels:
 <br>
 
 
-# Playground
+# Sandbox Playground
 
 Build & mess around with it :
 
@@ -296,8 +296,6 @@ make
 
 [![Open in Gitpod](https://gitpod.io/button/open-in-gitpod.svg)](https://gitpod.io/#https://github.com/xfhg/intercept)
 
-</p>
-(gitpod latest images still dont fancy the go1.20 , it's ok to compile intercept using 1.19 by editing the go.mod so you can play around inside gitpod)
 <br>
 <br>
 <br>
