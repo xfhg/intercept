@@ -8,6 +8,7 @@ import (
 	"os"
 	"strings"
 
+	"github.com/gosuri/uitable"
 	"github.com/spf13/cobra"
 )
 
@@ -47,42 +48,6 @@ var apiCmd = &cobra.Command{
 		fmt.Println("│ Scan ENV\t: ", cfgEnv)
 		fmt.Println("│ Scan TAG\t: ", scanTags)
 
-		// files, err := PathSHA256(scanPath)
-		// if err != nil {
-		// 	LogError(err)
-		// }
-
-		// jsonData, err := json.Marshal(struct {
-		// 	Scanned []ScannedFile `json:"scanned"`
-		// }{
-		// 	Scanned: files,
-		// })
-		// if err != nil {
-		// 	LogError(err)
-		// 	return
-		// }
-
-		// err = os.WriteFile("intercept.scannedSHA256.json", jsonData, 0644)
-		// if err != nil {
-		// 	LogError(err)
-		// }
-
-		// fmt.Println("│ ")
-		// fmt.Printf("│ Target Size : %d file(s)\n", len(files))
-
-		// if len(files) < 20 {
-
-		// 	fmt.Println("│ Target Filelist Checksum :")
-		// 	fmt.Println("│ ")
-
-		// 	for _, file := range files {
-		// 		cleanPath := filepath.Clean(file.Path)
-		// 		fmt.Printf("│ Path: %s :SHA256: %s\n", cleanPath, file.Sha256)
-
-		// 	}
-		// 	fmt.Println("│ ")
-		// }
-		// fmt.Println("│ ")
 		fmt.Println(line)
 
 		if auditNox {
@@ -137,11 +102,17 @@ var apiCmd = &cobra.Command{
 			fmt.Println("│")
 			fmt.Println("│")
 
-			colorBold.Println("├  Quick Stats : ")
-			colorBold.Println("│ \t Total Policies Scanned :\t", stats.Total)
-			colorGreenBold.Println("│ \t Clean Policy Checks :\t\t", stats.Clean)
-			colorYellowBold.Println("│ \t Policy Irregularities :\t", stats.Dirty)
-			colorRedBold.Println("│ \t Fatal Policy Breach :\t\t", stats.Fatal)
+			table := uitable.New()
+			table.MaxColWidth = 254
+
+			table.AddRow(colorBold.Render("├ Quick Stats "), "")
+			table.AddRow(colorBold.Render("│"), "")
+			table.AddRow(colorBold.Render("│ Total Policies Scanned"), ": "+colorBold.Render(stats.Total))
+			table.AddRow(colorGreenBold.Render("│ Clean Policy Checks"), ": "+colorGreenBold.Render(stats.Clean))
+			table.AddRow(colorYellowBold.Render("│ Irregularities Found"), ": "+colorYellowBold.Render(stats.Dirty))
+			table.AddRow(colorRedBold.Render("│ Fatal Policy Breach"), ": "+colorRedBold.Render(stats.Fatal))
+
+			fmt.Println(table)
 
 			jsonstats, _jerr := json.Marshal(stats)
 			if _jerr != nil {
@@ -186,44 +157,6 @@ var apiCmd = &cobra.Command{
 
 			}
 
-		} else {
-
-			// startTime = time.Now()
-			// formattedTime = startTime.Format("2006-01-02 15:04:05")
-			// fmt.Println("├ S ", formattedTime)
-			// fmt.Print("│")
-
-			// numCPU := runtime.NumCPU()
-
-			// var wg sync.WaitGroup
-			// wg.Add(len(rules.Rules))
-
-			// sem := make(chan struct{}, numCPU*2)
-
-			// rulesChan := make(chan Rule, len(rules.Rules))
-
-			// for i := 0; i < numCPU; i++ {
-			// 	go func(workerID int) {
-			// 		for rule := range rulesChan {
-			// 			sem <- struct{}{} // Acquire a token
-
-			// 			tagfound := FindMatchingString(scanTags, rule.Tags, ",")
-			// 			if tagfound || scanTags == "" {
-			// 				worker(workerID, sem, &wg, rgembed, pwddir, scanPath, rule)
-			// 			} else {
-			// 				wg.Done() // Call wg.Done() if the worker skips the rule
-			// 			}
-			// 		}
-			// 	}(i)
-			// }
-
-			// for _, policy := range rules.Rules {
-			// 	rulesChan <- policy
-			// }
-
-			// close(rulesChan)
-
-			// wg.Wait()
 		}
 		endTime := time.Now()
 		duration := endTime.Sub(startTime)

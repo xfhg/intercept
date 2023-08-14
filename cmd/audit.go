@@ -12,6 +12,7 @@ import (
 	"strings"
 
 	"github.com/gookit/color"
+	"github.com/gosuri/uitable"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
@@ -228,11 +229,17 @@ var auditCmd = &cobra.Command{
 			fmt.Println("│")
 			fmt.Println("│")
 
-			colorBold.Println("├  Quick Stats : ")
-			colorBold.Println("│ \t Total Policies Scanned :\t", stats.Total)
-			colorGreenBold.Println("│ \t Clean Policy Checks :\t\t", stats.Clean)
-			colorYellowBold.Println("│ \t Policy Irregularities :\t", stats.Dirty)
-			colorRedBold.Println("│ \t Fatal Policy Breach :\t\t", stats.Fatal)
+			table := uitable.New()
+			table.MaxColWidth = 254
+
+			table.AddRow(colorBold.Render("├ Quick Stats "), "")
+			table.AddRow(colorBold.Render("│"), "")
+			table.AddRow(colorBold.Render("│ Total Policies Scanned"), ": "+colorBold.Render(stats.Total))
+			table.AddRow(colorGreenBold.Render("│ Clean Policy Checks"), ": "+colorGreenBold.Render(stats.Clean))
+			table.AddRow(colorYellowBold.Render("│ Irregularities Found"), ": "+colorYellowBold.Render(stats.Dirty))
+			table.AddRow(colorRedBold.Render("│ Fatal Policy Breach"), ": "+colorRedBold.Render(stats.Fatal))
+
+			fmt.Println(table)
 
 			jsonstats, _jerr := json.Marshal(stats)
 			if _jerr != nil {

@@ -6,6 +6,7 @@ require (
 	github.com/blang/semver v3.5.1+incompatible
 	github.com/go-resty/resty/v2 v2.7.0
 	github.com/gookit/color v1.5.4
+	github.com/gosuri/uitable v0.0.4
 	github.com/hashicorp/go-getter v1.7.2
 	github.com/itchyny/gojq v0.12.13
 	github.com/kardianos/osext v0.0.0-20190222173326-2bc1f35cddc0
