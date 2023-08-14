@@ -18,9 +18,6 @@ jobs:
         with: 
           go-version-file: go.mod
 
-      - name: Frogbot by JFrog
-        uses: jfrog/frogbot@v2.6.1
-
       - name: Fetch Tags
         run: |
           git fetch --tags -f
