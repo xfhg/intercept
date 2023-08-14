@@ -4,9 +4,9 @@
 
 </p>
 
-# INTERCEPT v1.2.1
+# INTERCEPT v1.3.0
 
-**intercept** is a DevSecOps cli tool designed to provide Static Application Security Testing (SAST) capabilities to software development teams. The tool aims to help developers identify and address security vulnerabilities in their code early in the software development life cycle, reducing the risk of security breaches and ensuring compliance with industry regulations. intercept leverages a range of security scanning techniques to analyze code, including pattern matching, code analysis, and vulnerability scanning. It is designed to be easy to integrate, with a simple sub-second command-line interface and customizable configuration options. With intercept, developers can integrate security testing into their development workflows and make security a critical yet seamless part of their software development process.
+**intercept** is a DevSecOps cli multi-tool designed to provide Static Application Security Testing (SAST) capabilities to software development teams. The tool aims to help developers identify and address security vulnerabilities in their code and API endpoints early in the software development life cycle, reducing the risk of security breaches and ensuring compliance with industry regulations. intercept leverages a range of security scanning techniques to analyze code, including pattern matching, code analysis, and vulnerability scanning. It is seamless to integrate, with a simple sub-second command-line interface and granular customizable configuration options. With intercept, developers can speed up security and integration testing into their development workflows and make security a critical yet seamless part of their software development process.
 
 <br>
 
@@ -29,8 +29,9 @@
 ## Features
 
 
-- **Pattern matching:** intercept uses regex pattern matching technique to scan code for known vulnerabilities and customised patterns, reducing the time and effort required to identify and fix these common issues. [Chose from more than 1500 patterns](https://github.com/xfhg/intercept/tree/master/policy/unstable.yaml) 
+- **Pattern matching:** intercept uses regex pattern matching technique to scan code for known vulnerabilities and customised patterns, reducing the time and effort required to identify and fix these common issues. [Library with more than 1500 patterns](https://github.com/xfhg/intercept/tree/master/policy/unstable.yaml) 
 - **Customizable rules:** intercept allows users to customize all security rules used to scan their code, making it possible to tailor the scanning process to the specific requirements of their application or organization.
+- **API endpoint checks:** intercept supports gathering API data and applying the same pattern matching policies throughout it's response, complete with full telemetry.
 - **Integration with CI/CD:** intercept can easily be integrated into continuous integration and continuous deployment (CI/CD) pipelines, allowing security testing to be performed automatically as part of the development process.
 - **Detailed reporting:** intercept provides detailed reports on vulnerabilities and security issues, _fully compliant SARIF output_, including severity ratings and remediation advice, making it easy for developers to prioritize and address security concerns early on.
 - **Support for any programming language:** intercept supports scanning through any programming languages or file types,  making it a versatile tool for security testing across a range of applications and environments.
@@ -118,11 +119,12 @@ intercept audit -t examples/target -e "development" -i "AWS"
 
 ## Policy File Structure
 
-These are 3 types of policies available :
+These are 4 types of policies available :
 
 - **scan** : where we enforce breaking rules on matched patterns
 - **collect** : where we just collect matched patterns
 - **assure** : where we expect matched patterns and detect if missing
+- **api** : apply the assure rules into API endpoint data
 
 Easy to read and compose the rules file have this minimal required structure:
 ```
@@ -170,6 +172,26 @@ Rules:
     patterns:
       - ssl_cyphers\s*=\s*"GANSO_SSL"
 
+  - name: Check API config endpoint
+    id: 105
+    description: Ensure anonymous access is turned OFF
+    error: Misconfiguration or omission
+    tags: KEY
+    type: api
+    api_endpoint: https://localhost:3003/simple
+    api_insecure: true
+    api_request: POST
+    api_body: <xml><rpc><show><config></config></show></rpc><xml>
+    api_auth: basic
+    api_auth_basic: RULE105
+    api_auth_token:
+    fatal: false
+    enforcement: true
+    environment: all
+    confidence: high
+    patterns:
+      - \s*ANONYMOUS_ACCESS\s*:\s*OFF\s*
+
 ExitCritical: "Critical irregularities found in your code"
 ExitWarning: "Irregularities found in your code"
 ExitClean: "Clean report"
@@ -200,6 +222,10 @@ intercept audit -t examples/target -e "development"
 - Rule Tag filter
 ```
 intercept audit -t examples/target -i "AWS,OWASP"
+```
+- Run only the API type checks (but with tags)
+```
+intercept api -i "AWS,OWASP"
 ```
 - TURBO SILENT mode
 ```
