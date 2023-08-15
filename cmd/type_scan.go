@@ -21,7 +21,7 @@ func processScanType(value Rule) {
 
 	rgembed, _ := prepareEmbeddedExecutable()
 
-	searchPatternFile := strings.Join([]string{pwddir, "/", "search_regex"}, "")
+	searchPatternFile := strings.Join([]string{pwddir, "/", "search_regex_", strconv.Itoa(value.ID)}, "")
 
 	fmt.Println("│ ")
 	fmt.Println(line)

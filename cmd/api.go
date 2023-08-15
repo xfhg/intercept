@@ -3,6 +3,8 @@ package cmd
 import (
 	"encoding/json"
 	"fmt"
+	"strconv"
+	"sync"
 	"time"
 
 	"os"
@@ -10,6 +12,10 @@ import (
 
 	"github.com/gosuri/uitable"
 	"github.com/spf13/cobra"
+)
+
+var (
+	scanTurboAPI string
 )
 
 var apiCmd = &cobra.Command{
@@ -44,17 +50,15 @@ var apiCmd = &cobra.Command{
 		fmt.Println("│ PWD : ", pwddir)
 		fmt.Println("│ RGP : ", rgembed)
 		fmt.Println("│ ")
-		//fmt.Println("│ Scan PATH\t: ", scanPath)
+
 		fmt.Println("│ Scan ENV\t: ", cfgEnv)
 		fmt.Println("│ Scan TAG\t: ", scanTags)
-
+		fmt.Println("│ ")
 		fmt.Println(line)
 
 		if auditNox {
 			fmt.Println("│ Exceptions Disabled - All Policies Activated")
 		}
-
-		searchPatternFile := strings.Join([]string{pwddir, "/", "search_regex"}, "")
 
 		fmt.Println("│ ")
 		fmt.Println("│ ")
@@ -69,7 +73,7 @@ var apiCmd = &cobra.Command{
 			os.Exit(0)
 		}
 
-		if scanTurbo == "false" && len(rules.Rules) < 50 {
+		if scanTurboAPI == "false" && len(rules.Rules) < 50 {
 
 			for _, value := range rules.Rules {
 
@@ -80,15 +84,17 @@ var apiCmd = &cobra.Command{
 					continue
 				}
 
-				searchPattern := []byte(strings.Join(value.Patterns, "\n") + "\n")
-				_ = os.WriteFile(searchPatternFile, searchPattern, 0644)
-
 				switch value.Type {
 
 				case "api":
 
-					gatheringData(value)
-					processAPIType(value)
+					searchPatternFile := strings.Join([]string{pwddir, "/", "search_regex_", strconv.Itoa(value.ID)}, "")
+
+					searchPattern := []byte(strings.Join(value.Patterns, "\n") + "\n")
+					_ = os.WriteFile(searchPatternFile, searchPattern, 0644)
+
+					gatheringData(value, false)
+					processAPIType(value, false)
 
 				default:
 
@@ -96,68 +102,121 @@ var apiCmd = &cobra.Command{
 
 			}
 
-			_ = os.Remove(searchPatternFile)
+		} else {
 
-			fmt.Println("│")
-			fmt.Println("│")
-			fmt.Println("│")
+			values := make(chan Rule, len(rules.Rules))
+			var wg sync.WaitGroup
 
-			table := uitable.New()
-			table.MaxColWidth = 254
+			for _, value := range rules.Rules {
 
-			table.AddRow(colorBold.Render("├ Quick Stats "), "")
-			table.AddRow(colorBold.Render("│"), "")
-			table.AddRow(colorBold.Render("│ Total Policies Scanned"), ": "+colorBold.Render(stats.Total))
-			table.AddRow(colorGreenBold.Render("│ Clean Policy Checks"), ": "+colorGreenBold.Render(stats.Clean))
-			table.AddRow(colorYellowBold.Render("│ Irregularities Found"), ": "+colorYellowBold.Render(stats.Dirty))
-			table.AddRow(colorRedBold.Render("│ Fatal Policy Breach"), ": "+colorRedBold.Render(stats.Fatal))
+				switch value.Type {
 
-			fmt.Println(table)
+				case "api":
 
-			jsonstats, _jerr := json.Marshal(stats)
-			if _jerr != nil {
-				LogError(_jerr)
-			}
+					searchPatternFile := strings.Join([]string{pwddir, "/", "search_regex_", strconv.Itoa(value.ID)}, "")
+					searchPattern := []byte(strings.Join(value.Patterns, "\n") + "\n")
+					_ = os.WriteFile(searchPatternFile, searchPattern, 0644)
 
-			_jwerr := os.WriteFile("stats.json", jsonstats, 0644)
-			if _jwerr != nil {
-				LogError(_jwerr)
-			}
+					tagfound := FindMatchingString(scanTags, value.Tags, ",")
+					if tagfound || scanTags == "" {
+						wg.Add(1)
+						go func(value Rule) {
+							defer wg.Done()
+							gatheringData(value, true)
+							values <- value
+						}(value)
+					}
 
-			fmt.Println("│")
-			fmt.Println("│")
-			fmt.Println("│")
-			fmt.Println("│")
+				default:
 
-			if fatal {
-
-				colorRedBold.Println("│")
-				colorRedBold.Println("├ ", rules.ExitCritical)
-				colorRedBold.Println("│")
-				PrintClose()
-				fmt.Println("")
-				if scanBreak != "false" {
-					colorRedBold.Println("► break signal ")
-					os.Exit(1)
 				}
-				os.Exit(0)
+			}
+
+			wg.Wait()
+			close(values)
+
+			for i := 0; i < len(rules.Rules); i++ {
+
+				wg.Add(1)
+				go func() {
+					defer wg.Done()
+					value := <-values
+					switch value.Type {
+
+					case "api":
+						processAPIType(value, true)
+					default:
+
+					}
+
+				}()
 
 			}
 
-			if warning {
-				colorYellowBold.Println("│")
-				colorYellowBold.Println("├ ", rules.ExitWarning)
-				colorYellowBold.Println("│")
-
-			} else {
-
-				colorGreenBold.Println("│")
-				colorGreenBold.Println("├ ", rules.ExitClean)
-				colorGreenBold.Println("│")
-
-			}
+			wg.Wait()
 
 		}
+
+		fmt.Println("│")
+		fmt.Println("│")
+		fmt.Println("│")
+
+		table := uitable.New()
+		table.MaxColWidth = 254
+
+		table.AddRow(colorBold.Render("├ Quick Stats "), "")
+		table.AddRow(colorBold.Render("│"), "")
+		table.AddRow(colorBold.Render("│ Total Policies Scanned"), ": "+colorBold.Render(stats.Total))
+		table.AddRow(colorGreenBold.Render("│ Clean Policy Checks"), ": "+colorGreenBold.Render(stats.Clean))
+		table.AddRow(colorYellowBold.Render("│ Irregularities Found"), ": "+colorYellowBold.Render(stats.Dirty))
+		table.AddRow(colorRedBold.Render("│"), "")
+		table.AddRow(colorRedBold.Render("│ Fatal Policy Breach"), ": "+colorRedBold.Render(stats.Fatal))
+
+		fmt.Println(table)
+
+		jsonstats, _jerr := json.Marshal(stats)
+		if _jerr != nil {
+			LogError(_jerr)
+		}
+
+		_jwerr := os.WriteFile("stats.json", jsonstats, 0644)
+		if _jwerr != nil {
+			LogError(_jwerr)
+		}
+
+		fmt.Println("│")
+		fmt.Println("│")
+		fmt.Println("│")
+		fmt.Println("│")
+
+		if fatal {
+
+			colorRedBold.Println("│")
+			colorRedBold.Println("├ ", rules.ExitCritical)
+			colorRedBold.Println("│")
+			PrintClose()
+			fmt.Println("")
+			if scanBreak != "false" {
+				colorRedBold.Println("► break signal ")
+				os.Exit(1)
+			}
+			os.Exit(0)
+
+		}
+
+		if warning {
+			colorYellowBold.Println("│")
+			colorYellowBold.Println("├ ", rules.ExitWarning)
+			colorYellowBold.Println("│")
+
+		} else {
+
+			colorGreenBold.Println("│")
+			colorGreenBold.Println("├ ", rules.ExitClean)
+			colorGreenBold.Println("│")
+
+		}
+
 		endTime := time.Now()
 		duration := endTime.Sub(startTime)
 		formattedTime = endTime.Format("2006-01-02 15:04:05")
@@ -172,6 +231,7 @@ func init() {
 
 	apiCmd.PersistentFlags().StringVarP(&scanTags, "tags", "i", "", "include only rules with the specified tag")
 	apiCmd.PersistentFlags().StringVarP(&scanBreak, "break", "b", "true", "disable exit 1 for fatal rules")
+	apiCmd.PersistentFlags().StringVarP(&scanTurboAPI, "silenturbo", "s", "false", "disable verbose output enabling turbo mode")
 
 	rootCmd.AddCommand(apiCmd)
 

@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"path/filepath"
 	"runtime"
+	"strconv"
 	"sync"
 	"time"
 
@@ -117,6 +118,9 @@ var auditCmd = &cobra.Command{
 		rgembed, _ := prepareEmbeddedExecutable()
 
 		startTime := time.Now()
+		formattedTime := startTime.Format("2006-01-02 15:04:05")
+		fmt.Println("├ S ", formattedTime)
+		fmt.Println("│")
 
 		line := "├────────────────────────────────────────────────────────────"
 
@@ -152,14 +156,18 @@ var auditCmd = &cobra.Command{
 
 		if len(files) < 20 {
 
-			fmt.Println("│ Target Filelist Checksum :")
-			fmt.Println("│ ")
+			shatable := uitable.New()
+			shatable.MaxColWidth = 254
+
+			shatable.AddRow(colorBold.Render("├ Target Filelist"), "")
+			shatable.AddRow(colorBold.Render("│ Path"), colorBold.Render("SHA256 Checksum"))
 
 			for _, file := range files {
 				cleanPath := filepath.Clean(file.Path)
-				fmt.Printf("│ Path: %s :SHA256: %s\n", cleanPath, file.Sha256)
-
+				shatable.AddRow("│ "+cleanPath, file.Sha256)
 			}
+
+			fmt.Println(shatable)
 			fmt.Println("│ ")
 		}
 		fmt.Println("│ ")
@@ -168,8 +176,6 @@ var auditCmd = &cobra.Command{
 		if auditNox {
 			fmt.Println("│ Exceptions Disabled - All Policies Activated")
 		}
-
-		searchPatternFile := strings.Join([]string{pwddir, "/", "search_regex"}, "")
 
 		fmt.Println("│ ")
 		fmt.Println("│ ")
@@ -195,6 +201,8 @@ var auditCmd = &cobra.Command{
 					continue
 				}
 
+				searchPatternFile := strings.Join([]string{pwddir, "/", "search_regex_", strconv.Itoa(value.ID)}, "")
+
 				searchPattern := []byte(strings.Join(value.Patterns, "\n") + "\n")
 				_ = os.WriteFile(searchPatternFile, searchPattern, 0644)
 
@@ -202,8 +210,8 @@ var auditCmd = &cobra.Command{
 
 				case "api":
 
-					gatheringData(value)
-					processAPIType(value)
+					gatheringData(value, false)
+					processAPIType(value, false)
 
 				case "assure":
 
@@ -221,9 +229,9 @@ var auditCmd = &cobra.Command{
 
 				}
 
-			}
+				_ = os.Remove(searchPatternFile)
 
-			_ = os.Remove(searchPatternFile)
+			}
 
 			fmt.Println("│")
 			fmt.Println("│")
@@ -237,6 +245,7 @@ var auditCmd = &cobra.Command{
 			table.AddRow(colorBold.Render("│ Total Policies Scanned"), ": "+colorBold.Render(stats.Total))
 			table.AddRow(colorGreenBold.Render("│ Clean Policy Checks"), ": "+colorGreenBold.Render(stats.Clean))
 			table.AddRow(colorYellowBold.Render("│ Irregularities Found"), ": "+colorYellowBold.Render(stats.Dirty))
+			table.AddRow(colorRedBold.Render("│"), "")
 			table.AddRow(colorRedBold.Render("│ Fatal Policy Breach"), ": "+colorRedBold.Render(stats.Fatal))
 
 			fmt.Println(table)
@@ -325,8 +334,8 @@ var auditCmd = &cobra.Command{
 		}
 		endTime := time.Now()
 		duration := endTime.Sub(startTime)
-		formattedTime := endTime.Format("2006-01-02 15:04:05")
-		fmt.Println("│ ", duration)
+		formattedTime = endTime.Format("2006-01-02 15:04:05")
+		fmt.Println("│ Δ ", duration)
 		fmt.Println("├ F ", formattedTime)
 		PrintClose()
 

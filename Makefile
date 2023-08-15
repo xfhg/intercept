@@ -144,8 +144,9 @@ build-tool:
 # 	rm venom.exe
 
 ## dev-macos: temp quick dev task // dev-test
-dev-macos: clean purge prepare macos 
+dev-macos: clean purge prepare macos macos-arm
 	cp bin/interceptm release/interceptm
+	cp bin/interceptma release/interceptma
 	cp .ignore release/.ignore
 
 

@@ -1,7 +1,6 @@
 package cmd
 
 import (
-	"bufio"
 	"crypto/tls"
 	"errors"
 	"fmt"
@@ -21,36 +20,42 @@ var (
 	token_auth     string
 )
 
-func gatheringData(value Rule) {
+func gatheringData(value Rule, turbo bool) {
 
 	var resp *resty.Response
 	var err error
 
-	fmt.Println("│ ")
-	fmt.Println(line)
-	fmt.Println("│ ")
-	fmt.Println("├ API Rule #", value.ID)
-	fmt.Println("│ Rule name : ", value.Name)
-	fmt.Println("│ Rule description : ", value.Description)
-	fmt.Println("│ Impacted Env : ", value.Environment)
-	fmt.Println("│ Tags : ", value.Tags)
-	fmt.Println("│ ")
+	if !turbo {
 
-	fmt.Println("│ API ENDPOINT : ", value.Api_Endpoint)
-	fmt.Println("│ ")
+		fmt.Println("│ ")
+		fmt.Println(line)
+		fmt.Println("│ ")
+		fmt.Println("├ API Rule #", value.ID)
+		fmt.Println("│ Rule name : ", value.Name)
+		fmt.Println("│ Rule description : ", value.Description)
+		fmt.Println("│ Impacted Env : ", value.Environment)
+		fmt.Println("│ Tags : ", value.Tags)
+		fmt.Println("│ ")
+
+		fmt.Println("│ API ENDPOINT : ", value.Api_Endpoint)
+		fmt.Println("│ ")
+
+	}
 
 	client := resty.New()
 
 	if value.Api_Insecure {
 		client.SetTLSClientConfig(&tls.Config{InsecureSkipVerify: true})
-		colorYellowBold.Println("│ API INSECURE - NO TLS CHECK")
-		fmt.Println("│ ")
+		if !turbo {
+			colorYellowBold.Println("│ API INSECURE - NO TLS CHECK")
+			fmt.Println("│ ")
+		}
 	}
 
 	cfg := yacspin.Config{
 		Frequency:         100 * time.Millisecond,
 		CharSet:           yacspin.CharSets[3],
-		Suffix:            " API Gathering Data ",
+		Suffix:            strconv.Itoa(value.ID) + " API Gathering Data ",
 		SuffixAutoColon:   true,
 		StopCharacter:     "│ ✓ ",
 		StopMessage:       "OK",
@@ -167,36 +172,39 @@ func gatheringData(value Rule) {
 
 		spinner.Stop()
 		fmt.Println("│ ")
-		fmt.Println("│ API Response Status:", resp.Status())
-		fmt.Println("│ ")
+		if !turbo {
+			fmt.Println("│ ")
+			fmt.Println("│ API Response Status:", resp.Status())
+			fmt.Println("│ ")
 
-		if value.Api_Trace {
+			if value.Api_Trace {
 
-			fmt.Println("│ API Request Body:", value.Api_Body)
+				fmt.Println("│ API Request Body:", value.Api_Body)
 
-			// Explore response object
-			fmt.Println("│ API Response Info:")
-			fmt.Println("│   Error      :", err)
-			fmt.Println("│   Status Code:", resp.StatusCode())
-			fmt.Println("│   Status     :", resp.Status())
-			fmt.Println("│   Proto      :", resp.Proto())
-			fmt.Println("│   Time       :", resp.Time())
-			fmt.Println("│   Received At:", resp.ReceivedAt())
-			// Explore trace info
-			fmt.Println("│ API Request Trace Info:")
-			ti := resp.Request.TraceInfo()
-			fmt.Println("│   DNSLookup     :", ti.DNSLookup)
-			fmt.Println("│   ConnTime      :", ti.ConnTime)
-			fmt.Println("│   TCPConnTime   :", ti.TCPConnTime)
-			fmt.Println("│   TLSHandshake  :", ti.TLSHandshake)
-			fmt.Println("│   ServerTime    :", ti.ServerTime)
-			fmt.Println("│   ResponseTime  :", ti.ResponseTime)
-			fmt.Println("│   TotalTime     :", ti.TotalTime)
-			fmt.Println("│   IsConnReused  :", ti.IsConnReused)
-			fmt.Println("│   IsConnWasIdle :", ti.IsConnWasIdle)
-			fmt.Println("│   ConnIdleTime  :", ti.ConnIdleTime)
-			fmt.Println("│   RequestAttempt:", ti.RequestAttempt)
-			fmt.Println("│   RemoteAddr    :", ti.RemoteAddr.String())
+				// Explore response object
+				fmt.Println("│ API Response Info:")
+				fmt.Println("│   Error      :", err)
+				fmt.Println("│   Status Code:", resp.StatusCode())
+				fmt.Println("│   Status     :", resp.Status())
+				fmt.Println("│   Proto      :", resp.Proto())
+				fmt.Println("│   Time       :", resp.Time())
+				fmt.Println("│   Received At:", resp.ReceivedAt())
+				// Explore trace info
+				fmt.Println("│ API Request Trace Info:")
+				ti := resp.Request.TraceInfo()
+				fmt.Println("│   DNSLookup     :", ti.DNSLookup)
+				fmt.Println("│   ConnTime      :", ti.ConnTime)
+				fmt.Println("│   TCPConnTime   :", ti.TCPConnTime)
+				fmt.Println("│   TLSHandshake  :", ti.TLSHandshake)
+				fmt.Println("│   ServerTime    :", ti.ServerTime)
+				fmt.Println("│   ResponseTime  :", ti.ResponseTime)
+				fmt.Println("│   TotalTime     :", ti.TotalTime)
+				fmt.Println("│   IsConnReused  :", ti.IsConnReused)
+				fmt.Println("│   IsConnWasIdle :", ti.IsConnWasIdle)
+				fmt.Println("│   ConnIdleTime  :", ti.ConnIdleTime)
+				fmt.Println("│   RequestAttempt:", ti.RequestAttempt)
+				fmt.Println("│   RemoteAddr    :", ti.RemoteAddr.String())
+			}
 		}
 
 	} else {
@@ -212,7 +220,7 @@ func gatheringData(value Rule) {
 
 }
 
-func processAPIType(value Rule) {
+func processAPIType(value Rule, turbo bool) {
 
 	if cfgEnv == "" {
 		cfgEnv = "先锋"
@@ -224,7 +232,7 @@ func processAPIType(value Rule) {
 
 	rgembed, _ := prepareEmbeddedExecutable()
 
-	searchPatternFile := strings.Join([]string{pwddir, "/", "search_regex"}, "")
+	searchPatternFile := strings.Join([]string{pwddir, "/", "search_regex_", strconv.Itoa(value.ID)}, "")
 
 	scanPath := "output_" + strconv.Itoa(value.ID)
 
@@ -244,8 +252,10 @@ func processAPIType(value Rule) {
 
 		codePatternScan := []string{"--pcre2", "-p", "-o", "-A0", "-B0", "-C0", "-i", "-U", "-f", searchPatternFile, scanPath}
 		xcmd := exec.Command(rgembed, codePatternScan...)
-		xcmd.Stdout = os.Stdout
-		xcmd.Stderr = os.Stderr
+		if !turbo {
+			xcmd.Stdout = os.Stdout
+			xcmd.Stderr = os.Stderr
+		}
 		errr := xcmd.Run()
 
 		if errr != nil {
@@ -256,73 +266,59 @@ func processAPIType(value Rule) {
 				envfound := FindMatchingString(cfgEnv, value.Environment, ",")
 				if (envfound || strings.Contains(value.Environment, "all") || value.Environment == "") && value.Fatal {
 
-					colorRedBold.Println("│")
-					colorRedBold.Println("│ NON COMPLIANT : ")
-					colorRedBold.Println("│ ", value.Error)
-					colorRedBold.Println("│")
+					if !turbo {
+						colorRedBold.Println("│")
+						colorRedBold.Println("│ NON COMPLIANT : ")
+						colorRedBold.Println("│ ", value.Error)
+						colorRedBold.Println("│")
+
+					} else {
+						colorRedBold.Print("│ ✗ ", value.ID, " ")
+					}
+
 					fatal = true
 					stats.Fatal++
 				} else {
 
-					colorRedBold.Println("│")
-					colorRedBold.Println("│ NOT FOUND")
-					colorRedBold.Println("│ ", value.Error)
-					colorRedBold.Println("│")
+					if !turbo {
+						colorRedBold.Println("│")
+						colorRedBold.Println("│ NOT FOUND")
+						colorRedBold.Println("│ ", value.Error)
+						colorRedBold.Println("│")
+					} else {
+						colorRedBold.Print("│ ✗ ", value.ID, " ")
+					}
 					warning = true
 
 				}
-				colorRedBold.Println("│")
-				colorRedBold.Println("│ API Rule : ", value.Name)
-				colorRedBold.Println("│ Target Environment : ", value.Environment)
-				colorRedBold.Println("│ Suggested Solution : ", value.Solution)
-				colorRedBold.Println("│")
-				fmt.Println("│ ")
+				if !turbo {
+					colorRedBold.Println("│")
+					colorRedBold.Println("│ API Rule : ", value.Name)
+					colorRedBold.Println("│ Target Environment : ", value.Environment)
+					colorRedBold.Println("│ Suggested Solution : ", value.Solution)
+					colorRedBold.Println("│")
+					fmt.Println("│ ")
+				}
 				stats.Total++
 				stats.Dirty++
 
 			}
 		} else {
-
-			colorGreenBold.Println("│ ")
-			colorGreenBold.Println("│ Compliant")
+			if !turbo {
+				colorGreenBold.Println("│ ")
+				colorGreenBold.Println("│ Compliant")
+				fmt.Println("│ ")
+			} else {
+				colorGreenBold.Print("│ ✓ ", value.ID, " ")
+			}
 			stats.Clean++
 			stats.Total++
-			fmt.Println("│ ")
-
-		}
-
-		jsonOutputFile := strings.Join([]string{pwddir, "/", strconv.Itoa(value.ID), ".json"}, "")
-		jsonoutfile, erroutjson := os.Create(jsonOutputFile)
-		if erroutjson != nil {
-			LogError(erroutjson)
-		}
-		defer jsonoutfile.Close()
-		writer := bufio.NewWriter(jsonoutfile)
-		defer writer.Flush()
-
-		codePatternScanJSON := []string{"--pcre2", "--no-heading", "-o", "-p", "-i", "-U", "--json", "-f", searchPatternFile, scanPath}
-		xcmdJSON := exec.Command(rgembed, codePatternScanJSON...)
-		xcmdJSON.Stdout = jsonoutfile
-		xcmdJSON.Stderr = os.Stderr
-		errrJSON := xcmdJSON.Run()
-
-		if errrJSON != nil {
-			if xcmdJSON.ProcessState.ExitCode() == 2 {
-				LogError(errrJSON)
-			} else {
-
-				ProcessOutput(strings.Join([]string{strconv.Itoa(value.ID), ".json"}, ""), strconv.Itoa(value.ID), value.Name, value.Description, value.Error, value.Solution, value.Fatal)
-				GenerateSarif()
-				colorRedBold.Println("│ ")
-			}
-		} else {
-			colorGreenBold.Println("│")
-			os.Remove(jsonOutputFile)
 
 		}
 
 	}
 
 	_ = os.Remove(scanPath)
+	_ = os.Remove(searchPatternFile)
 
 }
