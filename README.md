@@ -4,7 +4,7 @@
 
 </p>
 
-# INTERCEPT v1.3.0
+# INTERCEPT v1.3.x
 
 **intercept** is a DevSecOps cli multi-tool designed to provide Static Application Security Testing (SAST) capabilities to software development teams. The tool aims to help developers identify and address security vulnerabilities in their code and API endpoints early in the software development life cycle, reducing the risk of security breaches and ensuring compliance with industry regulations. intercept leverages a range of security scanning techniques to analyze code, including pattern matching, code analysis, and vulnerability scanning. It is seamless to integrate, with a simple sub-second command-line interface and granular customizable configuration options. With intercept, developers can speed up security and integration testing into their development workflows and make security a critical yet seamless part of their software development process.
 
