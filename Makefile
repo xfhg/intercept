@@ -64,7 +64,7 @@ rename-bin:
 	mv bin/interceptm bin/intercept-darwin_amd64
 	mv bin/intercept.exe bin/intercept-windows_amd64.exe
 
-out-full: purge version release-raw compress-bin
+out-full: purge version release-raw compress-bin release
 	cp bin/interceptl release/interceptl
 	cp bin/interceptm release/interceptm
 	cp bin/intercept.exe release/intercept.exe
@@ -144,13 +144,11 @@ build-tool:
 # 	rm venom.exe
 
 ## dev-macos: temp quick dev task // dev-test
-dev-macos: clean purge prepare macos macos-arm
+dev-macos: clean purge prepare macos 
 	cp bin/interceptm release/interceptm
-	cp bin/interceptma release/interceptma
 	cp .ignore release/.ignore
 
-
-dev-macos-arm: clean purge macos-arm
+arm-macos: clean purge prepare macos-arm
 	cp bin/interceptma release/interceptma
 	cp .ignore release/.ignore
 
@@ -171,9 +169,14 @@ get-compressor-apt:
 	sudo apt-get install -y upx
 
 release-raw: preserve-raw add-ignore
-	tar -czvf bin/intercept-linux_amd64.tar.gz -C bin raw-intercept-linux_amd64 .ignore _version
-	tar -czvf bin/intercept-darwin_amd64.tar.gz -C bin raw-intercept-darwin_amd64 .ignore _version
-	tar -czvf bin/intercept-windows_amd64.tar.gz -C bin raw-intercept-windows_amd64.exe .ignore _version
+	tar -czvf bin/raw-intercept-linux_amd64.tar.gz -C bin raw-intercept-linux_amd64 .ignore _version
+	tar -czvf bin/raw-intercept-darwin_amd64.tar.gz -C bin raw-intercept-darwin_amd64 .ignore _version
+	tar -czvf bin/raw-intercept-windows_amd64.tar.gz -C bin raw-intercept-windows_amd64.exe .ignore _version
+
+release:  add-ignore
+	tar -czvf bin/intercept-linux_amd64.tar.gz -C bin intercept-linux_amd64 .ignore _version
+	tar -czvf bin/intercept-darwin_amd64.tar.gz -C bin intercept-darwin_amd64 .ignore _version
+	tar -czvf bin/intercept-windows_amd64.tar.gz -C bin intercept-windows_amd64.exe .ignore _version
 
 sha256sums:
 	@for file in bin/*; do \
