@@ -165,6 +165,11 @@ compress-bin:
 	upx -9 bin/interceptm || upx-ucl -9 bin/interceptm
 	upx -9 bin/intercept.exe || upx-ucl -9 bin/intercept.exe
 
+cprename:
+	cp -f bin/interceptl bin/intercept-linux_amd64
+	cp -f bin/interceptm bin/intercept-darwin_amd64
+	cp -f bin/intercept.exe bin/intercept-windows_amd64.exe
+
 get-compressor-apt:
 	sudo apt-get install -y upx
 
@@ -173,7 +178,7 @@ release-raw: preserve-raw add-ignore
 	tar -czvf bin/raw-intercept-darwin_amd64.tar.gz -C bin raw-intercept-darwin_amd64 .ignore _version
 	tar -czvf bin/raw-intercept-windows_amd64.tar.gz -C bin raw-intercept-windows_amd64.exe .ignore _version
 
-release:  add-ignore
+release:  cprename add-ignore
 	tar -czvf bin/intercept-linux_amd64.tar.gz -C bin intercept-linux_amd64 .ignore _version
 	tar -czvf bin/intercept-darwin_amd64.tar.gz -C bin intercept-darwin_amd64 .ignore _version
 	tar -czvf bin/intercept-windows_amd64.tar.gz -C bin intercept-windows_amd64.exe .ignore _version
