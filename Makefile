@@ -88,19 +88,6 @@ out-win: clean purge version windows
 	cp .ignore release/.ignore
 	cd release/ ; zip -9 -T -x "*.DS_Store*" "*interceptm*" "*rgl*" "*rgm*" "*interceptl*" -r ../output/core-intercept-rg-x86_64-windows.zip * ; zip -T -u ../output/core-intercept-rg-x86_64-windows.zip .ignore
 
-# ripgrep-full:
-# 	cd release/ ; zip -9 -T -x "*.DS_Store*" "*intercept*" -r ../output/intercept-ripgrep.zip rg/
-
-# ripgrep-win:
-# 	cd release/ ; zip -9 -T -x "*.DS_Store*" "*intercept*" "*rgl*" "*rgm*" -r ../output/i-ripgrep-x86_64-windows.zip rg/
-
-# ripgrep-macos:
-# 	cd release/ ; zip -9 -T -x "*.DS_Store*" "*intercept*" "*rgl*" "*.exe" -r ../output/i-ripgrep-x86_64-darwin.zip rg/
-
-# ripgrep-linux:
-# 	cd release/ ; zip -9 -T -x "*.DS_Store*" "*intercept*" "*.exe" "*rgm*" -r ../output/i-ripgrep-x86_64-linux.zip rg/
-
-# ripgrep: purge-ripgrep ripgrep-win ripgrep-linux ripgrep-macos
 
 add-ignore:
 	cp .ignore release/.ignore
@@ -110,13 +97,6 @@ add-ignore:
 # compress-examples:
 # 	zip -9 -T -x "*.DS_Store*" -r output/_examples.zip examples/
 
-# setup-dev:
-# 	rm -f setup-buildpack.zip
-# 	curl -S -O -J -L https://github.com/xfhg/intercept/releases/latest/download/setup-buildpack.zip
-# 	unzip setup-*
-# 	chmod -R a+x release/
-# 	mkdir output/
-# 	rm-f setup-buildpack.zip
 
 build-tool:
 	sudo apt-get install -y upx
@@ -148,6 +128,7 @@ dev-macos: clean purge prepare macos
 	cp bin/interceptm release/interceptm
 	cp .ignore release/.ignore
 
+## no embedded RG available
 arm-macos: clean purge prepare macos-arm
 	cp bin/interceptma release/interceptma
 	cp .ignore release/.ignore
@@ -156,9 +137,9 @@ dev-test:
 	./tests/venom run tests/suite.yml
 
 preserve-raw:
-	cp -f bin/interceptl bin/raw-intercept-linux_amd64
-	cp -f bin/interceptm bin/raw-intercept-darwin_amd64
-	cp -f bin/intercept.exe bin/raw-intercept-windows_amd64.exe
+	cp -f bin/interceptl bin/intercept-linux_amd64
+	cp -f bin/interceptm bin/intercept-darwin_amd64
+	cp -f bin/intercept.exe bin/intercept-windows_amd64.exe
 
 compress-bin:
 	upx -9 bin/interceptl || upx-ucl -9 bin/interceptl
@@ -166,22 +147,22 @@ compress-bin:
 	upx -9 bin/intercept.exe || upx-ucl -9 bin/intercept.exe
 
 cprename:
-	cp -f bin/interceptl bin/intercept-linux_amd64
-	cp -f bin/interceptm bin/intercept-darwin_amd64
-	cp -f bin/intercept.exe bin/intercept-windows_amd64.exe
+	cp -f bin/interceptl bin/x-intercept-linux_amd64
+	cp -f bin/interceptm bin/x-intercept-darwin_amd64
+	cp -f bin/intercept.exe bin/x-intercept-windows_amd64.exe
 
 get-compressor-apt:
 	sudo apt-get install -y upx
 
 release-raw: preserve-raw add-ignore
-	tar -czvf bin/raw-intercept-linux_amd64.tar.gz -C bin raw-intercept-linux_amd64 .ignore _version
-	tar -czvf bin/raw-intercept-darwin_amd64.tar.gz -C bin raw-intercept-darwin_amd64 .ignore _version
-	tar -czvf bin/raw-intercept-windows_amd64.tar.gz -C bin raw-intercept-windows_amd64.exe .ignore _version
-
-release:  cprename add-ignore
 	tar -czvf bin/intercept-linux_amd64.tar.gz -C bin intercept-linux_amd64 .ignore _version
 	tar -czvf bin/intercept-darwin_amd64.tar.gz -C bin intercept-darwin_amd64 .ignore _version
 	tar -czvf bin/intercept-windows_amd64.tar.gz -C bin intercept-windows_amd64.exe .ignore _version
+
+release:  cprename add-ignore
+	tar -czvf bin/x-intercept-linux_amd64.tar.gz -C bin x-intercept-linux_amd64 .ignore _version
+	tar -czvf bin/x-intercept-darwin_amd64.tar.gz -C bin x-intercept-darwin_amd64 .ignore _version
+	tar -czvf bin/x-intercept-windows_amd64.tar.gz -C bin x-intercept-windows_amd64.exe .ignore _version
 
 sha256sums:
 	@for file in bin/*; do \
