@@ -27,7 +27,7 @@ jobs:
         run: |
           go get -v -t -d ./...
           if [ -f Gopkg.toml ]; then
-              curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
+              curl https://x.githubusercontent.com/golang/dep/master/install.sh | sh
               dep ensure
           fi
 
@@ -65,22 +65,22 @@ jobs:
             bin/intercept-linux_amd64.sha256
             bin/intercept-windows_amd64.exe.sha256
             bin/intercept-darwin_amd64.sha256
-            bin/raw-intercept-windows_amd64.exe
-            bin/raw-intercept-darwin_amd64
-            bin/raw-intercept-linux_amd64
-            bin/raw-intercept-darwin_amd64.sha256
-            bin/raw-intercept-windows_amd64.exe.sha256
-            bin/raw-intercept-linux_amd64.sha256
+            bin/x-intercept-windows_amd64.exe
+            bin/x-intercept-darwin_amd64
+            bin/x-intercept-linux_amd64
+            bin/x-intercept-darwin_amd64.sha256
+            bin/x-intercept-windows_amd64.exe.sha256
+            bin/x-intercept-linux_amd64.sha256
             bin/intercept-linux_amd64.tar.gz
             bin/intercept-darwin_amd64.tar.gz
             bin/intercept-windows_amd64.tar.gz
             bin/intercept-linux_amd64.tar.gz.sha256
             bin/intercept-darwin_amd64.tar.gz.sha256
             bin/intercept-windows_amd64.tar.gz.sha256
-            bin/raw-intercept-linux_amd64.tar.gz
-            bin/raw-intercept-darwin_amd64.tar.gz
-            bin/raw-intercept-windows_amd64.tar.gz
-            bin/raw-intercept-linux_amd64.tar.gz.sha256
-            bin/raw-intercept-darwin_amd64.tar.gz.sha256
-            bin/raw-intercept-windows_amd64.tar.gz.sha256            
+            bin/x-intercept-linux_amd64.tar.gz
+            bin/x-intercept-darwin_amd64.tar.gz
+            bin/x-intercept-windows_amd64.tar.gz
+            bin/x-intercept-linux_amd64.tar.gz.sha256
+            bin/x-intercept-darwin_amd64.tar.gz.sha256
+            bin/x-intercept-windows_amd64.tar.gz.sha256            
             output/_version
