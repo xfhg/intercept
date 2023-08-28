@@ -35,10 +35,12 @@
 - **Integration with CI/CD:** intercept can easily be integrated into continuous integration and continuous deployment (CI/CD) pipelines, allowing security testing to be performed automatically as part of the development process.
 - **Detailed reporting:** intercept provides detailed reports on vulnerabilities and security issues, _fully compliant SARIF output_, including severity ratings and remediation advice, making it easy for developers to prioritize and address security concerns early on.
 - **Support for any programming language:** intercept supports scanning through any programming languages or file types,  making it a versatile tool for security testing across a range of applications and environments.
+- **CUE Lang compatible ruleset:** intercept CUE Lang policies reduce boilerplate in large-scale configurations.Validate text-based data files or programmatic data such as incoming RPCs and validate backwards compatibility.
 - **No daemons, low footprint, self-updatable binary**
 - **Ultra flexible fine-grained regex policies**
 - **No custom policy language, reduced complexity**
-- **Weaponised** ripgrep
+- New **CUE Lang schemas** normalized and simplified representations of constraints
+- **Weaponised** ripgrep on steroids (CUE Lang + API checks)
 - **Open source, free as in beer**
 
 <br>
@@ -119,18 +121,19 @@ intercept audit -t examples/target -e "development" -i "AWS"
 
 ## Policy File Structure
 
-These are 4 types of policies available :
+These are 5 types of policies available :
 
 - **scan** : where we enforce breaking rules on matched patterns
 - **collect** : where we just collect matched patterns
 - **assure** : where we expect matched patterns and detect if missing
 - **api** : apply the assure rules into API endpoint data
+- **yml** : scan assure rules with CUE Lang schemas for YAML
 
 Easy to read and compose the rules file have this minimal required structure:
 ```
 Banner: |
 
-  | Example SCAN , ASSURE and COLLECT RULES
+  | Example SCAN, ASSURE, COLLECT, API and YML RULES
 
 Rules:
   - name: Private key committed in code
@@ -152,7 +155,7 @@ Rules:
       - \s*(-----BEGIN PGP PRIVATE KEY BLOCK-----)
 
   - name: Collect sparse TF resources outside of modules.
-    id: 900
+    id: 200
     description: The following resources were detected outside of compliant module usage
     type: collect
     tags: AWS,AZURE
@@ -160,7 +163,7 @@ Rules:
       - (resource)\s*"(.*)"
 
   - name: ASSURE SSL
-    id: 101
+    id: 301
     description: Assure ssl_cyphers only contains GANSO_SSL
     error: Misconfiguration or omission is fatal
     tags: KEY
@@ -173,7 +176,7 @@ Rules:
       - ssl_cyphers\s*=\s*"GANSO_SSL"
 
   - name: Check API config endpoint
-    id: 105
+    id: 405
     description: Ensure anonymous access is turned OFF
     error: Misconfiguration or omission
     tags: KEY
@@ -191,6 +194,21 @@ Rules:
     confidence: high
     patterns:
       - \s*ANONYMOUS_ACCESS\s*:\s*OFF\s*
+
+  - name: YML ASSURE Ingress enabled
+    id: 506
+    description: Assure ingress enabled
+    error: Misconfiguration or omission is fatal
+    tags: KEY
+    type: yml
+    fatal: true
+    enforcement: true
+    environment: all
+    confidence: high
+    yml_filepattern: "^development-\\d+\\.yml$"
+    yml_structure: |
+      ingress: {enabled: true}
+      ...
 
 ExitCritical: "Critical irregularities found in your code"
 ExitWarning: "Irregularities found in your code"
@@ -230,6 +248,10 @@ intercept api -i "AWS,OWASP"
 - TURBO SILENT mode
 ```
 intercept audit -t examples/target -s true
+```
+- Run only the YML type checks
+```
+intercept yml -t examples/target 
 ```
 - Disable pipeline break
 ```
@@ -302,15 +324,17 @@ make
 
 
 
-## Standing on the shoulders of giants - [ripgrep](https://github.com/BurntSushi/ripgrep)
+## Standing on the shoulders of giants - [ripgrep](https://github.com/BurntSushi/ripgrep) + [cue](https://github.com/cue-lang/cue)
 
 - It is built on top of Rust's regex engine. Rust's regex engine uses finite automata, SIMD and aggressive literal optimizations to make searching very fast. (PCRE2 support)
 - Rust's regex library maintains performance with full Unicode support by building UTF-8 decoding directly into its deterministic finite automaton engine.
 It supports searching with either memory maps or by searching incrementally with an intermediate buffer. The former is better for single files and the latter is better for large directories. ripgrep chooses the best searching strategy for you automatically.
 - Applies your ignore patterns in .gitignore files using a RegexSet. That means a single file path can be matched against multiple glob patterns simultaneously.
 - It uses a lock-free parallel recursive directory iterator, courtesy of crossbeam and ignore.
-
 - **same engine used on vscode search**
+- **CUE** merges the notion of schema and data. The same CUE definition can simultaneously be used for validating data and act as a template to reduce boilerplate. Schema definition is enriched with fine-grained value definitions and default values. At the same time, data can be simplified by removing values implied by such detailed definitions. The merging of these two concepts enables many tasks to be handled in a principled way.
+- Constraints provide a simple and well-defined, yet powerful, alternative to inheritance, a common source of complexity with configuration languages.
+
 
 <br>
 

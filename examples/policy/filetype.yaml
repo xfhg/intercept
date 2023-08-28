@@ -4,9 +4,9 @@ Banner: |
 
 Rules:
 
-  - name: YML ASSURE SSL
+  - name: YML ASSURE ingress enabled
     id: 101
-    description: Assure ingress enabled and port 88
+    description: Assure ingress enabled
     error: Misconfiguration or omission is fatal
     tags: KEY
     type: yml
@@ -20,7 +20,7 @@ Rules:
       ...
 
 
-  - name: YML ASSURE SSL
+  - name: YML ASSURE ingress disabled
     id: 102
     description: Assure ingress disabled
     error: Misconfiguration or omission is fatal
@@ -35,7 +35,7 @@ Rules:
       ingress: {enabled: false}
       ...
 
-  - name: YML ASSURE SSL
+  - name: YML ASSURE memory limit
     id: 103
     description: Assure resources
     error: Misconfiguration or omission is fatal
@@ -50,6 +50,6 @@ Rules:
       resources: {limits: { memory: "128Mi" }}
       ...
     
-ExitCritical: "Critical irregularities found in your code"
-ExitWarning: "Irregularities found in your code"
+ExitCritical: "Critical irregularities found in your configuration"
+ExitWarning: "Irregularities found in your configuration"
 ExitClean: "Clean report"
