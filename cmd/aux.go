@@ -17,6 +17,14 @@ import (
 	homedir "github.com/mitchellh/go-homedir"
 )
 
+func cleanupFiles() {
+
+	_ = os.Remove("intercept.output.json")
+	_ = os.Remove("intercept.sarif.json")
+	_ = os.Remove("intercept.scannedSHA256.json")
+
+}
+
 func detectFormat(data string) string {
 	// Try to unmarshal as JSON
 	var js map[string]interface{}
@@ -223,6 +231,24 @@ func sha256hash(data []byte) string {
 
 	HexDigest := sha256.Sum256(data)
 	return hex.EncodeToString(HexDigest[:])
+}
+
+func calculateSHA256(filePath string) (string, error) {
+	file, err := os.Open(filePath)
+	if err != nil {
+		return "", err
+	}
+	defer file.Close()
+
+	hash := sha256.New()
+	if _, err := io.Copy(hash, file); err != nil {
+		return "", err
+	}
+
+	hashSum := hash.Sum(nil)
+	hashString := hex.EncodeToString(hashSum)
+
+	return hashString, nil
 }
 
 // func unmarshalYAML(data []byte) (map[string]interface{}, error) {

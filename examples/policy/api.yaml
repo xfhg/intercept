@@ -50,7 +50,7 @@ Rules:
     api_request: GET
     api_body: <xml><rpc version="ganso/8_11"></rpc><xml>
     api_auth: basic
-    api_auth_basic: RULE105
+    api_auth_basic: EAUTH
     api_auth_token:
     fatal: false
     enforcement: true
@@ -71,7 +71,7 @@ Rules:
     api_request: GET
     api_body: <xml><rpc version="ganso/8_11"></rpc><xml>
     api_auth: basic
-    api_auth_basic: RULE105
+    api_auth_basic: EAUTH
     api_auth_token:
     fatal: false
     enforcement: true
@@ -91,7 +91,7 @@ Rules:
     api_request: GET
     api_body: <xml><rpc version="ganso/8_11"></rpc><xml>
     api_auth: basic
-    api_auth_basic: RULE105
+    api_auth_basic: EAUTH
     api_auth_token:
     fatal: false
     enforcement: true
@@ -112,7 +112,7 @@ Rules:
     api_request: GET
     api_body: <xml><rpc version="ganso/8_11"></rpc><xml>
     api_auth: basic
-    api_auth_basic: RULE105
+    api_auth_basic: EAUTH
     api_auth_token:
     fatal: false
     enforcement: true

@@ -28,9 +28,7 @@ var apiCmd = &cobra.Command{
 			cfgEnv = "先锋"
 		}
 
-		_ = os.Remove("intercept.output.json")
-		_ = os.Remove("intercept.sarif.json")
-		_ = os.Remove("intercept.scannedSHA256.json")
+		cleanupFiles()
 
 		rules = loadUpRules()
 

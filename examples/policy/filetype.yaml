@@ -1,0 +1,55 @@
+Banner: |
+
+  | New Filetype Scan
+
+Rules:
+
+  - name: YML ASSURE SSL
+    id: 101
+    description: Assure ingress enabled and port 88
+    error: Misconfiguration or omission is fatal
+    tags: KEY
+    type: yml
+    fatal: true
+    enforcement: true
+    environment: all
+    confidence: high
+    yml_filepattern: "^development-\\d+\\.yml$"
+    yml_structure: |
+      ingress: {enabled: true}
+      ...
+
+
+  - name: YML ASSURE SSL
+    id: 102
+    description: Assure ingress disabled
+    error: Misconfiguration or omission is fatal
+    tags: KEY
+    type: yml
+    fatal: true
+    enforcement: true
+    environment: all
+    confidence: high
+    yml_filepattern: "^development-\\d+\\.yml$"
+    yml_structure: |
+      ingress: {enabled: false}
+      ...
+
+  - name: YML ASSURE SSL
+    id: 103
+    description: Assure resources
+    error: Misconfiguration or omission is fatal
+    tags: KEY
+    type: yml
+    fatal: true
+    enforcement: true
+    environment: all
+    confidence: high
+    yml_filepattern: "^development-\\d+\\.yml$"
+    yml_structure: |
+      resources: {limits: { memory: "128Mi" }}
+      ...
+    
+ExitCritical: "Critical irregularities found in your code"
+ExitWarning: "Irregularities found in your code"
+ExitClean: "Clean report"
