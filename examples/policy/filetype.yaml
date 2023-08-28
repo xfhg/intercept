@@ -1,0 +1,55 @@
+Banner: |
+
+  | New Filetype Scan
+
+Rules:
+
+  - name: YML ASSURE ingress enabled
+    id: 101
+    description: Assure ingress enabled
+    error: Misconfiguration or omission is fatal
+    tags: KEY
+    type: yml
+    fatal: true
+    enforcement: true
+    environment: all
+    confidence: high
+    yml_filepattern: "^development-\\d+\\.yml$"
+    yml_structure: |
+      ingress: {enabled: true}
+      ...
+
+
+  - name: YML ASSURE ingress disabled
+    id: 102
+    description: Assure ingress disabled
+    error: Misconfiguration or omission is fatal
+    tags: KEY
+    type: yml
+    fatal: true
+    enforcement: true
+    environment: all
+    confidence: high
+    yml_filepattern: "^development-\\d+\\.yml$"
+    yml_structure: |
+      ingress: {enabled: false}
+      ...
+
+  - name: YML ASSURE memory limit
+    id: 103
+    description: Assure resources
+    error: Misconfiguration or omission is fatal
+    tags: KEY
+    type: yml
+    fatal: true
+    enforcement: true
+    environment: all
+    confidence: high
+    yml_filepattern: "^development-\\d+\\.yml$"
+    yml_structure: |
+      resources: {limits: { memory: "128Mi" }}
+      ...
+    
+ExitCritical: "Critical irregularities found in your configuration"
+ExitWarning: "Irregularities found in your configuration"
+ExitClean: "Clean report"

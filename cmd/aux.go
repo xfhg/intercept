@@ -17,6 +17,14 @@ import (
 	homedir "github.com/mitchellh/go-homedir"
 )
 
+func cleanupFiles() {
+
+	_ = os.Remove("intercept.output.json")
+	_ = os.Remove("intercept.sarif.json")
+	_ = os.Remove("intercept.scannedSHA256.json")
+
+}
+
 func detectFormat(data string) string {
 	// Try to unmarshal as JSON
 	var js map[string]interface{}
@@ -225,6 +233,24 @@ func sha256hash(data []byte) string {
 	return hex.EncodeToString(HexDigest[:])
 }
 
+func calculateSHA256(filePath string) (string, error) {
+	file, err := os.Open(filePath)
+	if err != nil {
+		return "", err
+	}
+	defer file.Close()
+
+	hash := sha256.New()
+	if _, err := io.Copy(hash, file); err != nil {
+		return "", err
+	}
+
+	hashSum := hash.Sum(nil)
+	hashString := hex.EncodeToString(hashSum)
+
+	return hashString, nil
+}
+
 // func unmarshalYAML(data []byte) (map[string]interface{}, error) {
 // 	var result map[string]interface{}
 // 	err := yaml.Unmarshal(data, &result)
@@ -258,3 +284,70 @@ func PathSHA256(root string) ([]ScannedFile, error) {
 	})
 	return files, err
 }
+
+// func DownloadJSONFile(src, dst string) error {
+// 	// Send a HEAD request to get the Content-Type without downloading the body
+// 	resp, err := http.Head(src)
+// 	if err != nil {
+// 		return err
+// 	}
+// 	defer resp.Body.Close()
+
+// 	// Check if the Content-Type is JSON
+// 	// if resp.Header.Get("Content-Type") != "application/json" {
+// 	// 	return errors.New("source is not a JSON file")
+// 	// }
+
+// 	// Configure the getter client
+// 	client := &getter.Client{
+// 		Src:  src,
+// 		Dst:  dst,
+// 		Mode: getter.ClientModeFile,
+// 	}
+
+// 	// Configure the yacspin spinner
+// 	cfg := yacspin.Config{
+// 		Frequency:       100 * time.Millisecond,
+// 		CharSet:         yacspin.CharSets[3],
+// 		Suffix:          " Downloading",
+// 		SuffixAutoColon: true,
+// 		StopCharacter:   "│ ✓",
+// 		StopColors:      []string{"fgGreen"},
+// 	}
+
+// 	spinner, err := yacspin.New(cfg)
+// 	if err != nil {
+// 		return err
+// 	}
+
+// 	// Start the spinner
+// 	err = spinner.Start()
+// 	if err != nil {
+// 		return err
+// 	}
+
+// 	// Download the file
+// 	err = client.Get()
+// 	if err != nil {
+// 		spinner.StopFail()
+// 		return err
+// 	}
+
+// 	// Stop the spinner
+// 	spinner.Stop()
+
+// 	// Read the downloaded file
+// 	data, err := ioutil.ReadFile(dst)
+// 	if err != nil {
+// 		return err
+// 	}
+
+// 	// Compute the SHA-256 hash of the file
+// 	hash := sha256hash(data)
+
+// 	fmt.Println("│")
+// 	fmt.Println("├ Hash: ", hash)
+// 	fmt.Println("│")
+
+// 	return nil
+// }
