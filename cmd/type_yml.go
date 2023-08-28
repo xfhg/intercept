@@ -1,25 +1,12 @@
 package cmd
 
-// func processYmlType(value Rule) {
+import (
+	"encoding/json"
+	"fmt"
 
-// 	if cfgEnv == "" {
-// 		cfgEnv = "先锋"
-// 	}
-
-// 	//rules := loadUpRules()
-
-// 	fmt.Println("│ ")
-// 	fmt.Println(line)
-// 	fmt.Println("│ ")
-// 	fmt.Println("├ YML Rule #", value.ID)
-// 	fmt.Println("│ Rule name : ", value.Name)
-// 	fmt.Println("│ Rule description : ", value.Description)
-// 	fmt.Println("│ Impacted Env : ", value.Environment)
-// 	fmt.Println("│ Confidence : ", value.Confidence)
-// 	fmt.Println("│ Tags : ", value.Tags)
-// 	fmt.Println("│ ")
-
-// }
+	"cuelang.org/go/cue"
+	"gopkg.in/yaml.v3"
+)
 
 // func validateYAMLAgainstCUE(yamlFile string, cueFile string) (bool, string) {
 // 	yamlData, err := os.ReadFile(yamlFile)
@@ -68,39 +55,39 @@ package cmd
 // 	return true, ""
 // }
 
-// func validateYAMLAndCUEContent(yamlContent string, cueContent string) (bool, string) {
-// 	var yamlObj interface{}
-// 	err := yaml.Unmarshal([]byte(yamlContent), &yamlObj)
-// 	if err != nil {
-// 		return false, fmt.Sprintf("error unmarshaling YAML data: %v", err)
-// 	}
+func validateYAMLAndCUEContent(yamlContent string, cueContent string) (bool, string) {
+	var yamlObj interface{}
+	err := yaml.Unmarshal([]byte(yamlContent), &yamlObj)
+	if err != nil {
+		return false, fmt.Sprintf("error unmarshaling YAML data: %v", err)
+	}
 
-// 	var r cue.Runtime
-// 	binst, err := r.Compile("", cueContent)
-// 	if err != nil {
-// 		return false, fmt.Sprintf("error compiling CUE content: %v", err)
-// 	}
+	var r cue.Runtime
+	binst, err := r.Compile("", cueContent)
+	if err != nil {
+		return false, fmt.Sprintf("error compiling CUE content: %v", err)
+	}
 
-// 	cueValue := binst.Value()
-// 	err = cueValue.Validate(cue.Concrete(true))
-// 	if err != nil {
-// 		return false, fmt.Sprintf("error validating CUE value: %v", err)
-// 	}
+	cueValue := binst.Value()
+	err = cueValue.Validate(cue.Concrete(true))
+	if err != nil {
+		return false, fmt.Sprintf("error validating CUE value: %v", err)
+	}
 
-// 	jsonData, err := json.Marshal(yamlObj)
-// 	if err != nil {
-// 		return false, fmt.Sprintf("error marshaling YAML object to JSON: %v", err)
-// 	}
+	jsonData, err := json.Marshal(yamlObj)
+	if err != nil {
+		return false, fmt.Sprintf("error marshaling YAML object to JSON: %v", err)
+	}
 
-// 	yamlCueValue, err := r.Compile("", string(jsonData))
-// 	if err != nil {
-// 		return false, fmt.Sprintf("error compiling JSON data to CUE value: %v", err)
-// 	}
+	yamlCueValue, err := r.Compile("", string(jsonData))
+	if err != nil {
+		return false, fmt.Sprintf("error compiling JSON data to CUE value: %v", err)
+	}
 
-// 	err = cueValue.Unify(yamlCueValue.Value()).Validate(cue.Concrete(true))
-// 	if err != nil {
-// 		return false, fmt.Sprintf("error validating YAML data against CUE schema: %v", err)
-// 	}
+	err = cueValue.Unify(yamlCueValue.Value()).Validate(cue.Concrete(true))
+	if err != nil {
+		return false, fmt.Sprintf("error validating YAML data against CUE schema: %v", err)
+	}
 
-// 	return true, ""
-// }
+	return true, ""
+}

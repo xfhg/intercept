@@ -161,6 +161,10 @@ dev-macos: clean purge prepare macos
 	cp bin/interceptm release/interceptm
 	cp .ignore release/.ignore
 
+dev-linux: clean purge prepare linux 
+	cp bin/interceptl release/interceptl
+	cp .ignore release/.ignore
+
 ## no embedded RG available yet
 # arm-macos: clean purge prepare macos-arm
 # 	cp bin/interceptma release/interceptma

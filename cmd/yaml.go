@@ -64,22 +64,6 @@ var yamlCmd = &cobra.Command{
 			os.Exit(0)
 		}
 
-		/*
-
-			1. detect if target is file or folder
-			2. collect all files defined by the pile pattern regex
-			3. detect if they are yml
-			4. split the filestructure
-			5. loop it inside the file and find the structure value
-			6. validate the found value against the ASSURE pattern
-			7. print the compliant file name , file line , and sha256 of the compliant value
-			8. list uncompliant files
-
-		*/
-
-		// step one detect if folder
-
-		// loop rules
 		if yamlTurboAPI == "false" && len(rules.Rules) < 50 {
 
 			for _, value := range rules.Rules {
@@ -113,13 +97,13 @@ var yamlCmd = &cobra.Command{
 						// Compile regex pattern
 						regex, err := regexp.Compile(value.Yml_Filepattern)
 						if err != nil {
-							LogError(fmt.Errorf("Error compiling regex: %s", err))
+							LogError(fmt.Errorf("error compiling regex: %s", err))
 							return
 						}
 
 						fileInfo, err := os.Stat(yamlScanPath)
 						if err != nil {
-							LogError(fmt.Errorf("Error accessing path: %s", err))
+							LogError(fmt.Errorf("error accessing path: %s", err))
 						}
 
 						// Check if the path is a directory
@@ -147,14 +131,14 @@ var yamlCmd = &cobra.Command{
 
 								ymlContentBytes, err := os.ReadFile(path)
 								if err != nil {
-									LogError(fmt.Errorf("Error reading file: %s", err))
+									LogError(fmt.Errorf("error reading file: %s", err))
 									return nil
 								}
 
 								var yamlObj interface{}
 								err = yaml.Unmarshal(ymlContentBytes, &yamlObj)
 								if err != nil {
-									LogError(fmt.Errorf("Error unmarshaling YAML data: %v", err))
+									LogError(fmt.Errorf("error unmarshaling YAML data: %v", err))
 									return nil
 								}
 
@@ -185,7 +169,7 @@ var yamlCmd = &cobra.Command{
 						})
 						if err != nil {
 
-							LogError(fmt.Errorf("Error walking directory: %s", err))
+							LogError(fmt.Errorf("error walking directory: %s", err))
 						}
 
 					} else {
