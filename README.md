@@ -35,13 +35,13 @@
 - **Integration with CI/CD:** intercept can easily be integrated into continuous integration and continuous deployment (CI/CD) pipelines, allowing security testing to be performed automatically as part of the development process.
 - **Detailed reporting:** intercept provides detailed reports on vulnerabilities and security issues, _fully compliant SARIF output_, including severity ratings and remediation advice, making it easy for developers to prioritize and address security concerns early on.
 - **Support for any programming language:** intercept supports scanning through any programming languages or file types,  making it a versatile tool for security testing across a range of applications and environments.
-- **CUE Lang compatible ruleset:** intercept CUE Lang policies reduce boilerplate in large-scale configurations.Validate text-based data files or programmatic data such as incoming RPCs and validate backwards compatibility.
+- **CUE Lang compatible ruleset:** intercept CUE Lang policies reduce boilerplate in large-scale configurations. Validate text-based YML/TOML data files or programmatic data such as incoming RPCs and validate backwards compatibility.
 - **No daemons, low footprint, self-updatable binary**
 - **Ultra flexible fine-grained regex policies**
 - **No custom policy language, reduced complexity**
 - New **CUE Lang schemas** normalized and simplified representations of constraints
 - **Weaponised** ripgrep on steroids (CUE Lang + API checks)
-- **Open source, free as in beer**
+- **Open source**
 
 <br>
 
@@ -80,7 +80,7 @@ core-intercept-rg-x86_64-windows.zip
 
 2. Make sure you have the latest setup
 
-```
+```sh
 intercept system --update
 ```
 
@@ -92,14 +92,14 @@ start with the minimal.yaml
 
 4. Configure intercept
 
-```
+```sh
 intercept config -r
 intercept config -a examples/minimal.yaml
 ```
 
 5. Audit the target folder
 
-```
+```sh
 intercept audit -t examples/target
 ```
 
@@ -115,22 +115,24 @@ all SHA256 of the scanned files into intercept.scannedSHA256.json
 
 7. Tune the scan with extra flags like ENVIRONMENT or TAGS filter
 
-```
+```sh
 intercept audit -t examples/target -e "development" -i "AWS"
 ```
 
 ## Policy File Structure
 
-These are 5 types of policies available :
+These are 6 types of policies available :
 
 - **scan** : where we enforce breaking rules on matched patterns
 - **collect** : where we just collect matched patterns
 - **assure** : where we expect matched patterns and detect if missing
 - **api** : apply the assure rules into API endpoint data
-- **yml** : scan assure rules with CUE Lang schemas for YAML
+- **yml** : assure rules with CUE Lang schemas for YAML
+- **toml** : assure rules with CUE Lang schemas for TOML
 
 Easy to read and compose the rules file have this minimal required structure:
-```
+
+```yml
 Banner: |
 
   | Example SCAN, ASSURE, COLLECT, API and YML RULES
@@ -210,6 +212,22 @@ Rules:
       ingress: {enabled: true}
       ...
 
+  - name: TOML ASSURE database port and logging 
+    id: 666
+    description: Assure database port and logging
+    error: Misconfiguration or omission is fatal
+    tags: KEY
+    type: toml
+    fatal: true
+    enforcement: true
+    environment: all
+    confidence: high
+    toml_filepattern: "^development-\\d+\\.toml$"
+    toml_structure: |
+      database: {port: 5432 }
+      logging: {level : "info"}
+      ...
+
 ExitCritical: "Critical irregularities found in your code"
 ExitWarning: "Irregularities found in your code"
 ExitClean: "Clean report"
@@ -226,39 +244,39 @@ all flags under the same instruction can be combined
 <br>
 
 - SHA256 Hash for configuration file 
-```
+```sh
 intercept config -a examples/yourpolicies.yaml -k 201c8fe265808374f3354768410401216632b9f2f68f9b15c85403da75327396
 ```
 - Download of configuration file
-```
+```sh
 intercept config -a https://xxx.com/artifact/policy.yaml -k 201c8fe26580(...)
 ```
 - Enviroment enforcement (check policy enforcement levels)
-```
+```sh
 intercept audit -t examples/target -e "development"
 ```
 - Rule Tag filter
-```
+```sh
 intercept audit -t examples/target -i "AWS,OWASP"
 ```
 - Run only the API type checks (but with tags)
-```
+```sh
 intercept api -i "AWS,OWASP"
 ```
 - TURBO SILENT mode
-```
+```sh
 intercept audit -t examples/target -s true
 ```
 - Run only the YML type checks
-```
+```sh
 intercept yml -t examples/target 
 ```
 - Disable pipeline break
-```
+```sh
 intercept audit -t examples/target -b false
 ```
 - No exceptions 
-```
+```sh
 intercept audit -t examples/target -x
 ```
 - Ignoring files and folders

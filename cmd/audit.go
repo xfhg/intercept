@@ -42,29 +42,31 @@ type ScannedFile struct {
 }
 
 type Rule struct {
-	ID              int      `yaml:"id"`
-	Name            string   `yaml:"name"`
-	Description     string   `yaml:"description"`
-	Solution        string   `yaml:"solution"`
-	Error           string   `yaml:"error"`
-	Type            string   `yaml:"type"`
-	Environment     string   `yaml:"environment"`
-	Enforcement     bool     `yaml:"enforcement"`
-	Fatal           bool     `yaml:"fatal"`
-	Tags            string   `yaml:"tags,omitempty"`
-	Impact          string   `yaml:"impact,omitempty"`
-	Confidence      string   `yaml:"confidence,omitempty"`
-	Api_Endpoint    string   `yaml:"api_endpoint,omitempty"`
-	Api_Request     string   `yaml:"api_request,omitempty"`
-	Api_Insecure    bool     `yaml:"api_insecure"`
-	Api_Body        string   `yaml:"api_body,omitempty"`
-	Api_Auth        string   `yaml:"api_auth,omitempty"`
-	Api_Auth_Basic  *string  `yaml:"api_auth_basic,omitempty"`
-	Api_Auth_Token  *string  `yaml:"api_auth_token,omitempty"`
-	Api_Trace       bool     `yaml:"api_trace,omitempty"`
-	Yml_Filepattern string   `yaml:"yml_filepattern,omitempty"`
-	Yml_Structure   string   `yaml:"yml_structure,omitempty"`
-	Patterns        []string `yaml:"patterns"`
+	ID               int      `yaml:"id"`
+	Name             string   `yaml:"name"`
+	Description      string   `yaml:"description"`
+	Solution         string   `yaml:"solution"`
+	Error            string   `yaml:"error"`
+	Type             string   `yaml:"type"`
+	Environment      string   `yaml:"environment"`
+	Enforcement      bool     `yaml:"enforcement"`
+	Fatal            bool     `yaml:"fatal"`
+	Tags             string   `yaml:"tags,omitempty"`
+	Impact           string   `yaml:"impact,omitempty"`
+	Confidence       string   `yaml:"confidence,omitempty"`
+	Api_Endpoint     string   `yaml:"api_endpoint,omitempty"`
+	Api_Request      string   `yaml:"api_request,omitempty"`
+	Api_Insecure     bool     `yaml:"api_insecure"`
+	Api_Body         string   `yaml:"api_body,omitempty"`
+	Api_Auth         string   `yaml:"api_auth,omitempty"`
+	Api_Auth_Basic   *string  `yaml:"api_auth_basic,omitempty"`
+	Api_Auth_Token   *string  `yaml:"api_auth_token,omitempty"`
+	Api_Trace        bool     `yaml:"api_trace,omitempty"`
+	Yml_Filepattern  string   `yaml:"yml_filepattern,omitempty"`
+	Yml_Structure    string   `yaml:"yml_structure,omitempty"`
+	Toml_Filepattern string   `yaml:"toml_filepattern,omitempty"`
+	Toml_Structure   string   `yaml:"toml_structure,omitempty"`
+	Patterns         []string `yaml:"patterns"`
 }
 
 type allRules struct {

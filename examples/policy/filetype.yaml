@@ -49,7 +49,23 @@ Rules:
     yml_structure: |
       resources: {limits: { memory: "128Mi" }}
       ...
-    
+
+  - name: TOML ASSURE database port
+    id: 103
+    description: Assure database port
+    error: Misconfiguration or omission is fatal
+    tags: KEY
+    type: toml
+    fatal: true
+    enforcement: true
+    environment: all
+    confidence: high
+    toml_filepattern: "^development-\\d+\\.toml$"
+    toml_structure: |
+      database: {port: 5432 }
+      logging: {level : "info"}
+      ...
+
 ExitCritical: "Critical irregularities found in your configuration"
 ExitWarning: "Irregularities found in your configuration"
 ExitClean: "Clean report"
