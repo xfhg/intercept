@@ -135,7 +135,7 @@ Easy to read and compose the rules file have this minimal required structure:
 ```yml
 Banner: |
 
-  | Example SCAN, ASSURE, COLLECT, API and YML RULES
+  | Example SCAN, ASSURE, COLLECT, API, YML and TOML RULES
 
 Rules:
   - name: Private key committed in code
