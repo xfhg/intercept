@@ -10,7 +10,7 @@ Rules:
     error: Misconfiguration or omission is fatal
     tags: KEY
     type: yml
-    fatal: true
+    fatal: false
     enforcement: true
     environment: all
     confidence: high
@@ -26,7 +26,7 @@ Rules:
     error: Misconfiguration or omission is fatal
     tags: KEY
     type: yml
-    fatal: true
+    fatal: false
     enforcement: true
     environment: all
     confidence: high
@@ -41,13 +41,14 @@ Rules:
     error: Misconfiguration or omission is fatal
     tags: KEY
     type: yml
-    fatal: true
+    fatal: false
     enforcement: true
     environment: all
     confidence: high
     yml_filepattern: "^development-\\d+\\.yml$"
     yml_structure: |
       resources: {limits: { memory: "128Mi" }}
+      logging { "alert" | "info" }
       ...
 
   - name: TOML ASSURE database port
@@ -56,7 +57,7 @@ Rules:
     error: Misconfiguration or omission is fatal
     tags: KEY
     type: toml
-    fatal: true
+    fatal: false
     enforcement: true
     environment: all
     confidence: high

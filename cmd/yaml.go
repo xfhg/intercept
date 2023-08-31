@@ -1,14 +1,17 @@
 package cmd
 
 import (
+	"encoding/json"
 	"errors"
 	"fmt"
 	"os"
 	"path/filepath"
 	"regexp"
+	"strings"
 	"sync"
 	"time"
 
+	"github.com/gosuri/uitable"
 	"github.com/spf13/cobra"
 	"gopkg.in/yaml.v2"
 )
@@ -152,9 +155,18 @@ var yamlCmd = &cobra.Command{
 									colorGreenBold.Println("│ Compliant")
 									colorGreenBold.Println("│ ")
 									colorGreenBold.Println("├── ─")
+									stats.Clean++
+									stats.Total++
 									fmt.Println("│")
 
 								} else {
+
+									envfound := FindMatchingString(cfgEnv, value.Environment, ",")
+									if (envfound || strings.Contains(value.Environment, "all") || value.Environment == "") && value.Fatal {
+										fatal = true
+										stats.Fatal++
+									}
+
 									// fmt.Printf("│ The YAML file is not valid: %s\n", xerrMsg)
 									colorRedBold.Println("│")
 									colorRedBold.Println("│ NON COMPLIANT : ")
@@ -162,7 +174,10 @@ var yamlCmd = &cobra.Command{
 									colorRedBold.Println("│ ", xerrMsg)
 									colorRedBold.Println("│")
 									colorRedBold.Println("├── ─")
+									stats.Total++
+									stats.Dirty++
 									fmt.Println("│")
+									warning = true
 								}
 
 							}
@@ -264,10 +279,22 @@ var yamlCmd = &cobra.Command{
 									if xvalid {
 										// fmt.Printf("│ The YAML file is valid.\n")
 										colorGreenBold.Println("│ ✓ ", value.ID, " ", path)
+										stats.Clean++
+										stats.Total++
 
 									} else {
+
+										envfound := FindMatchingString(cfgEnv, value.Environment, ",")
+										if (envfound || strings.Contains(value.Environment, "all") || value.Environment == "") && value.Fatal {
+											fatal = true
+											stats.Fatal++
+										}
+
 										// fmt.Printf("│ The YAML file is not valid: %s\n", xerrMsg)
 										colorRedBold.Println("│ ✗ ", value.ID, " ", path)
+										stats.Total++
+										stats.Dirty++
+										warning = true
 
 									}
 
@@ -294,6 +321,67 @@ var yamlCmd = &cobra.Command{
 
 		fmt.Println("│")
 		fmt.Println("│")
+		fmt.Println("│")
+
+		table := uitable.New()
+		table.MaxColWidth = 254
+
+		table.AddRow(colorBold.Render("├ Quick Stats "), "")
+		table.AddRow(colorBold.Render("│"), "")
+		table.AddRow(colorBold.Render("│ Total Policies Scanned"), ": "+colorBold.Render(stats.Total))
+		table.AddRow(colorGreenBold.Render("│ Clean Policy Checks"), ": "+colorGreenBold.Render(stats.Clean))
+		table.AddRow(colorYellowBold.Render("│ Irregularities Found"), ": "+colorYellowBold.Render(stats.Dirty))
+		table.AddRow(colorRedBold.Render("│"), "")
+		table.AddRow(colorRedBold.Render("│ Fatal Policy Breach"), ": "+colorRedBold.Render(stats.Fatal))
+
+		fmt.Println(table)
+
+		jsonstats, _jerr := json.Marshal(stats)
+		if _jerr != nil {
+			LogError(_jerr)
+		}
+
+		_jwerr := os.WriteFile("stats.json", jsonstats, 0644)
+		if _jwerr != nil {
+			LogError(_jwerr)
+		}
+
+		fmt.Println("│")
+		fmt.Println("│")
+		fmt.Println("│")
+		fmt.Println("│")
+
+		if fatal {
+
+			colorRedBold.Println("│")
+			colorRedBold.Println("├ ", rules.ExitCritical)
+			colorRedBold.Println("│")
+			PrintClose()
+			fmt.Println("")
+			if scanBreak != "false" {
+				colorRedBold.Println("► break signal ")
+				os.Exit(1)
+			}
+			os.Exit(0)
+
+		}
+
+		if warning {
+			colorYellowBold.Println("│")
+			colorYellowBold.Println("├ ", rules.ExitWarning)
+			colorYellowBold.Println("│")
+
+		} else {
+
+			colorGreenBold.Println("│")
+			colorGreenBold.Println("├ ", rules.ExitClean)
+			colorGreenBold.Println("│")
+
+		}
+
+		fmt.Println("│")
+		fmt.Println("│")
+
 		endTime := time.Now()
 		duration := endTime.Sub(startTime)
 		formattedTime = endTime.Format("2006-01-02 15:04:05")

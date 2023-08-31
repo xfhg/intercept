@@ -1,15 +1,18 @@
 package cmd
 
 import (
+	"encoding/json"
 	"errors"
 	"fmt"
 	"os"
 	"path/filepath"
 	"regexp"
+	"strings"
 	"sync"
 	"time"
 
 	"github.com/BurntSushi/toml"
+	"github.com/gosuri/uitable"
 	"github.com/spf13/cobra"
 )
 
@@ -153,8 +156,17 @@ var tomlCmd = &cobra.Command{
 									colorGreenBold.Println("│ ")
 									colorGreenBold.Println("├── ─")
 									fmt.Println("│")
+									stats.Clean++
+									stats.Total++
 
 								} else {
+
+									envfound := FindMatchingString(cfgEnv, value.Environment, ",")
+									if (envfound || strings.Contains(value.Environment, "all") || value.Environment == "") && value.Fatal {
+										fatal = true
+										stats.Fatal++
+									}
+
 									// fmt.Printf("│ The toml file is not valid: %s\n", xerrMsg)
 									colorRedBold.Println("│")
 									colorRedBold.Println("│ NON COMPLIANT : ")
@@ -163,6 +175,10 @@ var tomlCmd = &cobra.Command{
 									colorRedBold.Println("│")
 									colorRedBold.Println("├── ─")
 									fmt.Println("│")
+									stats.Dirty++
+									stats.Total++
+									warning = true
+
 								}
 
 							}
@@ -264,10 +280,22 @@ var tomlCmd = &cobra.Command{
 									if xvalid {
 										// fmt.Printf("│ The toml file is valid.\n")
 										colorGreenBold.Println("│ ✓ ", value.ID, " ", path)
+										stats.Clean++
+										stats.Total++
 
 									} else {
+
 										// fmt.Printf("│ The toml file is not valid: %s\n", xerrMsg)
 										colorRedBold.Println("│ ✗ ", value.ID, " ", path)
+										stats.Dirty++
+										stats.Total++
+										warning = true
+
+										envfound := FindMatchingString(cfgEnv, value.Environment, ",")
+										if (envfound || strings.Contains(value.Environment, "all") || value.Environment == "") && value.Fatal {
+											fatal = true
+											stats.Fatal++
+										}
 
 									}
 
@@ -289,6 +317,66 @@ var tomlCmd = &cobra.Command{
 			}
 
 			wg.Wait() // Wait for all goroutines to finish
+
+		}
+
+		fmt.Println("│")
+		fmt.Println("│")
+		fmt.Println("│")
+
+		table := uitable.New()
+		table.MaxColWidth = 254
+
+		table.AddRow(colorBold.Render("├ Quick Stats "), "")
+		table.AddRow(colorBold.Render("│"), "")
+		table.AddRow(colorBold.Render("│ Total Policies Scanned"), ": "+colorBold.Render(stats.Total))
+		table.AddRow(colorGreenBold.Render("│ Clean Policy Checks"), ": "+colorGreenBold.Render(stats.Clean))
+		table.AddRow(colorYellowBold.Render("│ Irregularities Found"), ": "+colorYellowBold.Render(stats.Dirty))
+		table.AddRow(colorRedBold.Render("│"), "")
+		table.AddRow(colorRedBold.Render("│ Fatal Policy Breach"), ": "+colorRedBold.Render(stats.Fatal))
+
+		fmt.Println(table)
+
+		jsonstats, _jerr := json.Marshal(stats)
+		if _jerr != nil {
+			LogError(_jerr)
+		}
+
+		_jwerr := os.WriteFile("stats.json", jsonstats, 0644)
+		if _jwerr != nil {
+			LogError(_jwerr)
+		}
+
+		fmt.Println("│")
+		fmt.Println("│")
+		fmt.Println("│")
+		fmt.Println("│")
+
+		if fatal {
+
+			colorRedBold.Println("│")
+			colorRedBold.Println("├ ", rules.ExitCritical)
+			colorRedBold.Println("│")
+			PrintClose()
+			fmt.Println("")
+			if scanBreak != "false" {
+				colorRedBold.Println("► break signal ")
+				os.Exit(1)
+			}
+			os.Exit(0)
+
+		}
+
+		if warning {
+			colorYellowBold.Println("│")
+			colorYellowBold.Println("├ ", rules.ExitWarning)
+			colorYellowBold.Println("│")
+
+		} else {
+
+			colorGreenBold.Println("│")
+			colorGreenBold.Println("├ ", rules.ExitClean)
+			colorGreenBold.Println("│")
 
 		}
 

@@ -70,6 +70,7 @@ func processScanType(value Rule) {
 				colorRedBold.Println("│")
 				fatal = true
 				stats.Fatal++
+
 			} else {
 
 				colorRedBold.Println("│")
