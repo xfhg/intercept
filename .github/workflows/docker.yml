@@ -2,7 +2,8 @@ name: Publish Docker Image
 
 on:
   push:
-    branches: [ docker ]  # Trigger the workflow on push to docker branch
+    tags:
+      - "*"
 
 jobs:
   build:
