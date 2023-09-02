@@ -173,6 +173,13 @@ dev-linux: clean purge prepare linux
 dev-test:
 	./tests/venom run tests/suite.yml
 
+
+build-docker:
+	docker build -t intercept .
+
+test-docker:
+	docker run -it -v $(shell pwd)/examples:/app/examples intercept
+
 ## help: prints this help message
 help:
 	@echo "Usage: \n"
