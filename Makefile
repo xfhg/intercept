@@ -171,6 +171,9 @@ dev-test:
 	./tests/venom run tests/suite.yml
 
 
+x-docker:
+	docker build -t intercept .
+
 build-docker-test:
 	docker build -t intercept -f Dockerfile.test .
 
