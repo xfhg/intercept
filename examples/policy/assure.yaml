@@ -7,7 +7,7 @@ Rules:
     id: 100
     description: Private key committed to code version control
     error: This violation immediately blocks your code deployment
-    tags: KEY
+    tags: AWS
     type: scan
     fatal: true
     enforcement: true
@@ -25,7 +25,7 @@ Rules:
     id: 101
     description: Assure ssl_cyphers only contains GANSO_SSL
     error: Misconfiguration or omission is fatal
-    tags: KEY
+    tags: AWS
     type: assure
     fatal: true
     enforcement: true
@@ -38,7 +38,7 @@ Rules:
     id: 102
     description: Assure ssl_weak_cyphers only contains PATO_SSL
     error: Misconfiguration or omission is NOT fatal but not recommended
-    tags: KEY
+    tags: AWS
     type: assure
     fatal: false
     enforcement: true
@@ -59,7 +59,7 @@ Rules:
     id: 105
     description: Sandbox API check
     error: Misconfiguration or omission
-    tags: KEY
+    tags: API
     type: api
     api_endpoint: https://localhost:3003/simple
     api_insecure: true

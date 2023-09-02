@@ -6,7 +6,7 @@ TAG=$(shell git describe --abbrev=0)
 PTAG=$(shell git describe --tags --abbrev=0 @^)
 
 
-all: purge-output prepare build-tool windows linux macos out-full out-linux out-macos out-win sha256sums
+all: purge-output prepare compress-tool windows linux macos out-full out-linux out-macos out-win sha256sums
 
 version:  
 	touch release/$(TAG)_$(VERSION)-$(MOMENT)
@@ -22,10 +22,7 @@ prepare:
 	chmod -R a+x release/
 	mkdir -p output/
 
-build-tool:
-	sudo apt-get install -y upx
-
-get-compressor-apt:
+compress-tool:
 	sudo apt-get install -y upx
 
 mod-needs-update:
@@ -172,6 +169,16 @@ dev-linux: clean purge prepare linux
 
 dev-test:
 	./tests/venom run tests/suite.yml
+
+
+x-docker:
+	docker build -t intercept .
+
+build-docker-test:
+	docker build -t intercept -f Dockerfile.test .
+
+docker-test:
+	docker run -it -v $(shell pwd)/examples:/app/examples intercept
 
 ## help: prints this help message
 help:
