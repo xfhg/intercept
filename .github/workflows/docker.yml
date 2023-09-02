@@ -20,7 +20,7 @@ jobs:
     - name: Fetch Tags
       run: |
         git fetch --tags -f
-        git describe --abbrev=0
+        git describe --tags --always
 
     - name: Get dependencies
       run: |
