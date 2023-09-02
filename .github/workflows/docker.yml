@@ -51,4 +51,4 @@ jobs:
       with:
         context: .
         push: true
-        tags: xfhg/intercept:${{ steps.get_version.outputs.VERSION }}
+        tags: xfhg/intercept:latest
