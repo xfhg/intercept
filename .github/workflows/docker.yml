@@ -65,4 +65,4 @@ jobs:
       with:
         context: .
         push: true
-        tags: ghcr.io/${{ github.repository }}:${{ steps.get_version.outputs.VERSION }}
+        tags: ghcr.io/${{ github.repository }}:latest
