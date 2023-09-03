@@ -7,7 +7,7 @@ PTAG=$(shell git describe --tags --abbrev=0 @^)
 
 all: purge-output prepare compress-tool windows linux macos out-full out-linux out-macos out-win sha256sums
 
-devbox : purge-output prepare windows linux macos out-devbox out-linux out-macos out-win sha256sums
+with-docker : purge-output prepare windows linux macos out-devbox out-linux out-macos out-win sha256sums x-docker
 
 version:  
 	touch release/$(TAG)_$(VERSION)-$(MOMENT)
@@ -65,9 +65,11 @@ compress-bin:
 	upx -9 bin/intercept.exe || upx-ucl -9 bin/intercept.exe
 
 compress-docker:
-	docker run --rm -w $(shell pwd) -v $(shell pwd):$(shell pwd) gruebel/upx:latest --best --lzma bin/interceptl
-	docker run --rm -w $(shell pwd) -v $(shell pwd):$(shell pwd) gruebel/upx:latest --best --lzma bin/interceptm
-	docker run --rm -w $(shell pwd) -v $(shell pwd):$(shell pwd) gruebel/upx:latest --best --lzma bin/intercept.exe
+	docker run --rm -w $(shell pwd) -v $(shell pwd):$(shell pwd) xfhg/upx:latest -9 bin/interceptl
+	docker run --rm -w $(shell pwd) -v $(shell pwd):$(shell pwd) xfhg/upx:latest -9 bin/interceptm
+	docker run --rm -w $(shell pwd) -v $(shell pwd):$(shell pwd) xfhg/upx:latest -9 bin/intercept.exe
+
+# docker run --rm -w $(shell pwd) -v $(shell pwd):$(shell pwd) xfhg/upx:latest --best --lzma bin/intercept.exe
 
 out-full: purge version release-raw compress-bin release
 	cp bin/interceptl release/interceptl
@@ -138,32 +140,6 @@ sha256sums:
 		sha256sum "$$file" > "$$file.sha256"; \
 	done
 
-
-# compress-examples:
-# 	zip -9 -T -x "*.DS_Store*" -r output/_examples.zip examples/
-
-# test-macos:
-# 	curl -S -O -J -L https://github.com/ovh/venom/releases/latest/download/venom.darwin-amd64
-# 	mv venom.darwin-amd64 venom
-# 	chmod +x venom
-# 	./venom run tests/suite.yml
-# 	rm venom
-
-# test-linux:
-# 	curl -S -O -J -L https://github.com/ovh/venom/releases/latest/download/venom.linux-amd64
-# 	mv venom.linux-amd64 venom
-# 	chmod +x venom
-# 	go install
-# 	./venom run tests/suite.yml
-# 	rm venom
-
-# test-win:
-# 	curl -S -O -J -L https://github.com/ovh/venom/releases/latest/download/venom.windows-amd64
-# 	mv venom.windows-amd64 venom.exe
-# 	chmod +x venom.exe
-# 	./venom.exe run tests/suite.yml
-# 	rm venom.exe
-
 ## dev-macos: temp quick dev task // dev-test
 dev-macos: clean purge prepare macos 
 	cp bin/interceptm release/interceptm
@@ -173,22 +149,16 @@ dev-linux: clean purge prepare linux
 	cp bin/interceptl release/interceptl
 	cp .ignore release/.ignore
 
-## no embedded RG available yet
-# arm-macos: clean purge prepare macos-arm
-# 	cp bin/interceptma release/interceptma
-# 	cp .ignore release/.ignore
-
 dev-test:
 	./tests/venom run tests/suite.yml
-
 
 x-docker:
 	docker build -t intercept .
 
-build-docker-test:
+build-testbox:
 	docker build -t test/intercept -f Dockerfile.test .
 
-docker-test:
+run-testbox: build-testbox
 	docker run -it -v $(shell pwd)/examples:/app/examples test/intercept
 
 ## help: prints this help message

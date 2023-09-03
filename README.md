@@ -70,6 +70,9 @@ Main benefits:
 
 # Docker Quickstart 
 
+```sh
+docker pull ghcr.io/xfhg/intercept:latest
+```
 
 from the project root folder:
 
@@ -345,7 +348,7 @@ You can set three enforcement levels:
 Build & mess around with it :
 
 ```
-make
+make with-docker
 ```
 
 <p align="center">
