@@ -5,8 +5,9 @@ RANDOM=$(shell awk 'BEGIN{srand();printf("%d", 65536*rand())}')
 TAG=$(shell git describe --abbrev=0)
 PTAG=$(shell git describe --tags --abbrev=0 @^)
 
-
 all: purge-output prepare compress-tool windows linux macos out-full out-linux out-macos out-win sha256sums
+
+devbox : purge-output prepare windows linux macos out-devbox out-linux out-macos out-win sha256sums
 
 version:  
 	touch release/$(TAG)_$(VERSION)-$(MOMENT)
@@ -58,11 +59,15 @@ macos-arm: clean
 linux-arm: clean
 	CGO_ENABLED=0 GOOS=linux GOARCH=arm64 go build -ldflags="-s -w -X 'github.com/xfhg/intercept/cmd.buildVersion=$(TAG)'" -mod=readonly -o bin/interceptla
 
-
 compress-bin:
 	upx -9 bin/interceptl || upx-ucl -9 bin/interceptl
 	upx -9 bin/interceptm || upx-ucl -9 bin/interceptm
 	upx -9 bin/intercept.exe || upx-ucl -9 bin/intercept.exe
+
+compress-docker:
+	docker run --rm -w $(shell pwd) -v $(shell pwd):$(shell pwd) gruebel/upx:latest --best --lzma bin/interceptl
+	docker run --rm -w $(shell pwd) -v $(shell pwd):$(shell pwd) gruebel/upx:latest --best --lzma bin/interceptm
+	docker run --rm -w $(shell pwd) -v $(shell pwd):$(shell pwd) gruebel/upx:latest --best --lzma bin/intercept.exe
 
 out-full: purge version release-raw compress-bin release
 	cp bin/interceptl release/interceptl
@@ -71,6 +76,12 @@ out-full: purge version release-raw compress-bin release
 	cp .ignore release/.ignore
 	cd release/ ; zip -9 -T -x "*.DS_Store*" -r ../output/x-intercept.zip *
 
+out-devbox: purge version release-raw compress-docker release
+	cp bin/interceptl release/interceptl
+	cp bin/interceptm release/interceptm
+	cp bin/intercept.exe release/intercept.exe
+	cp .ignore release/.ignore
+	cd release/ ; zip -9 -T -x "*.DS_Store*" -r ../output/x-intercept.zip *
 
 preserve-raw:
 	cp -f bin/interceptl bin/intercept-linux_amd64
@@ -175,10 +186,10 @@ x-docker:
 	docker build -t intercept .
 
 build-docker-test:
-	docker build -t intercept -f Dockerfile.test .
+	docker build -t test/intercept -f Dockerfile.test .
 
 docker-test:
-	docker run -it -v $(shell pwd)/examples:/app/examples intercept
+	docker run -it -v $(shell pwd)/examples:/app/examples test/intercept
 
 ## help: prints this help message
 help:
