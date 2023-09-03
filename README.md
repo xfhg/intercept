@@ -68,7 +68,23 @@ Main benefits:
 <br>
 <br>
 
-# Quick Start
+# Docker Quickstart 
+
+```sh
+
+from the project root folder:
+
+$ docker run -v --rm -w $PWD -v $PWD:$PWD -e TERM=xterm-256color ghcr.io/xfhg/intercept intercept config -a examples/policy/filetype.yaml
+
+$ docker run -v --rm -w $PWD -v $PWD:$PWD -e TERM=xterm-256color ghcr.io/xfhg/intercept intercept yml -t examples/target
+
+```
+
+<br>
+<br>
+<br>
+
+# Manual Quick Start
 
 1. Grab the latest [RELEASE](https://github.com/xfhg/intercept/releases) of intercept bundle for your platform 
 
@@ -233,7 +249,6 @@ ExitWarning: "Irregularities found in your code"
 ExitClean: "Clean report"
 
 ```
-[Policy Schema](https://github.com/xfhg/intercept/tree/master/policy/schema.json) 
 
 <br>
 <br>

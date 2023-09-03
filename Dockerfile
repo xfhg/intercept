@@ -1,5 +1,6 @@
 
 FROM alpine:latest
-COPY bin/interceptl /usr/local/bin/intercept
-RUN chmod +x /usr/local/bin/intercept 
+COPY bin/interceptl /app/intercept
+COPY .ignore /app/.ignore
+RUN chmod +x /app/intercept 
 CMD ["intercept"]

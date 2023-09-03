@@ -1,3 +1,2 @@
 search_regex*
-*.yaml
-*.yml
+config.yaml
