@@ -19,9 +19,18 @@
 ![GitHub code size in bytes](https://img.shields.io/github/languages/code-size/xfhg/intercept)
 ![GitHub go.mod Go version](https://img.shields.io/github/go-mod/go-version/xfhg/intercept)
 
+
+[![docker size](https://badgen.net/docker/size/xfhg/intercept)](https://badgen.net/docker/size/xfhg/intercept)
+[![docker pulls](https://badgen.net/docker/pulls/xfhg/intercept)](https://badgen.net/docker/pulls/xfhg/intercept)
+
 [![CodeQL](https://github.com/xfhg/intercept/actions/workflows/codeql.yml/badge.svg)](https://github.com/xfhg/intercept/actions/workflows/codeql.yml)
 ![GitHub pull requests](https://img.shields.io/github/issues-pr-raw/xfhg/intercept)
 [![intercept Release](https://github.com/xfhg/intercept/actions/workflows/release.yml/badge.svg)](https://github.com/xfhg/intercept/actions/workflows/release.yml)
+
+
+
+
+
 
 <br>
 <br>
