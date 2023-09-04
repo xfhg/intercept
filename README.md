@@ -76,6 +76,7 @@ Main benefits:
 <br>
 <br>
 <br>
+<img src="static/container.svg" width="75">
 
 # Docker Quickstart 
 
@@ -314,7 +315,18 @@ use .ignore file
 <br>
 <br>
 <br>
+<img src="static/container.svg" width="45">
 
+- Quick API example using intercept container 
+```
+docker run -v --rm -w $PWD -v $PWD:$PWD -e TERM=xterm-256color -e INTERCEPT_BAUTH=user:pass ghcr.io/xfhg/intercept intercept config -a examples/policy/api.yaml
+
+docker run -v --rm -w $PWD -v $PWD:$PWD -e TERM=xterm-256color -e INTERCEPT_BAUTH=user:pass ghcr.io/xfhg/intercept intercept api
+```
+
+<br>
+<br>
+<br>
 
 # Policy Enforcement Levels
 
