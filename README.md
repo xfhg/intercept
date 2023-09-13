@@ -124,7 +124,7 @@ start with the minimal.yaml
 
 ```sh
 intercept config -r
-intercept config -a examples/minimal.yaml
+intercept config -a examples/policy/minimal.yaml
 ```
 
 5. Audit the target folder
@@ -135,12 +135,12 @@ intercept audit -t examples/target
 
 6. Check the different output flavours
 
-```
-stdout human readable console report
-individual json rule output with detailed matches
-all findings compiled into intercept.output.json
-fully compliant SARIF output into intercept.sarif.json
-all SHA256 of the scanned files into intercept.scannedSHA256.json
+```yml
+- stdout human readable console report
+- individual json rule output with detailed matches
+- all findings compiled into intercept.output.json
+- fully compliant SARIF output into intercept.sarif.json
+- all SHA256 of the scanned files into intercept.scannedSHA256.json
 ```
 
 7. Tune the scan with extra flags like ENVIRONMENT or TAGS filter
@@ -263,7 +263,7 @@ ExitWarning: "Irregularities found in your code"
 ExitClean: "Clean report"
 
 ```
-
+#### [Policy file schema](https://github.com/xfhg/intercept/tree/master/policy/policy.schema) 
 <br>
 <br>
 
@@ -317,7 +317,7 @@ use .ignore file
 <br>
 <img src="static/container.svg" width="45">
 
-- Quick API example using intercept container 
+Quick API example using intercept container 
 ```
 docker run -v --rm -w $PWD -v $PWD:$PWD -e TERM=xterm-256color -e INTERCEPT_BAUTH=user:pass ghcr.io/xfhg/intercept intercept config -a examples/policy/api.yaml
 
@@ -407,6 +407,11 @@ It supports searching with either memory maps or by searching incrementally with
 | The Platinum Searcher | `pt -w -e '[A-Z]+_SUSPEND'`                             | 452        | 14.208s    |
 
 
+| Tool | Command | Line count | Time |
+| ---- | ------- | ---------- | ---- |
+| ripgrep | `rg -uuu -tc -n -w '[A-Z]+_SUSPEND'` | 388 | **0.096s** |
+| [ugrep](https://github.com/Genivia/ugrep) | `ugrep -r -n --include='*.c' --include='*.h' -w '[A-Z]+_SUSPEND'` | 388 | 0.493s |
+| [GNU grep](https://www.gnu.org/software/grep/) | `egrep -r -n --include='*.c' --include='*.h' -w '[A-Z]+_SUSPEND'` | 388 | 0.806s |
 
 Timings were collected on a system with an Intel
 i7-6900K 3.2 GHz.
