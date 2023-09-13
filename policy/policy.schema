@@ -1,0 +1,30 @@
+Banner: string
+
+Rules: [...{
+    name:        string
+    id:          int
+    description: string
+    error?:      string
+    tags:        string
+    type:        string
+    fatal:       bool
+    enforcement: bool
+    environment: string
+    confidence:  string
+    patterns:    [...string]
+    api_endpoint?:    string
+    api_insecure?:    bool
+    api_request?:     string
+    api_body?:        string
+    api_auth?:        string
+    api_auth_basic?:  string
+    api_auth_token?:  string
+    yml_filepattern?: string
+    yml_structure?:   string
+    toml_filepattern?: string
+    toml_structure?:  string
+}]
+
+ExitCritical: string
+ExitWarning:  string
+ExitClean:    string
