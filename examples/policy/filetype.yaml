@@ -97,8 +97,6 @@ Rules:
       db: {port: 666 }
       ...
 
-
-
 ExitCritical: "Critical irregularities found in your configuration"
 ExitWarning: "Irregularities found in your configuration"
 ExitClean: "Clean report"
