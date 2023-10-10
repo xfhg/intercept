@@ -151,7 +151,7 @@ intercept audit -t examples/target -e "development" -i "AWS"
 
 ## Policy File Structure
 
-These are 6 types of policies available :
+These are 7 types of policies available :
 
 - **scan** : where we enforce breaking rules on matched patterns
 - **collect** : where we just collect matched patterns
@@ -159,13 +159,14 @@ These are 6 types of policies available :
 - **api** : apply the assure rules into API endpoint data
 - **yml** : assure rules with CUE Lang schemas for YAML
 - **toml** : assure rules with CUE Lang schemas for TOML
+- **json** : assure rules with CUE Lang schemas for JSON
 
 Easy to read and compose the rules file have this minimal required structure:
 
 ```yml
 Banner: |
 
-  | Example SCAN, ASSURE, COLLECT, API, YML and TOML RULES
+  | Example SCAN, ASSURE, COLLECT, API, YML, JSON and TOML RULES
 
 Rules:
   - name: Private key committed in code
@@ -254,6 +255,22 @@ Rules:
     confidence: high
     toml_filepattern: "^development-\\d+\\.toml$"
     toml_structure: |
+      database: {port: 5432 }
+      logging: {level : "info"}
+      ...
+
+  - name: JSON ASSURE database port and logging 
+    id: 444
+    description: Assure database port and logging
+    error: Misconfiguration or omission is fatal
+    tags: KEY
+    type: json
+    fatal: true
+    enforcement: true
+    environment: all
+    confidence: high
+    json_filepattern: "^development-\\d+\\.json$"
+    json_structure: |
       database: {port: 5432 }
       logging: {level : "info"}
       ...

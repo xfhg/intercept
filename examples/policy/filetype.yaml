@@ -82,6 +82,21 @@ Rules:
       db: {port: 666 }
       ...
 
+  - name: JSON ASSURE missing database port
+    id: 134
+    description: Assure database port
+    error: Misconfiguration or omission is fatal
+    tags: KEY
+    type: json
+    fatal: false
+    enforcement: true
+    environment: all
+    confidence: high
+    json_filepattern: "^development-\\d+\\.json$"
+    json_structure: |
+      db: {port: 666 }
+      ...
+
 ExitCritical: "Critical irregularities found in your configuration"
 ExitWarning: "Irregularities found in your configuration"
 ExitClean: "Clean report"
