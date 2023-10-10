@@ -25,6 +25,27 @@ func cleanupFiles() {
 
 }
 
+func isSubsetOrEqual(a, b map[string]interface{}) bool {
+	for k, v := range a {
+		if bv, exists := b[k]; exists {
+			switch vv := v.(type) {
+			case map[string]interface{}:
+				bvv, ok := bv.(map[string]interface{})
+				if !ok || !isSubsetOrEqual(vv, bvv) {
+					return false
+				}
+			default:
+				if v != bv {
+					return false
+				}
+			}
+		} else {
+			return false
+		}
+	}
+	return true
+}
+
 func detectFormat(data string) string {
 	// Try to unmarshal as JSON
 	var js map[string]interface{}

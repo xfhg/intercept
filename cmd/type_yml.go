@@ -5,55 +5,10 @@ import (
 	"fmt"
 
 	"cuelang.org/go/cue"
+	xdiff "github.com/yudai/gojsondiff"
+	"github.com/yudai/gojsondiff/formatter"
 	"gopkg.in/yaml.v3"
 )
-
-// func validateYAMLAgainstCUE(yamlFile string, cueFile string) (bool, string) {
-// 	yamlData, err := os.ReadFile(yamlFile)
-// 	if err != nil {
-// 		return false, fmt.Sprintf("error reading YAML file: %v", err)
-// 	}
-
-// 	var yamlObj interface{}
-// 	err = yaml.Unmarshal(yamlData, &yamlObj)
-// 	if err != nil {
-// 		return false, fmt.Sprintf("error unmarshaling YAML data: %v", err)
-// 	}
-
-// 	var r cue.Runtime
-// 	binst := load.Instances([]string{cueFile}, &load.Config{})
-// 	if len(binst) != 1 || binst[0].Err != nil {
-// 		return false, fmt.Sprintf("error loading CUE file: %v", binst[0].Err)
-// 	}
-
-// 	cueInstance, err := r.Build(binst[0])
-// 	if err != nil {
-// 		return false, fmt.Sprintf("error building CUE instance: %v", err)
-// 	}
-
-// 	cueValue := cueInstance.Value()
-// 	err = cueValue.Validate(cue.Concrete(true))
-// 	if err != nil {
-// 		return false, fmt.Sprintf("error validating CUE value: %v", err)
-// 	}
-
-// 	jsonData, err := json.Marshal(yamlObj)
-// 	if err != nil {
-// 		return false, fmt.Sprintf("error marshaling YAML object to JSON: %v", err)
-// 	}
-
-// 	yamlCueValue, err := r.Compile("", string(jsonData))
-// 	if err != nil {
-// 		return false, fmt.Sprintf("error compiling JSON data to CUE value: %v", err)
-// 	}
-
-// 	err = cueValue.Unify(yamlCueValue.Value()).Validate(cue.Concrete(true))
-// 	if err != nil {
-// 		return false, fmt.Sprintf("error validating YAML data against CUE schema: %v", err)
-// 	}
-
-// 	return true, ""
-// }
 
 func validateYAMLAndCUEContent(yamlContent string, cueContent string) (bool, string) {
 	var yamlObj interface{}
@@ -84,10 +39,57 @@ func validateYAMLAndCUEContent(yamlContent string, cueContent string) (bool, str
 		return false, fmt.Sprintf("error compiling JSON data to CUE value: %v", err)
 	}
 
+	cuepolicy, err := cueValue.Value().MarshalJSON()
+	yamlcontent, err := yamlCueValue.Value().MarshalJSON()
+
 	err = cueValue.Unify(yamlCueValue.Value()).Validate(cue.Concrete(true))
 	if err != nil {
 		return false, fmt.Sprintf("error validating YAML data against CUE schema: %v", err)
 	}
 
-	return true, ""
+	// subset
+
+	var a, b map[string]interface{}
+
+	json.Unmarshal(cuepolicy, &a)
+	json.Unmarshal(yamlcontent, &b)
+
+	if isSubsetOrEqual(a, b) {
+		return true, ""
+	}
+
+	// diff
+
+	differ := xdiff.New()
+	d, err := differ.Compare(cuepolicy, yamlcontent)
+	if err != nil {
+		return false, fmt.Sprintf("error unmarshaling content: %s\n", err.Error())
+	}
+
+	if d.Modified() {
+
+		var diffString string
+
+		var aJson map[string]interface{}
+		json.Unmarshal(cuepolicy, &aJson)
+
+		config := formatter.AsciiFormatterConfig{
+			ShowArrayIndex: true,
+			Coloring:       true,
+		}
+
+		zformatter := formatter.NewAsciiFormatter(aJson, config)
+		diffString, err = zformatter.Format(d)
+		if err != nil {
+			return false, fmt.Sprintf("Internal error: %v", err)
+		}
+
+		fmt.Println(diffString)
+
+		return false, fmt.Sprintf("Missing required keys \n")
+
+	} else {
+		return true, ""
+	}
+
 }
