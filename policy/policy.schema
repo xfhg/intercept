@@ -1,17 +1,23 @@
 Banner: string
 
 Rules: [...{
-    name:        string
+
     id:          int
-    description: string
-    error?:      string
-    tags:        string
+
     type:        string
+    
     fatal:       bool
     enforcement: bool
     environment: string
+    
+    name:        string
+    description: string
     confidence:  string
+    error?:      string
+    tags:        string
+    
     patterns:    [...string]
+
     api_endpoint?:    string
     api_insecure?:    bool
     api_request?:     string
@@ -19,10 +25,15 @@ Rules: [...{
     api_auth?:        string
     api_auth_basic?:  string
     api_auth_token?:  string
+    
     yml_filepattern?: string
     yml_structure?:   string
+    
     toml_filepattern?: string
     toml_structure?:  string
+    
+    json_filepattern?: string
+    json_structure?:  string
 }]
 
 ExitCritical: string
