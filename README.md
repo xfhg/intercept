@@ -98,7 +98,9 @@ docker run -v --rm -w $PWD -v $PWD:$PWD -e TERM=xterm-256color ghcr.io/xfhg/inte
 <br>
 <br>
 
-# Sandbox Playground
+<img src="static/1F6DD.svg " width="80">
+
+# Sandbox Playground + [CUE](https://cuelang.org/play/#cue@export@cue)
 
 Build & mess around with it :
 
@@ -106,9 +108,12 @@ Build & mess around with it :
 make with-docker
 ```
 
-<p align="center">
+<center>
 
 [![Open in Gitpod](https://gitpod.io/button/open-in-gitpod.svg)](https://gitpod.io/#https://github.com/xfhg/intercept)
+
+</center>
+
 
 <br>
 <br>
