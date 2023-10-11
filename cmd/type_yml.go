@@ -58,6 +58,10 @@ func validateYAMLAndCUEContent(yamlContent string, cueContent string) (bool, str
 		return true, ""
 	}
 
+	// lazy match
+
+	keysExist := LazyMatch(b, a)
+
 	// diff
 
 	differ := xdiff.New()
@@ -66,7 +70,7 @@ func validateYAMLAndCUEContent(yamlContent string, cueContent string) (bool, str
 		return false, fmt.Sprintf("error unmarshaling content: %s\n", err.Error())
 	}
 
-	if d.Modified() {
+	if d.Modified() && !keysExist {
 
 		var diffString string
 

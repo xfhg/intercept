@@ -39,8 +39,6 @@ func validateTOMLAndCUEContent(tomlContent string, cueContent string) (bool, str
 		return false, fmt.Sprintf("error compiling JSON data to CUE value: %v", err)
 	}
 
-	fmt.Printf("│ DEBUG tomlCueValue : ", tomlCueValue.Value())
-
 	err = cueValue.Unify(tomlCueValue.Value()).Validate(cue.Concrete(true))
 	if err != nil {
 		return false, fmt.Sprintf("error validating toml data against CUE schema: %v", err)
@@ -65,6 +63,10 @@ func validateTOMLAndCUEContent(tomlContent string, cueContent string) (bool, str
 		return true, ""
 	}
 
+	// lazy match
+
+	keysExist := LazyMatch(b, a)
+
 	// diff
 
 	differ := xdiff.New()
@@ -73,7 +75,7 @@ func validateTOMLAndCUEContent(tomlContent string, cueContent string) (bool, str
 		return false, fmt.Sprintf("error unmarshaling content: %s\n", err.Error())
 	}
 
-	if d.Modified() {
+	if d.Modified() && !keysExist {
 
 		var diffString string
 
