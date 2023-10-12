@@ -6,8 +6,6 @@ import (
 
 	"cuelang.org/go/cue"
 	"github.com/BurntSushi/toml"
-	xdiff "github.com/yudai/gojsondiff"
-	"github.com/yudai/gojsondiff/formatter"
 )
 
 func validateTOMLAndCUEContent(tomlContent string, cueContent string) (bool, string) {
@@ -44,8 +42,8 @@ func validateTOMLAndCUEContent(tomlContent string, cueContent string) (bool, str
 		return false, fmt.Sprintf("error validating toml data against CUE schema: %v", err)
 	}
 
-	cuepolicy, err := cueValue.Value().MarshalJSON()
-	tomlcontent, err := tomlCueValue.Value().MarshalJSON()
+	// cuepolicy, err := cueValue.Value().MarshalJSON()
+	// tomlcontent, err := tomlCueValue.Value().MarshalJSON()
 
 	err = cueValue.UnifyAccept(cueValue.Value(), tomlCueValue.Value()).Validate(cue.Concrete(true))
 	if err != nil {
@@ -54,51 +52,52 @@ func validateTOMLAndCUEContent(tomlContent string, cueContent string) (bool, str
 
 	// subset
 
-	var a, b map[string]interface{}
+	// var a, b map[string]interface{}
 
-	json.Unmarshal(cuepolicy, &a)
-	json.Unmarshal(tomlcontent, &b)
+	// json.Unmarshal(cuepolicy, &a)
+	// json.Unmarshal(tomlcontent, &b)
 
-	if isSubsetOrEqual(a, b) {
-		return true, ""
-	}
+	// if isSubsetOrEqual(a, b) {
+	// 	return true, ""
+	// }
 
 	// lazy match
 
-	keysExist := LazyMatch(b, a)
+	// keysExist := LazyMatch(b, a)
 
 	// diff
 
-	differ := xdiff.New()
-	d, err := differ.Compare(cuepolicy, tomlcontent)
-	if err != nil {
-		return false, fmt.Sprintf("error unmarshaling content: %s\n", err.Error())
-	}
+	// differ := xdiff.New()
+	// d, err := differ.Compare(cuepolicy, tomlcontent)
+	// if err != nil {
+	// 	return false, fmt.Sprintf("error unmarshaling content: %s\n", err.Error())
+	// }
 
-	if d.Modified() && !keysExist {
+	// if d.Modified() && !keysExist {
 
-		var diffString string
+	// 	var diffString string
 
-		var aJson map[string]interface{}
-		json.Unmarshal(cuepolicy, &aJson)
+	// 	var aJson map[string]interface{}
+	// 	json.Unmarshal(cuepolicy, &aJson)
 
-		config := formatter.AsciiFormatterConfig{
-			ShowArrayIndex: true,
-			Coloring:       true,
-		}
+	// 	config := formatter.AsciiFormatterConfig{
+	// 		ShowArrayIndex: true,
+	// 		Coloring:       true,
+	// 	}
 
-		zformatter := formatter.NewAsciiFormatter(aJson, config)
-		diffString, err = zformatter.Format(d)
-		if err != nil {
-			return false, fmt.Sprintf("Internal error: %v", err)
-		}
+	// 	zformatter := formatter.NewAsciiFormatter(aJson, config)
+	// 	diffString, err = zformatter.Format(d)
+	// 	if err != nil {
+	// 		return false, fmt.Sprintf("Internal error: %v", err)
+	// 	}
 
-		fmt.Println(diffString)
+	// 	fmt.Println(diffString)
 
-		return false, fmt.Sprintf("Missing required keys \n")
+	// 	return false, fmt.Sprintf("Missing required keys \n")
 
-	} else {
-		return true, ""
-	}
+	// } else {
+	// 	return true, ""
+	// }
 
+	return true, ""
 }
