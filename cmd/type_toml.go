@@ -3,7 +3,6 @@ package cmd
 import (
 	"encoding/json"
 	"fmt"
-	"log"
 
 	"cuelang.org/go/cue"
 	"github.com/BurntSushi/toml"
@@ -56,22 +55,20 @@ func validateTOMLAndCUEContent(tomlContent string, cueContent string) (bool, str
 
 	var jsonObj map[string]interface{}
 	if err := json.Unmarshal([]byte(cuepolicy), &jsonObj); err != nil {
-		fmt.Printf("Error parsing JSON: %v", err)
-		return
+		return false, fmt.Sprintf("Error parsing policy: %v", err)
 	}
-
 	rootKeys := getJSONRootKeys(jsonObj)
 
-	tree, err := xtoml.Load(tomlContent)
+	tree, err := xtoml.Load(string(tomlcontent))
 	if err != nil {
-		log.Fatalf("Error parsing TOML: %v", err)
-	}
-
-	for _, key := range rootKeys {
-		if isTOMLKeyAbsent(tree, key) {
-			fmt.Printf("Key '%s' is absent\n", key)
-		} else {
-			fmt.Printf("Key '%s' is present\n", key)
+		colorYellowBold.Println("│ Warning : TOML not valid")
+		return true, ""
+	} else {
+		for _, key := range rootKeys {
+			if isTOMLKeyAbsent(tree, key) {
+				fmt.Printf("Key '%s' is absent\n", key)
+				return false, fmt.Sprintf("Key '%s' is absent", key)
+			}
 		}
 	}
 

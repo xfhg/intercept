@@ -14,6 +14,7 @@ require (
 	github.com/lens-vm/jsonmerge v0.0.0-20210328131518-91ae88d1bfff
 	github.com/mitchellh/go-homedir v1.1.0
 	github.com/owenrumney/go-sarif/v2 v2.3.0
+	github.com/pelletier/go-toml v1.9.5
 	github.com/rhysd/go-github-selfupdate v1.2.3
 	github.com/spf13/cobra v1.7.0
 	github.com/spf13/viper v1.17.0
@@ -62,7 +63,6 @@ require (
 	github.com/emicklei/proto v1.12.1 // indirect
 	github.com/google/uuid v1.3.1 // indirect
 	github.com/mpvl/unique v0.0.0-20150818121801-cbe035fff7de // indirect
-	github.com/pelletier/go-toml v1.9.5 // indirect
 	github.com/protocolbuffers/txtpbfmt v0.0.0-20230730201308-0c31dbd32b9f // indirect
 	github.com/sagikazarmark/locafero v0.3.0 // indirect
 	github.com/sagikazarmark/slog-shim v0.1.0 // indirect
