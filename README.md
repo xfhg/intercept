@@ -98,6 +98,27 @@ docker run -v --rm -w $PWD -v $PWD:$PWD -e TERM=xterm-256color ghcr.io/xfhg/inte
 <br>
 <br>
 
+<img src="static/1F6DD.svg " width="80">
+
+# Sandbox Playground + [CUE](https://cuelang.org/play/#cue@export@cue)
+
+Build & mess around with it :
+
+```
+make with-docker
+```
+
+<center>
+
+[![Open in Gitpod](https://gitpod.io/button/open-in-gitpod.svg)](https://gitpod.io/#https://github.com/xfhg/intercept)
+
+</center>
+
+
+<br>
+<br>
+<br>
+
 # Manual Quick Start
 
 1. Grab the latest [RELEASE](https://github.com/xfhg/intercept/releases) of intercept bundle for your platform 
@@ -381,25 +402,12 @@ You can set three enforcement levels:
 <br>
 
 
-# Sandbox Playground
-
-Build & mess around with it :
-
-```
-make with-docker
-```
-
-<p align="center">
-
-[![Open in Gitpod](https://gitpod.io/button/open-in-gitpod.svg)](https://gitpod.io/#https://github.com/xfhg/intercept)
 
 <br>
-<br>
-<br>
 
 
 
-## Standing on the shoulders of giants - [ripgrep](https://github.com/BurntSushi/ripgrep) + [cue](https://github.com/cue-lang/cue)
+# Standing on the shoulders of giants - [ripgrep](https://github.com/BurntSushi/ripgrep) + [cue](https://github.com/cue-lang/cue)
 
 - It is built on top of Rust's regex engine. Rust's regex engine uses finite automata, SIMD and aggressive literal optimizations to make searching very fast. (PCRE2 support)
 - Rust's regex library maintains performance with full Unicode support by building UTF-8 decoding directly into its deterministic finite automaton engine.

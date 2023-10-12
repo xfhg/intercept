@@ -65,6 +65,10 @@ func validateTOMLAndCUEContent(tomlContent string, cueContent string) (bool, str
 
 	// keysExist := LazyMatch(b, a)
 
+	// lazy match
+
+	// keysExist := LazyMatch(b, a)
+
 	// diff
 
 	// differ := xdiff.New()
@@ -73,7 +77,9 @@ func validateTOMLAndCUEContent(tomlContent string, cueContent string) (bool, str
 	// 	return false, fmt.Sprintf("error unmarshaling content: %s\n", err.Error())
 	// }
 
+
 	// if d.Modified() && !keysExist {
+
 
 	// 	var diffString string
 
