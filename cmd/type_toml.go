@@ -61,7 +61,9 @@ func validateTOMLAndCUEContent(tomlContent string, cueContent string) (bool, str
 
 	tree, err := xtoml.Load(string(tomlcontent))
 	if err != nil {
-		colorYellowBold.Println("│ Warning : TOML not valid")
+		colorYellow.Println("│ Warning : TOML File not valid")
+		colorYellow.Println("├ Missing keys feature not available")
+		fmt.Println("│ ")
 		return true, ""
 	} else {
 		for _, key := range rootKeys {
