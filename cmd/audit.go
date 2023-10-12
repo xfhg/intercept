@@ -89,6 +89,7 @@ var (
 	colorYellowBold = color.New(color.Yellow, color.OpBold)
 	colorBlueBold   = color.New(color.Blue, color.OpBold)
 	colorBold       = color.New(color.OpBold)
+	colorYellow     = color.New(color.Yellow)
 )
 
 func loadUpRules() *allRules {

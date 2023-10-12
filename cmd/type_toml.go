@@ -6,6 +6,7 @@ import (
 
 	"cuelang.org/go/cue"
 	"github.com/BurntSushi/toml"
+	xtoml "github.com/pelletier/go-toml"
 )
 
 func validateTOMLAndCUEContent(tomlContent string, cueContent string) (bool, string) {
@@ -42,68 +43,35 @@ func validateTOMLAndCUEContent(tomlContent string, cueContent string) (bool, str
 		return false, fmt.Sprintf("error validating toml data against CUE schema: %v", err)
 	}
 
-	// cuepolicy, err := cueValue.Value().MarshalJSON()
-	// tomlcontent, err := tomlCueValue.Value().MarshalJSON()
+	cuepolicy, _ := cueValue.Value().MarshalJSON()
+	tomlcontent, _ := tomlCueValue.Value().MarshalJSON()
 
 	err = cueValue.UnifyAccept(cueValue.Value(), tomlCueValue.Value()).Validate(cue.Concrete(true))
 	if err != nil {
 		return false, fmt.Sprintf("error validating toml accept data against CUE schema: %v", err)
 	}
 
-	// subset
+	// keys present
 
-	// var a, b map[string]interface{}
+	var jsonObj map[string]interface{}
+	if err := json.Unmarshal([]byte(cuepolicy), &jsonObj); err != nil {
+		return false, fmt.Sprintf("Error parsing policy: %v", err)
+	}
+	rootKeys := getJSONRootKeys(jsonObj)
 
-	// json.Unmarshal(cuepolicy, &a)
-	// json.Unmarshal(tomlcontent, &b)
-
-	// if isSubsetOrEqual(a, b) {
-	// 	return true, ""
-	// }
-
-	// lazy match
-
-	// keysExist := LazyMatch(b, a)
-
-	// lazy match
-
-	// keysExist := LazyMatch(b, a)
-
-	// diff
-
-	// differ := xdiff.New()
-	// d, err := differ.Compare(cuepolicy, tomlcontent)
-	// if err != nil {
-	// 	return false, fmt.Sprintf("error unmarshaling content: %s\n", err.Error())
-	// }
-
-
-	// if d.Modified() && !keysExist {
-
-
-	// 	var diffString string
-
-	// 	var aJson map[string]interface{}
-	// 	json.Unmarshal(cuepolicy, &aJson)
-
-	// 	config := formatter.AsciiFormatterConfig{
-	// 		ShowArrayIndex: true,
-	// 		Coloring:       true,
-	// 	}
-
-	// 	zformatter := formatter.NewAsciiFormatter(aJson, config)
-	// 	diffString, err = zformatter.Format(d)
-	// 	if err != nil {
-	// 		return false, fmt.Sprintf("Internal error: %v", err)
-	// 	}
-
-	// 	fmt.Println(diffString)
-
-	// 	return false, fmt.Sprintf("Missing required keys \n")
-
-	// } else {
-	// 	return true, ""
-	// }
+	tree, err := xtoml.Load(string(tomlcontent))
+	if err != nil {
+		colorYellow.Println("│ Warning : TOML File not valid")
+		colorYellow.Println("├ Missing keys feature not available")
+		fmt.Println("│ ")
+		return true, ""
+	} else {
+		for _, key := range rootKeys {
+			if isTOMLKeyAbsent(tree, key) {
+				return false, fmt.Sprintf("TOML Key '%s' is absent", key)
+			}
+		}
+	}
 
 	return true, ""
 }

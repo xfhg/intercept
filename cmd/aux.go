@@ -16,6 +16,7 @@ import (
 
 	"github.com/kardianos/osext"
 	homedir "github.com/mitchellh/go-homedir"
+	"github.com/pelletier/go-toml"
 )
 
 func cleanupFiles() {
@@ -129,6 +130,18 @@ func FileExists(filename string) bool {
 	} else {
 		return true
 	}
+}
+
+func getJSONRootKeys(jsonObj map[string]interface{}) []string {
+	var keys []string
+	for k := range jsonObj {
+		keys = append(keys, k)
+	}
+	return keys
+}
+
+func isTOMLKeyAbsent(tree *toml.Tree, key string) bool {
+	return tree.Get(key) == nil
 }
 
 // // CoreExists return path of core binaries on this platform

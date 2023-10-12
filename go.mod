@@ -14,6 +14,7 @@ require (
 	github.com/lens-vm/jsonmerge v0.0.0-20210328131518-91ae88d1bfff
 	github.com/mitchellh/go-homedir v1.1.0
 	github.com/owenrumney/go-sarif/v2 v2.3.0
+	github.com/pelletier/go-toml v1.9.5
 	github.com/rhysd/go-github-selfupdate v1.2.3
 	github.com/spf13/cobra v1.7.0
 	github.com/spf13/viper v1.17.0
