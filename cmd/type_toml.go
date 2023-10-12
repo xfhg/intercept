@@ -3,9 +3,11 @@ package cmd
 import (
 	"encoding/json"
 	"fmt"
+	"log"
 
 	"cuelang.org/go/cue"
 	"github.com/BurntSushi/toml"
+	xtoml "github.com/pelletier/go-toml"
 )
 
 func validateTOMLAndCUEContent(tomlContent string, cueContent string) (bool, string) {
@@ -42,12 +44,35 @@ func validateTOMLAndCUEContent(tomlContent string, cueContent string) (bool, str
 		return false, fmt.Sprintf("error validating toml data against CUE schema: %v", err)
 	}
 
-	// cuepolicy, err := cueValue.Value().MarshalJSON()
-	// tomlcontent, err := tomlCueValue.Value().MarshalJSON()
+	cuepolicy, err := cueValue.Value().MarshalJSON()
+	tomlcontent, err := tomlCueValue.Value().MarshalJSON()
 
 	err = cueValue.UnifyAccept(cueValue.Value(), tomlCueValue.Value()).Validate(cue.Concrete(true))
 	if err != nil {
 		return false, fmt.Sprintf("error validating toml accept data against CUE schema: %v", err)
+	}
+
+	// keys present
+
+	var jsonObj map[string]interface{}
+	if err := json.Unmarshal([]byte(cuepolicy), &jsonObj); err != nil {
+		fmt.Printf("Error parsing JSON: %v", err)
+		return
+	}
+
+	rootKeys := getJSONRootKeys(jsonObj)
+
+	tree, err := xtoml.Load(tomlContent)
+	if err != nil {
+		log.Fatalf("Error parsing TOML: %v", err)
+	}
+
+	for _, key := range rootKeys {
+		if isTOMLKeyAbsent(tree, key) {
+			fmt.Printf("Key '%s' is absent\n", key)
+		} else {
+			fmt.Printf("Key '%s' is present\n", key)
+		}
 	}
 
 	// subset
@@ -77,9 +102,7 @@ func validateTOMLAndCUEContent(tomlContent string, cueContent string) (bool, str
 	// 	return false, fmt.Sprintf("error unmarshaling content: %s\n", err.Error())
 	// }
 
-
 	// if d.Modified() && !keysExist {
-
 
 	// 	var diffString string
 

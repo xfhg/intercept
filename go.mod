@@ -62,6 +62,7 @@ require (
 	github.com/emicklei/proto v1.12.1 // indirect
 	github.com/google/uuid v1.3.1 // indirect
 	github.com/mpvl/unique v0.0.0-20150818121801-cbe035fff7de // indirect
+	github.com/pelletier/go-toml v1.9.5 // indirect
 	github.com/protocolbuffers/txtpbfmt v0.0.0-20230730201308-0c31dbd32b9f // indirect
 	github.com/sagikazarmark/locafero v0.3.0 // indirect
 	github.com/sagikazarmark/slog-shim v0.1.0 // indirect
