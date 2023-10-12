@@ -66,64 +66,10 @@ func validateTOMLAndCUEContent(tomlContent string, cueContent string) (bool, str
 	} else {
 		for _, key := range rootKeys {
 			if isTOMLKeyAbsent(tree, key) {
-				fmt.Printf("Key '%s' is absent\n", key)
-				return false, fmt.Sprintf("Key '%s' is absent", key)
+				return false, fmt.Sprintf("TOML Key '%s' is absent", key)
 			}
 		}
 	}
-
-	// subset
-
-	// var a, b map[string]interface{}
-
-	// json.Unmarshal(cuepolicy, &a)
-	// json.Unmarshal(tomlcontent, &b)
-
-	// if isSubsetOrEqual(a, b) {
-	// 	return true, ""
-	// }
-
-	// lazy match
-
-	// keysExist := LazyMatch(b, a)
-
-	// lazy match
-
-	// keysExist := LazyMatch(b, a)
-
-	// diff
-
-	// differ := xdiff.New()
-	// d, err := differ.Compare(cuepolicy, tomlcontent)
-	// if err != nil {
-	// 	return false, fmt.Sprintf("error unmarshaling content: %s\n", err.Error())
-	// }
-
-	// if d.Modified() && !keysExist {
-
-	// 	var diffString string
-
-	// 	var aJson map[string]interface{}
-	// 	json.Unmarshal(cuepolicy, &aJson)
-
-	// 	config := formatter.AsciiFormatterConfig{
-	// 		ShowArrayIndex: true,
-	// 		Coloring:       true,
-	// 	}
-
-	// 	zformatter := formatter.NewAsciiFormatter(aJson, config)
-	// 	diffString, err = zformatter.Format(d)
-	// 	if err != nil {
-	// 		return false, fmt.Sprintf("Internal error: %v", err)
-	// 	}
-
-	// 	fmt.Println(diffString)
-
-	// 	return false, fmt.Sprintf("Missing required keys \n")
-
-	// } else {
-	// 	return true, ""
-	// }
 
 	return true, ""
 }
