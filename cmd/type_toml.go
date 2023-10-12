@@ -43,8 +43,8 @@ func validateTOMLAndCUEContent(tomlContent string, cueContent string) (bool, str
 		return false, fmt.Sprintf("error validating toml data against CUE schema: %v", err)
 	}
 
-	cuepolicy, err := cueValue.Value().MarshalJSON()
-	tomlcontent, err := tomlCueValue.Value().MarshalJSON()
+	cuepolicy, _ := cueValue.Value().MarshalJSON()
+	tomlcontent, _ := tomlCueValue.Value().MarshalJSON()
 
 	err = cueValue.UnifyAccept(cueValue.Value(), tomlCueValue.Value()).Validate(cue.Concrete(true))
 	if err != nil {
