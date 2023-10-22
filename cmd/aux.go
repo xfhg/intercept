@@ -11,7 +11,6 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
-	"reflect"
 	"strings"
 
 	"github.com/kardianos/osext"
@@ -19,90 +18,16 @@ import (
 	"github.com/pelletier/go-toml"
 )
 
+type KeyArray struct {
+	Keys []string `json:"keys"`
+}
+
 func cleanupFiles() {
 
 	_ = os.Remove("intercept.output.json")
 	_ = os.Remove("intercept.sarif.json")
 	_ = os.Remove("intercept.scannedSHA256.json")
 
-}
-
-func LazyMatch(allJSONData map[string]interface{}, jsonPiece map[string]interface{}) bool {
-	for key, pieceValue := range jsonPiece {
-		if allValue, ok := allJSONData[key]; ok {
-			switch pieceTyped := pieceValue.(type) {
-			case map[string]interface{}:
-				allValueMap, ok := allValue.(map[string]interface{})
-				if !ok || !LazyMatch(allValueMap, pieceTyped) {
-					return false
-				}
-			case []interface{}:
-				allValueArray, ok := allValue.([]interface{})
-				if !ok {
-					return false
-				}
-				found := false
-				for _, entry := range allValueArray {
-					entryMap, ok := entry.(map[string]interface{})
-					if !ok {
-						continue
-					}
-					for _, pieceEntry := range pieceTyped {
-						pieceEntryMap, ok := pieceEntry.(map[string]interface{})
-						if !ok {
-							continue
-						}
-						if LazyMatch(entryMap, pieceEntryMap) {
-							found = true
-							break
-						}
-					}
-					if found {
-						break
-					}
-				}
-				if !found {
-					return false
-				}
-			default:
-				if allValue != pieceValue {
-					return false
-				}
-			}
-		} else {
-			return false
-		}
-	}
-	return true
-}
-
-func isSubsetOrEqual(a, b map[string]interface{}) bool {
-	for k, v := range a {
-		if bv, exists := b[k]; exists {
-			if reflect.DeepEqual(v, bv) {
-				continue
-			}
-			switch vv := v.(type) {
-			case map[string]interface{}:
-				bvv, ok := bv.(map[string]interface{})
-				if !ok || !isSubsetOrEqual(vv, bvv) {
-					return false
-				}
-			case []interface{}:
-				bvv, ok := bv.([]interface{})
-				if !ok || !reflect.DeepEqual(vv, bvv) {
-					return false
-				}
-			default:
-				if v != bv {
-					return false
-				}
-			}
-		} else {
-			return false
-		}
-	}
-	return true
 }
 
 func detectFormat(data string) string {
@@ -130,6 +55,33 @@ func FileExists(filename string) bool {
 	} else {
 		return true
 	}
+}
+
+func collectKeys(m map[string]interface{}, prefix string, keys *[]string) {
+	for k, v := range m {
+		if prefix != "" {
+			k = prefix + "." + k
+		}
+		*keys = append(*keys, k)
+		if childMap, ok := v.(map[string]interface{}); ok {
+			collectKeys(childMap, k, keys)
+		}
+	}
+}
+
+func allKeysExist(arrayA, arrayB []string) bool {
+	keyExistMap := make(map[string]bool)
+	for _, key := range arrayB {
+		keyExistMap[key] = true
+	}
+
+	for _, key := range arrayA {
+		if _, exists := keyExistMap[key]; !exists {
+			return false
+		}
+	}
+
+	return true
 }
 
 func getJSONRootKeys(jsonObj map[string]interface{}) []string {

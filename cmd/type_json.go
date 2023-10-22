@@ -51,20 +51,32 @@ func validateJSONAndCUEContent(jsonContent string, cueContent string) (bool, str
 		return false, fmt.Sprintf("error validating json accept data against CUE schema: %v", err)
 	}
 
-	// subset
+	// prepare for missing keys
 
 	var a, b map[string]interface{}
 
 	json.Unmarshal(cuepolicy, &a)
 	json.Unmarshal(jsoncontent, &b)
 
-	if isSubsetOrEqual(a, b) {
-		return true, ""
+	// collect keys
+
+	var cuekeys, allkeys []string
+
+	collectKeys(b, "", &allkeys)
+	alloutput := map[string][]string{"keys": allkeys}
+	alloutputJSON, _ := json.Marshal(alloutput)
+	collectKeys(a, "", &cuekeys)
+	cueoutput := map[string][]string{"keys": cuekeys}
+	cueoutputJSON, _ := json.Marshal(cueoutput)
+
+	var keysA, keysB KeyArray
+	if err := json.Unmarshal([]byte(cueoutputJSON), &keysA); err != nil {
+		return false, fmt.Sprintf("Error unmarshaling :", err)
 	}
-
-	// lazy match
-
-	keysExist := LazyMatch(b, a)
+	if err := json.Unmarshal([]byte(alloutputJSON), &keysB); err != nil {
+		return false, fmt.Sprintf("Error unmarshaling :", err)
+	}
+	keysExist := allKeysExist(keysA.Keys, keysB.Keys)
 
 	// diff
 
