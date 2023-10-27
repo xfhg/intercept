@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"encoding/json"
+	"errors"
 	"io"
 	"os"
 	"strings"
@@ -35,12 +36,36 @@ type InterceptResult struct {
 	RuleID          string `json:"ruleId"`
 	RuleName        string `json:"ruleName"`
 	RuleSolution    string `json:"ruleSolution"`
+	RuleType        string `json:"ruleType"`
 	Type            string `json:"type"`
 }
-
 type InterceptOutput []InterceptResult
 
-func ProcessOutput(filename string, ruleId string, ruleName string, ruleDescription string, ruleError string, ruleSolution string, ruleFatal bool) {
+type InterceptComplianceFinding struct {
+	FileName  string `yaml:"filename"`
+	FileHash  string `yaml:"filehash"`
+	Output    string `yaml:"output"`
+	Compliant bool   `yaml:"compliant"`
+	Missing   bool   `yaml:"missing"`
+	ParentID  int    `yaml:"parentID"`
+}
+
+type InterceptCompliance struct {
+	RuleFindings    []InterceptComplianceFinding `json:"ruleFindings"`
+	RuleDescription string                       `json:"ruleDescription"`
+	RuleError       string                       `json:"ruleError"`
+	RuleFatal       bool                         `json:"ruleFatal"`
+	RuleID          string                       `json:"ruleId"`
+	RuleName        string                       `json:"ruleName"`
+	RuleSolution    string                       `json:"ruleSolution"`
+	RuleType        string                       `json:"ruleType"`
+	Type            string                       `json:"type"`
+}
+
+type InterceptComplianceOutput []InterceptCompliance
+
+// processes ripgrep output into intercept meaningfull results
+func ProcessOutput(filename string, ruleId string, ruleType string, ruleName string, ruleDescription string, ruleError string, ruleSolution string, ruleFatal bool) {
 
 	ruleMetaData := map[string]interface{}{
 		"ruleId":          ruleId,
@@ -49,6 +74,7 @@ func ProcessOutput(filename string, ruleId string, ruleName string, ruleDescript
 		"ruleError":       ruleError,
 		"ruleSolution":    ruleSolution,
 		"ruleFatal":       ruleFatal,
+		"ruleType":        ruleType,
 	}
 
 	ruleMetajsonData, err := json.Marshal(ruleMetaData)
@@ -106,13 +132,13 @@ func ProcessOutput(filename string, ruleId string, ruleName string, ruleDescript
 
 	var outfile *os.File
 
-	if FileExists("intercept.output.json") {
-		outfile, err = os.OpenFile("intercept.output.json", os.O_RDWR, 0644)
+	if FileExists("intercept.audit.output.json") {
+		outfile, err = os.OpenFile("intercept.audit.output.json", os.O_RDWR, 0644)
 		if err != nil {
 			LogError(err)
 		}
 	} else {
-		outfile, err = os.Create("intercept.output.json")
+		outfile, err = os.Create("intercept.audit.output.json")
 		if err != nil {
 			LogError(err)
 		}
@@ -136,7 +162,7 @@ func ProcessOutput(filename string, ruleId string, ruleName string, ruleDescript
 		}
 
 		// Write the JSON to a file
-		err = os.WriteFile("intercept.output.json", emptyJSON, 0644)
+		err = os.WriteFile("intercept.audit.output.json", emptyJSON, 0644)
 		if err != nil {
 			LogError(err)
 		}
@@ -204,7 +230,7 @@ func ProcessOutput(filename string, ruleId string, ruleName string, ruleDescript
 		LogError(ferr)
 		return
 	}
-	err = os.WriteFile("intercept.output.json", []byte(string(compiledoutput)), 0644)
+	err = os.WriteFile("intercept.audit.output.json", []byte(string(compiledoutput)), 0644)
 	if err != nil {
 		LogError(err)
 		return
@@ -212,16 +238,44 @@ func ProcessOutput(filename string, ruleId string, ruleName string, ruleDescript
 
 }
 
-func GenerateSarif() {
+// package rg output into intercept results struct for SARIF
+func loadInterceptResults() (InterceptOutput, error) {
+
+	if FileExists("intercept.audit.output.json") {
+
+		jsonResult, err := os.ReadFile("intercept.audit.output.json")
+		if err != nil {
+			LogError(err)
+		}
+
+		var results InterceptOutput
+
+		err = json.Unmarshal(jsonResult, &results)
+
+		return results, err
+
+	} else {
+		return nil, errors.New("no results found")
+	}
+}
+
+// generates SARIF output from rg intercept results
+func GenerateSarif(calledby string) {
+
+	// input needs cmd ran
+
 	interceptResults, err := loadInterceptResults()
 	if err != nil {
-		LogError(err)
+		// clean scan return nothing
+		return
 	}
 
 	report, err := sarif.New(sarif.Version210)
 	if err != nil {
 		LogError(err)
 	}
+
+	// build strings
 
 	run := sarif.NewRunWithInformationURI("intercept", "https://intercept.cc")
 
@@ -231,11 +285,13 @@ func GenerateSarif() {
 
 	for _, r := range interceptResults {
 
+		r.RuleType = strings.ToLower(r.RuleType)
+
 		pb := sarif.NewPropertyBag()
 		pb.Add("impact", r.RuleError)
 		pb.Add("resolution", r.RuleSolution)
 
-		run.AddRule(strings.Join([]string{"intercept.cc.policy.", r.RuleID, ": ", r.RuleName}, "")).
+		run.AddRule(strings.Join([]string{"intercept.cc.audit.policy.", r.RuleID, ": ", r.RuleName}, "")).
 			WithDescription(r.RuleDescription).
 			WithHelpURI("https://intercept.cc").
 			WithProperties(pb.Properties).
@@ -244,10 +300,15 @@ func GenerateSarif() {
 		run.AddDistinctArtifact(r.Data.Path.Text)
 
 		ResultLevel := func() string {
-			if r.RuleFatal {
-				return "error"
+			if r.RuleType == "collect" || r.RuleType == "assure" {
+				return "note"
+			} else {
+				if r.RuleFatal {
+					return "error"
+				}
+				return "warning"
 			}
-			return "warning"
+
 		}()
 
 		snippetText := strings.Trim(r.Data.Submatches[0].Match.Text, "\n")
@@ -256,7 +317,7 @@ func GenerateSarif() {
 			Text: &snippetText,
 		}
 
-		run.CreateResultForRule(strings.Join([]string{"intercept.cc.policy.", r.RuleID, ": ", r.RuleName}, "")).
+		run.CreateResultForRule(strings.Join([]string{"intercept.cc.audit.policy.", r.RuleID, ": ", r.RuleName}, "")).
 			WithLevel(strings.ToLower(ResultLevel)).
 			WithMessage(sarif.NewTextMessage(r.RuleDescription)).
 			AddLocation(
@@ -273,21 +334,90 @@ func GenerateSarif() {
 
 	report.AddRun(run)
 
-	if err := report.WriteFile("intercept.sarif.json"); err != nil {
+	if err := report.WriteFile("intercept.audit.sarif.json"); err != nil {
 		LogError(err)
 	}
 
 }
 
-func loadInterceptResults() (InterceptOutput, error) {
+func GenerateComplianceSarif(results InterceptComplianceOutput) {
 
-	jsonResult, err := os.ReadFile("intercept.output.json")
+	report, err := sarif.New(sarif.Version210)
 	if err != nil {
 		LogError(err)
 	}
 
-	var results InterceptOutput
+	// build strings
 
-	err = json.Unmarshal(jsonResult, &results)
-	return results, err
+	run := sarif.NewRunWithInformationURI("intercept", "https://intercept.cc")
+
+	if buildVersion != "" {
+		run.Tool.Driver.SemanticVersion = &buildVersion
+	}
+
+	for _, r := range results {
+
+		r.RuleType = strings.ToLower(r.RuleType)
+
+		pb := sarif.NewPropertyBag()
+		pb.Add("impact", r.RuleError)
+		pb.Add("resolution", r.RuleSolution)
+
+		run.AddRule(strings.Join([]string{"intercept.cc.", strings.ToLower(r.RuleType), ".policy.", r.RuleID, ": ", strings.ToUpper(r.RuleName)}, "")).
+			WithDescription(r.RuleDescription).
+			WithHelpURI("https://intercept.cc").
+			WithProperties(pb.Properties).
+			WithMarkdownHelp("# INTERCEPT.CC").WithTextHelp(r.RuleSolution)
+
+		for _, rf := range r.RuleFindings {
+
+			run.AddDistinctArtifact(rf.FileHash)
+
+			ResultLevel := func() string {
+				if rf.Compliant {
+					return "note"
+				} else {
+					if rf.Missing {
+						return "warning"
+					}
+					return "error"
+				}
+
+			}()
+
+			snippetText := strings.Trim(rf.Output, "\n")
+
+			artifactContent := sarif.ArtifactContent{
+				Text: &snippetText,
+			}
+
+			run.CreateResultForRule(strings.Join([]string{"intercept.cc.", strings.ToLower(r.RuleType), ".policy.", r.RuleID, ": ", strings.ToUpper(r.RuleName)}, "")).
+				WithLevel(strings.ToLower(ResultLevel)).
+				WithMessage(sarif.NewTextMessage(r.RuleDescription)).
+				AddLocation(
+					sarif.NewLocationWithPhysicalLocation(
+						sarif.NewPhysicalLocation().
+							WithArtifactLocation(
+								sarif.NewSimpleArtifactLocation(rf.FileName),
+							).WithRegion(
+							sarif.NewSimpleRegion(0, 0).WithSnippet(&artifactContent),
+						),
+					),
+				)
+
+		}
+
+	}
+
+	report.AddRun(run)
+
+	sarifOutputFilename := strings.Join([]string{"intercept.", strings.ToLower(results[0].RuleType), ".sarif.json"}, "")
+
+	if FileExists(sarifOutputFilename) {
+		_ = os.Remove(sarifOutputFilename)
+	}
+
+	if err := report.WriteFile(sarifOutputFilename); err != nil {
+		LogError(err)
+	}
 }

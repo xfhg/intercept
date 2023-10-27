@@ -7,6 +7,7 @@ import (
 	"os"
 	"path/filepath"
 	"regexp"
+	"strconv"
 	"strings"
 	"sync"
 	"time"
@@ -21,6 +22,8 @@ var (
 	tomlScanPath  string
 	tomlscanTags  string
 	tomlscanBreak string
+	otCompliance  InterceptComplianceOutput
+	otRule        InterceptCompliance
 )
 
 var tomlCmd = &cobra.Command{
@@ -98,6 +101,15 @@ var tomlCmd = &cobra.Command{
 						fmt.Println("│ TOML pattern : ", value.Toml_Structure)
 						fmt.Println("│ ")
 
+						otRule = InterceptCompliance{}
+						otRule.RuleDescription = value.Description
+						otRule.RuleError = value.Error
+						otRule.RuleFatal = value.Fatal
+						otRule.RuleID = strconv.Itoa(value.ID)
+						otRule.RuleName = value.Name
+						otRule.RuleSolution = value.Solution
+						otRule.RuleType = value.Type
+
 						// Compile regex pattern
 						regex, err := regexp.Compile(value.Toml_Filepattern)
 						if err != nil {
@@ -122,6 +134,9 @@ var tomlCmd = &cobra.Command{
 							if err != nil {
 								return err
 							}
+
+							oFinding := InterceptComplianceFinding{}
+
 							// Ignore directories and match files against regex pattern
 							if !info.IsDir() && regex.MatchString(info.Name()) {
 
@@ -146,6 +161,12 @@ var tomlCmd = &cobra.Command{
 									return nil
 								}
 
+								oFinding = InterceptComplianceFinding{
+									FileName: path,
+									FileHash: filehash,
+									ParentID: value.ID,
+								}
+
 								ymlContent := string(ymlContentBytes)
 
 								xvalid, xerrMsg := validateTOMLAndCUEContent(ymlContent, value.Toml_Structure)
@@ -158,6 +179,10 @@ var tomlCmd = &cobra.Command{
 									fmt.Println("│")
 									stats.Clean++
 									stats.Total++
+
+									oFinding.Output = "COMPLIANT"
+									oFinding.Compliant = true
+									oFinding.Missing = false
 
 								} else {
 
@@ -179,7 +204,16 @@ var tomlCmd = &cobra.Command{
 									stats.Total++
 									warning = true
 
+									isMissing := FindMatchingString("Missing", xerrMsg, " ")
+									oFinding.Output = xerrMsg
+									oFinding.Compliant = false
+									oFinding.Missing = false
+									if isMissing {
+										oFinding.Missing = true
+									}
+
 								}
+								otRule.RuleFindings = append(otRule.RuleFindings, oFinding)
 
 							}
 							return nil
@@ -194,6 +228,8 @@ var tomlCmd = &cobra.Command{
 						LogError(errors.New("TOML Required policy fields not set (File Pattern / TOML Structure)"))
 
 					}
+
+					otCompliance = append(otCompliance, otRule)
 
 				default:
 
@@ -319,6 +355,8 @@ var tomlCmd = &cobra.Command{
 			wg.Wait() // Wait for all goroutines to finish
 
 		}
+
+		GenerateComplianceSarif(otCompliance)
 
 		fmt.Println("│")
 		fmt.Println("│")

@@ -70,7 +70,7 @@ func processCollectType(value Rule) {
 			os.Remove(jsonOutputFile)
 		}
 	} else {
-		ProcessOutput(strings.Join([]string{strconv.Itoa(value.ID), ".json"}, ""), strconv.Itoa(value.ID), value.Name, value.Description, "", "", false)
+		ProcessOutput(strings.Join([]string{strconv.Itoa(value.ID), ".json"}, ""), strconv.Itoa(value.ID), value.Type, value.Name, value.Description, "", "", false)
 		colorRedBold.Println("│ ")
 	}
 }

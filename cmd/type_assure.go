@@ -44,7 +44,7 @@ func processAssureType(value Rule) {
 
 	} else {
 
-		codePatternScan := []string{"--pcre2", "-p", "-o", "-A0", "-B0", "-C0", "-i", "-U", "-f", searchPatternFile, scanPath}
+		codePatternScan := []string{"--pcre2", "-p", "-o", "-A0", "-B0", "-C0", "-i", "-U", "-f", searchPatternFile, assureScanPath}
 		xcmd := exec.Command(rgembed, codePatternScan...)
 		xcmd.Stdout = os.Stdout
 		xcmd.Stderr = os.Stderr
@@ -102,7 +102,7 @@ func processAssureType(value Rule) {
 		writer := bufio.NewWriter(jsonoutfile)
 		defer writer.Flush()
 
-		codePatternScanJSON := []string{"--pcre2", "--no-heading", "-o", "-p", "-i", "-U", "--json", "-f", searchPatternFile, scanPath}
+		codePatternScanJSON := []string{"--pcre2", "--no-heading", "-o", "-p", "-i", "-U", "--json", "-f", searchPatternFile, assureScanPath}
 		xcmdJSON := exec.Command(rgembed, codePatternScanJSON...)
 		xcmdJSON.Stdout = jsonoutfile
 		xcmdJSON.Stderr = os.Stderr
@@ -112,17 +112,14 @@ func processAssureType(value Rule) {
 			if xcmdJSON.ProcessState.ExitCode() == 2 {
 				LogError(errrJSON)
 			} else {
-
-				ProcessOutput(strings.Join([]string{strconv.Itoa(value.ID), ".json"}, ""), strconv.Itoa(value.ID), value.Name, value.Description, value.Error, value.Solution, value.Fatal)
-				GenerateSarif()
-				colorRedBold.Println("│ ")
+				colorGreenBold.Println("│")
+				os.Remove(jsonOutputFile)
 			}
 		} else {
-			colorGreenBold.Println("│")
-			os.Remove(jsonOutputFile)
+			ProcessOutput(strings.Join([]string{strconv.Itoa(value.ID), ".json"}, ""), strconv.Itoa(value.ID), value.Type, value.Name, value.Description, value.Error, value.Solution, value.Fatal)
+			colorRedBold.Println("│ ")
 
 		}
-
 	}
 
 }

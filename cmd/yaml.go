@@ -7,6 +7,7 @@ import (
 	"os"
 	"path/filepath"
 	"regexp"
+	"strconv"
 	"strings"
 	"sync"
 	"time"
@@ -21,6 +22,8 @@ var (
 	yamlScanPath  string
 	yamlscanTags  string
 	yamlscanBreak string
+	oyCompliance  InterceptComplianceOutput
+	oyRule        InterceptCompliance
 )
 
 var yamlCmd = &cobra.Command{
@@ -98,6 +101,15 @@ var yamlCmd = &cobra.Command{
 						fmt.Println("│ Yml pattern : ", value.Yml_Structure)
 						fmt.Println("│ ")
 
+						oyRule = InterceptCompliance{}
+						oyRule.RuleDescription = value.Description
+						oyRule.RuleError = value.Error
+						oyRule.RuleFatal = value.Fatal
+						oyRule.RuleID = strconv.Itoa(value.ID)
+						oyRule.RuleName = value.Name
+						oyRule.RuleSolution = value.Solution
+						oyRule.RuleType = value.Type
+
 						// Compile regex pattern
 						regex, err := regexp.Compile(value.Yml_Filepattern)
 						if err != nil {
@@ -122,6 +134,9 @@ var yamlCmd = &cobra.Command{
 							if err != nil {
 								return err
 							}
+
+							oFinding := InterceptComplianceFinding{}
+
 							// Ignore directories and match files against regex pattern
 							if !info.IsDir() && regex.MatchString(info.Name()) {
 
@@ -146,6 +161,12 @@ var yamlCmd = &cobra.Command{
 									return nil
 								}
 
+								oFinding = InterceptComplianceFinding{
+									FileName: path,
+									FileHash: filehash,
+									ParentID: value.ID,
+								}
+
 								ymlContent := string(ymlContentBytes)
 
 								xvalid, xerrMsg := validateYAMLAndCUEContent(ymlContent, value.Yml_Structure)
@@ -158,6 +179,10 @@ var yamlCmd = &cobra.Command{
 									stats.Clean++
 									stats.Total++
 									fmt.Println("│")
+
+									oFinding.Output = "COMPLIANT"
+									oFinding.Compliant = true
+									oFinding.Missing = false
 
 								} else {
 
@@ -178,7 +203,18 @@ var yamlCmd = &cobra.Command{
 									stats.Dirty++
 									fmt.Println("│")
 									warning = true
+
+									isMissing := FindMatchingString("Missing", xerrMsg, " ")
+									oFinding.Output = xerrMsg
+									oFinding.Compliant = false
+									oFinding.Missing = false
+									if isMissing {
+										oFinding.Missing = true
+									}
+
 								}
+
+								oyRule.RuleFindings = append(oyRule.RuleFindings, oFinding)
 
 							}
 							return nil
@@ -193,6 +229,8 @@ var yamlCmd = &cobra.Command{
 						LogError(errors.New("YML Required policy fields not set (File Pattern / Yml Structure)"))
 
 					}
+
+					oyCompliance = append(oyCompliance, oyRule)
 
 				default:
 
@@ -318,6 +356,8 @@ var yamlCmd = &cobra.Command{
 			wg.Wait() // Wait for all goroutines to finish
 
 		}
+
+		GenerateComplianceSarif(oyCompliance)
 
 		fmt.Println("│")
 		fmt.Println("│")
