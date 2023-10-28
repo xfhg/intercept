@@ -18,6 +18,8 @@ var (
 	assureScanPath  string
 	assurescanTags  string
 	assurescanBreak string
+	aCompliance     InterceptComplianceOutput
+	aRule           InterceptCompliance
 )
 
 var assureCmd = &cobra.Command{
@@ -140,6 +142,7 @@ var assureCmd = &cobra.Command{
 			}
 
 			GenerateSarif("assure")
+			GenerateComplianceSarif(aCompliance)
 
 		} else {
 

@@ -34,6 +34,15 @@ func processAssureType(value Rule) {
 	fmt.Println("│ Tags : ", value.Tags)
 	fmt.Println("│ ")
 
+	aRule = InterceptCompliance{}
+	aRule.RuleDescription = value.Description
+	aRule.RuleError = value.Error
+	aRule.RuleFatal = value.Fatal
+	aRule.RuleID = strconv.Itoa(value.ID)
+	aRule.RuleName = value.Name
+	aRule.RuleSolution = value.Solution
+	aRule.RuleType = value.Type
+
 	exception := ContainsInt(rules.Exceptions, value.ID)
 
 	if exception && !auditNox && !value.Enforcement {
@@ -48,12 +57,19 @@ func processAssureType(value Rule) {
 		xcmd := exec.Command(rgembed, codePatternScan...)
 		xcmd.Stdout = os.Stdout
 		xcmd.Stderr = os.Stderr
+
 		errr := xcmd.Run()
 
 		if errr != nil {
 			if xcmd.ProcessState.ExitCode() == 2 {
 				LogError(errr)
 			} else {
+
+				aFinding := InterceptComplianceFinding{
+					FileName: assureScanPath,
+					FileHash: sha256hash([]byte(assureScanPath)),
+					ParentID: value.ID,
+				}
 
 				envfound := FindMatchingString(cfgEnv, value.Environment, ",")
 				if (envfound || strings.Contains(value.Environment, "all") || value.Environment == "") && value.Fatal {
@@ -64,6 +80,11 @@ func processAssureType(value Rule) {
 					colorRedBold.Println("│")
 					fatal = true
 					stats.Fatal++
+
+					aFinding.Compliant = false
+					aFinding.Missing = false
+					aFinding.Output = "NON COMPLIANT"
+
 				} else {
 
 					colorRedBold.Println("│")
@@ -71,6 +92,10 @@ func processAssureType(value Rule) {
 					colorRedBold.Println("│ ", value.Error)
 					colorRedBold.Println("│")
 					warning = true
+
+					aFinding.Compliant = false
+					aFinding.Missing = true
+					aFinding.Output = "NOT FOUND"
 
 				}
 				colorRedBold.Println("│")
@@ -82,6 +107,8 @@ func processAssureType(value Rule) {
 				stats.Total++
 				stats.Dirty++
 
+				aRule.RuleFindings = append(aRule.RuleFindings, aFinding)
+
 			}
 		} else {
 
@@ -92,6 +119,8 @@ func processAssureType(value Rule) {
 			fmt.Println("│ ")
 
 		}
+
+		aCompliance = append(aCompliance, aRule)
 
 		jsonOutputFile := strings.Join([]string{pwddir, "/", strconv.Itoa(value.ID), ".json"}, "")
 		jsonoutfile, erroutjson := os.Create(jsonOutputFile)

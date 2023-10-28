@@ -300,6 +300,9 @@ func GenerateSarif(calledby string) {
 		run.AddDistinctArtifact(r.Data.Path.Text)
 
 		ResultLevel := func() string {
+			if r.RuleType == "api" && r.Type == "match" {
+				return "note"
+			}
 			if r.RuleType == "collect" || r.RuleType == "assure" {
 				return "note"
 			} else {
@@ -349,6 +352,8 @@ func GenerateComplianceSarif(results InterceptComplianceOutput) {
 
 	// build strings
 
+	findings := 0
+
 	run := sarif.NewRunWithInformationURI("intercept", "https://intercept.cc")
 
 	if buildVersion != "" {
@@ -370,6 +375,8 @@ func GenerateComplianceSarif(results InterceptComplianceOutput) {
 			WithMarkdownHelp("# INTERCEPT.CC").WithTextHelp(r.RuleSolution)
 
 		for _, rf := range r.RuleFindings {
+
+			findings++
 
 			run.AddDistinctArtifact(rf.FileHash)
 
@@ -416,8 +423,10 @@ func GenerateComplianceSarif(results InterceptComplianceOutput) {
 	if FileExists(sarifOutputFilename) {
 		_ = os.Remove(sarifOutputFilename)
 	}
-
-	if err := report.WriteFile(sarifOutputFilename); err != nil {
-		LogError(err)
+	if findings > 0 {
+		if err := report.WriteFile(sarifOutputFilename); err != nil {
+			LogError(err)
+		}
 	}
+
 }

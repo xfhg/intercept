@@ -100,6 +100,8 @@ var apiCmd = &cobra.Command{
 
 			}
 
+			GenerateSarif("api")
+
 		} else {
 
 			values := make(chan Rule, len(rules.Rules))
