@@ -7,6 +7,7 @@ import (
 	"os"
 	"path/filepath"
 	"regexp"
+	"strconv"
 	"strings"
 	"sync"
 	"time"
@@ -20,6 +21,8 @@ var (
 	jsonScanPath  string
 	jsonscanTags  string
 	jsonscanBreak string
+	oCompliance   InterceptComplianceOutput
+	oRule         InterceptCompliance
 )
 
 var jsonCmd = &cobra.Command{
@@ -97,6 +100,15 @@ var jsonCmd = &cobra.Command{
 						fmt.Println("│ JSON pattern : ", value.Json_Structure)
 						fmt.Println("│ ")
 
+						oRule = InterceptCompliance{}
+						oRule.RuleDescription = value.Description
+						oRule.RuleError = value.Error
+						oRule.RuleFatal = value.Fatal
+						oRule.RuleID = strconv.Itoa(value.ID)
+						oRule.RuleName = value.Name
+						oRule.RuleSolution = value.Solution
+						oRule.RuleType = value.Type
+
 						// Compile regex pattern
 						regex, err := regexp.Compile(value.Json_Filepattern)
 						if err != nil {
@@ -121,6 +133,9 @@ var jsonCmd = &cobra.Command{
 							if err != nil {
 								return err
 							}
+
+							oFinding := InterceptComplianceFinding{}
+
 							// Ignore directories and match files against regex pattern
 							if !info.IsDir() && regex.MatchString(info.Name()) {
 
@@ -145,8 +160,13 @@ var jsonCmd = &cobra.Command{
 									return nil
 								}
 
-								ymlContent := string(ymlContentBytes)
+								oFinding = InterceptComplianceFinding{
+									FileName: path,
+									FileHash: filehash,
+									ParentID: value.ID,
+								}
 
+								ymlContent := string(ymlContentBytes)
 								xvalid, xerrMsg := validateJSONAndCUEContent(ymlContent, value.Json_Structure)
 								if xvalid {
 									// fmt.Printf("│ The json file is valid.\n")
@@ -157,6 +177,10 @@ var jsonCmd = &cobra.Command{
 									fmt.Println("│")
 									stats.Clean++
 									stats.Total++
+
+									oFinding.Output = "COMPLIANT"
+									oFinding.Compliant = true
+									oFinding.Missing = false
 
 								} else {
 
@@ -178,7 +202,17 @@ var jsonCmd = &cobra.Command{
 									stats.Total++
 									warning = true
 
+									isMissing := FindMatchingString("Missing", xerrMsg, " ")
+									oFinding.Output = xerrMsg
+									oFinding.Compliant = false
+									oFinding.Missing = false
+									if isMissing {
+										oFinding.Missing = true
+									}
+
 								}
+
+								oRule.RuleFindings = append(oRule.RuleFindings, oFinding)
 
 							}
 							return nil
@@ -193,6 +227,8 @@ var jsonCmd = &cobra.Command{
 						LogError(errors.New("JSON Required policy fields not set (File Pattern / JSON Structure)"))
 
 					}
+
+					oCompliance = append(oCompliance, oRule)
 
 				default:
 
@@ -318,6 +354,8 @@ var jsonCmd = &cobra.Command{
 			wg.Wait() // Wait for all goroutines to finish
 
 		}
+
+		GenerateComplianceSarif(oCompliance)
 
 		fmt.Println("│")
 		fmt.Println("│")

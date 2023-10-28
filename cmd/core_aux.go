@@ -24,9 +24,16 @@ type KeyArray struct {
 
 func cleanupFiles() {
 
-	_ = os.Remove("intercept.output.json")
-	_ = os.Remove("intercept.sarif.json")
-	_ = os.Remove("intercept.scannedSHA256.json")
+	if FileExists("intercept.audit.output.json") {
+		_ = os.Remove("intercept.output.json")
+	}
+	if FileExists("intercept.audit.sarif.json") {
+
+		_ = os.Remove("intercept.audit.sarif.json")
+	}
+	if FileExists("intercept.scannedSHA256.json") {
+		_ = os.Remove("intercept.scannedSHA256.json")
+	}
 
 }
 

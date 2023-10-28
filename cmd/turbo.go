@@ -55,8 +55,8 @@ func ripTurbo(rgbin string, pwddir string, scanPath string, policy Rule) {
 			}
 
 		} else {
-			ProcessOutput(strings.Join([]string{strconv.Itoa(policy.ID), ".json"}, ""), strconv.Itoa(policy.ID), policy.Name, policy.Description, policy.Error, policy.Solution, policy.Fatal)
-			GenerateSarif()
+			ProcessOutput(strings.Join([]string{strconv.Itoa(policy.ID), ".json"}, ""), strconv.Itoa(policy.ID), policy.Type, policy.Name, policy.Description, policy.Error, policy.Solution, policy.Fatal)
+			GenerateSarif("audit")
 			colorRedBold.Print("│")
 		}
 

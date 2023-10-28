@@ -1,0 +1,75 @@
+name: Publish package to GitHub Packages
+
+on:
+  push:
+    branches:
+      - main
+    paths: 
+      - 'action.yml'
+
+env:
+  IMAGE_NAME: action
+  REGISTRY: ghcr.io
+
+
+jobs:
+  verify-version:
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.action_version.outputs.IMAGE_VERSION }}
+      exists: ${{ steps.checkTag.outputs.exists }}
+    steps:
+      - uses: actions/checkout@v3.3.0
+      - name: Extract action.yml version
+        uses: mikefarah/yq@master
+        id: action_image
+        with:
+          cmd: yq '.runs.image' 'action.yml'
+      - name: Parse action.yml version
+        shell: bash
+        id: action_version
+        run: |
+          echo "IMAGE_VERSION=$(echo $IMAGE_URL | cut -d: -f3)" >> $GITHUB_OUTPUT
+        env:
+          IMAGE_URL: ${{ steps.action_image.outputs.result }}
+        # Verifies if there is a tag with that version number
+      - uses: mukunku/tag-exists-action@v1.4.0
+        if: steps.action_version.outputs.IMAGE_VERSION != 'Dockerfile'
+        id: checkTag
+        with: 
+          tag: ${{ steps.action_version.outputs.IMAGE_VERSION }}
+
+  publish:
+    if: needs.verify-version.outputs.exists == 'false'
+    needs: [verify-version]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      packages: write
+    steps:
+      - uses: actions/checkout@v3.3.0
+      - name: Tag version and create release
+        run: gh release create $VERSION --generate-notes
+        env:
+          VERSION: ${{ needs.verify-version.outputs.version }}
+          GH_TOKEN: ${{ github.token }}
+      - name: Log in to the Container registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Extract metadata (tags, labels) for Docker
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ github.repository }}/${{ env.IMAGE_NAME }}
+          tags: ${{ needs.verify-version.outputs.version }}
+      - uses: actions/checkout@v3
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}

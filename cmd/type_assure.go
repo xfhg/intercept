@@ -34,6 +34,15 @@ func processAssureType(value Rule) {
 	fmt.Println("│ Tags : ", value.Tags)
 	fmt.Println("│ ")
 
+	aRule = InterceptCompliance{}
+	aRule.RuleDescription = value.Description
+	aRule.RuleError = value.Error
+	aRule.RuleFatal = value.Fatal
+	aRule.RuleID = strconv.Itoa(value.ID)
+	aRule.RuleName = value.Name
+	aRule.RuleSolution = value.Solution
+	aRule.RuleType = value.Type
+
 	exception := ContainsInt(rules.Exceptions, value.ID)
 
 	if exception && !auditNox && !value.Enforcement {
@@ -44,16 +53,23 @@ func processAssureType(value Rule) {
 
 	} else {
 
-		codePatternScan := []string{"--pcre2", "-p", "-o", "-A0", "-B0", "-C0", "-i", "-U", "-f", searchPatternFile, scanPath}
+		codePatternScan := []string{"--pcre2", "-p", "-o", "-A0", "-B0", "-C0", "-i", "-U", "-f", searchPatternFile, assureScanPath}
 		xcmd := exec.Command(rgembed, codePatternScan...)
 		xcmd.Stdout = os.Stdout
 		xcmd.Stderr = os.Stderr
+
 		errr := xcmd.Run()
 
 		if errr != nil {
 			if xcmd.ProcessState.ExitCode() == 2 {
 				LogError(errr)
 			} else {
+
+				aFinding := InterceptComplianceFinding{
+					FileName: assureScanPath,
+					FileHash: sha256hash([]byte(assureScanPath)),
+					ParentID: value.ID,
+				}
 
 				envfound := FindMatchingString(cfgEnv, value.Environment, ",")
 				if (envfound || strings.Contains(value.Environment, "all") || value.Environment == "") && value.Fatal {
@@ -64,6 +80,11 @@ func processAssureType(value Rule) {
 					colorRedBold.Println("│")
 					fatal = true
 					stats.Fatal++
+
+					aFinding.Compliant = false
+					aFinding.Missing = false
+					aFinding.Output = "NON COMPLIANT"
+
 				} else {
 
 					colorRedBold.Println("│")
@@ -71,6 +92,10 @@ func processAssureType(value Rule) {
 					colorRedBold.Println("│ ", value.Error)
 					colorRedBold.Println("│")
 					warning = true
+
+					aFinding.Compliant = false
+					aFinding.Missing = true
+					aFinding.Output = "NOT FOUND"
 
 				}
 				colorRedBold.Println("│")
@@ -81,6 +106,8 @@ func processAssureType(value Rule) {
 				fmt.Println("│ ")
 				stats.Total++
 				stats.Dirty++
+
+				aRule.RuleFindings = append(aRule.RuleFindings, aFinding)
 
 			}
 		} else {
@@ -93,6 +120,8 @@ func processAssureType(value Rule) {
 
 		}
 
+		aCompliance = append(aCompliance, aRule)
+
 		jsonOutputFile := strings.Join([]string{pwddir, "/", strconv.Itoa(value.ID), ".json"}, "")
 		jsonoutfile, erroutjson := os.Create(jsonOutputFile)
 		if erroutjson != nil {
@@ -102,7 +131,7 @@ func processAssureType(value Rule) {
 		writer := bufio.NewWriter(jsonoutfile)
 		defer writer.Flush()
 
-		codePatternScanJSON := []string{"--pcre2", "--no-heading", "-o", "-p", "-i", "-U", "--json", "-f", searchPatternFile, scanPath}
+		codePatternScanJSON := []string{"--pcre2", "--no-heading", "-o", "-p", "-i", "-U", "--json", "-f", searchPatternFile, assureScanPath}
 		xcmdJSON := exec.Command(rgembed, codePatternScanJSON...)
 		xcmdJSON.Stdout = jsonoutfile
 		xcmdJSON.Stderr = os.Stderr
@@ -112,17 +141,14 @@ func processAssureType(value Rule) {
 			if xcmdJSON.ProcessState.ExitCode() == 2 {
 				LogError(errrJSON)
 			} else {
-
-				ProcessOutput(strings.Join([]string{strconv.Itoa(value.ID), ".json"}, ""), strconv.Itoa(value.ID), value.Name, value.Description, value.Error, value.Solution, value.Fatal)
-				GenerateSarif()
-				colorRedBold.Println("│ ")
+				colorGreenBold.Println("│")
+				os.Remove(jsonOutputFile)
 			}
 		} else {
-			colorGreenBold.Println("│")
-			os.Remove(jsonOutputFile)
+			ProcessOutput(strings.Join([]string{strconv.Itoa(value.ID), ".json"}, ""), strconv.Itoa(value.ID), value.Type, value.Name, value.Description, value.Error, value.Solution, value.Fatal)
+			colorRedBold.Println("│ ")
 
 		}
-
 	}
 
 }

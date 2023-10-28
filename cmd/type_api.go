@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"bufio"
 	"crypto/tls"
 	"errors"
 	"fmt"
@@ -240,6 +241,15 @@ func processAPIType(value Rule, turbo bool) {
 		LogError(errors.New("API Output not found"))
 	}
 
+	apiRule = InterceptCompliance{}
+	apiRule.RuleDescription = value.Description
+	apiRule.RuleError = value.Error
+	apiRule.RuleFatal = value.Fatal
+	apiRule.RuleID = strconv.Itoa(value.ID)
+	apiRule.RuleName = value.Name
+	apiRule.RuleSolution = value.Solution
+	apiRule.RuleType = value.Type
+
 	exception := ContainsInt(rules.Exceptions, value.ID)
 
 	if exception && !auditNox && !value.Enforcement {
@@ -263,6 +273,12 @@ func processAPIType(value Rule, turbo bool) {
 				LogError(errr)
 			} else {
 
+				apiFinding := InterceptComplianceFinding{
+					FileName: scanPath,
+					FileHash: sha256hash([]byte(scanPath)),
+					ParentID: value.ID,
+				}
+
 				envfound := FindMatchingString(cfgEnv, value.Environment, ",")
 				if (envfound || strings.Contains(value.Environment, "all") || value.Environment == "") && value.Fatal {
 
@@ -275,6 +291,10 @@ func processAPIType(value Rule, turbo bool) {
 					} else {
 						colorRedBold.Print("│ ✗ ", value.ID, " ")
 					}
+
+					apiFinding.Compliant = false
+					apiFinding.Missing = false
+					apiFinding.Output = "NON COMPLIANT"
 
 					fatal = true
 					stats.Fatal++
@@ -290,6 +310,10 @@ func processAPIType(value Rule, turbo bool) {
 					}
 					warning = true
 
+					apiFinding.Compliant = false
+					apiFinding.Missing = true
+					apiFinding.Output = "NOT FOUND"
+
 				}
 				if !turbo {
 					colorRedBold.Println("│")
@@ -301,6 +325,8 @@ func processAPIType(value Rule, turbo bool) {
 				}
 				stats.Total++
 				stats.Dirty++
+
+				apiRule.RuleFindings = append(apiRule.RuleFindings, apiFinding)
 
 			}
 		} else {
@@ -315,6 +341,36 @@ func processAPIType(value Rule, turbo bool) {
 			stats.Total++
 
 		}
+
+	}
+
+	apiCompliance = append(apiCompliance, apiRule)
+
+	jsonOutputFile := strings.Join([]string{pwddir, "/", strconv.Itoa(value.ID), ".json"}, "")
+	jsonoutfile, erroutjson := os.Create(jsonOutputFile)
+	if erroutjson != nil {
+		LogError(erroutjson)
+	}
+	defer jsonoutfile.Close()
+	writer := bufio.NewWriter(jsonoutfile)
+	defer writer.Flush()
+
+	codePatternScanJSON := []string{"--pcre2", "--no-heading", "-o", "-p", "-i", "-U", "--json", "-f", searchPatternFile, scanPath}
+	xcmdJSON := exec.Command(rgembed, codePatternScanJSON...)
+	xcmdJSON.Stdout = jsonoutfile
+	xcmdJSON.Stderr = os.Stderr
+	errrJSON := xcmdJSON.Run()
+
+	if errrJSON != nil {
+		if xcmdJSON.ProcessState.ExitCode() == 2 {
+			LogError(errrJSON)
+		} else {
+			colorGreenBold.Println("│")
+			os.Remove(jsonOutputFile)
+		}
+	} else {
+		ProcessOutput(strings.Join([]string{strconv.Itoa(value.ID), ".json"}, ""), strconv.Itoa(value.ID), value.Type, value.Name, value.Description, value.Error, value.Solution, value.Fatal)
+		colorRedBold.Println("│ ")
 
 	}
 

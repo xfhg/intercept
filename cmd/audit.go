@@ -62,6 +62,7 @@ type Rule struct {
 	Api_Auth_Basic   *string  `yaml:"api_auth_basic,omitempty"`
 	Api_Auth_Token   *string  `yaml:"api_auth_token,omitempty"`
 	Api_Trace        bool     `yaml:"api_trace,omitempty"`
+	Filepattern      string   `yaml:"filepattern,omitempty"`
 	Yml_Filepattern  string   `yaml:"yml_filepattern,omitempty"`
 	Yml_Structure    string   `yaml:"yml_structure,omitempty"`
 	Toml_Filepattern string   `yaml:"toml_filepattern,omitempty"`
@@ -112,9 +113,7 @@ var auditCmd = &cobra.Command{
 			cfgEnv = "先锋"
 		}
 
-		_ = os.Remove("intercept.output.json")
-		_ = os.Remove("intercept.sarif.json")
-		_ = os.Remove("intercept.scannedSHA256.json")
+		cleanupFiles()
 
 		rules = loadUpRules()
 
@@ -217,12 +216,14 @@ var auditCmd = &cobra.Command{
 
 				case "api":
 
-					gatheringData(value, false)
-					processAPIType(value, false)
+					// moved to its own command - will compile here later
+					// gatheringData(value, false)
+					// processAPIType(value, false)
 
 				case "assure":
 
-					processAssureType(value)
+					// moved to its own command - will compile here later
+					// processAssureType(value)
 
 				case "scan":
 
@@ -239,6 +240,8 @@ var auditCmd = &cobra.Command{
 				_ = os.Remove(searchPatternFile)
 
 			}
+
+			GenerateSarif("audit")
 
 			fmt.Println("│")
 			fmt.Println("│")
