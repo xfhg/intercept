@@ -15,7 +15,9 @@ import (
 )
 
 var (
-	scanTurboAPI string
+	scanTurboAPI  string
+	apiCompliance InterceptComplianceOutput
+	apiRule       InterceptCompliance
 )
 
 var apiCmd = &cobra.Command{
@@ -101,6 +103,7 @@ var apiCmd = &cobra.Command{
 			}
 
 			GenerateSarif("api")
+			GenerateComplianceSarif(apiCompliance)
 
 		} else {
 
