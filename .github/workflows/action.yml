@@ -15,6 +15,36 @@ jobs:
       contents: write
       packages: write
     steps:
+
+
+    
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Setup Go
+        uses: actions/setup-go@v4
+        with:
+          go-version-file: go.mod
+
+      - name: Fetch Tags
+        run: |
+          git fetch --tags -f
+          git describe --tags --always
+
+      - name: Get dependencies
+        run: |
+          go get -v -t -d ./...
+          if [ -f Gopkg.toml ]; then
+              curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
+              dep ensure
+          fi
+
+      - name: Get the compressor
+        run: sudo apt-get update -y ; sudo apt-get install -y upx
+
+      - name: Make all release artifacts
+        run: make
+
       - name: Set output
         id: tags
         run: echo "tag=${GITHUB_REF#refs/*/}" >> $GITHUB_OUTPUT
