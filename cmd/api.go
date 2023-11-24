@@ -104,6 +104,7 @@ var apiCmd = &cobra.Command{
 
 			GenerateSarif("api")
 			GenerateComplianceSarif(apiCompliance)
+			GenerateApiSARIF()
 
 		} else {
 

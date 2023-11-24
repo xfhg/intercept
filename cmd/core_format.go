@@ -12,6 +12,12 @@ import (
 	"github.com/owenrumney/go-sarif/v2/sarif"
 )
 
+type SARIF struct {
+	Version string        `json:"version"`
+	Schema  string        `json:"$schema"`
+	Runs    []interface{} `json:"runs"`
+}
+
 type InterceptResult struct {
 	Data struct {
 		AbsoluteOffset int `json:"absolute_offset"`
@@ -425,6 +431,72 @@ func GenerateComplianceSarif(results InterceptComplianceOutput) {
 	}
 	if findings > 0 {
 		if err := report.WriteFile(sarifOutputFilename); err != nil {
+			LogError(err)
+		}
+	}
+
+}
+
+func MergeSARIFFiles(file1, file2 string) (*SARIF, error) {
+	// Read and unmarshal the first file
+	data1, err := os.ReadFile(file1)
+	if err != nil {
+		return nil, err
+	}
+	var sarif1 SARIF
+	if err := json.Unmarshal(data1, &sarif1); err != nil {
+		return nil, err
+	}
+
+	// Read and unmarshal the second file
+	data2, err := os.ReadFile(file2)
+	if err != nil {
+		return nil, err
+	}
+	var sarif2 SARIF
+	if err := json.Unmarshal(data2, &sarif2); err != nil {
+		return nil, err
+	}
+
+	// Merge the 'runs' slices
+	mergedRuns := append(sarif1.Runs, sarif2.Runs...)
+
+	// Create the merged SARIF
+	mergedSARIF := &SARIF{
+		Version: sarif1.Version,
+		Schema:  sarif1.Schema,
+		Runs:    mergedRuns,
+	}
+
+	return mergedSARIF, nil
+}
+
+func GenerateApiSARIF() {
+
+	if FileExists("intercept.audit.sarif.json") && FileExists("intercept.api.sarif.json") {
+
+		mergedSARIF, err := MergeSARIFFiles("intercept.audit.sarif.json", "intercept.api.sarif.json")
+		if err != nil {
+			LogError(err)
+		}
+
+		mergedData, err := json.MarshalIndent(mergedSARIF, "", "    ")
+		if err != nil {
+			LogError(err)
+		}
+
+		if err := os.WriteFile("intercept.api.full.sarif.json", mergedData, 0644); err != nil {
+			LogError(err)
+		}
+
+	} else {
+
+		auditdata, err := os.ReadFile("intercept.audit.sarif.json")
+		if err != nil {
+			LogError(err)
+		}
+
+		if err := os.WriteFile("intercept.api.full.sarif.json", auditdata, 0644); err != nil {
 			LogError(err)
 		}
 	}
