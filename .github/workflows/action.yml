@@ -39,11 +39,11 @@ jobs:
               dep ensure
           fi
 
-      - name: Get the compressor
-        run: sudo apt-get update -y ; sudo apt-get install -y upx
+      - name: Update
+        run: sudo apt-get update -y
 
       - name: Make all release artifacts
-        run: make
+        run: make with-docker
 
       - name: Set output
         id: tags

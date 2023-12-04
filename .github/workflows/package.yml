@@ -3,7 +3,7 @@ name: Publish package to GitHub Packages
 on:
   push:
     branches:
-      - main
+      - master
     paths: 
       - 'action.yml'
 

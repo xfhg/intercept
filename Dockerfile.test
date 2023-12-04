@@ -1,6 +1,6 @@
 
 FROM alpine:latest
-COPY bin/interceptl /usr/local/bin/intercept
+COPY release/interceptl /usr/local/bin/intercept
 COPY tests/run.sh /usr/local/bin/run.sh
 COPY .ignore /usr/local/bin/.ignore
 RUN chmod +x /usr/local/bin/intercept /usr/local/bin/run.sh

@@ -7,7 +7,7 @@ PTAG=$(shell git describe --tags --abbrev=0 @^)
 
 all: purge-output prepare compress-tool windows linux macos out-full out-linux out-macos out-win sha256sums
 
-with-docker : purge-output prepare windows linux macos out-devbox out-linux out-macos out-win sha256sums x-docker
+with-docker : purge-output prepare windows linux macos out-devbox out-linux out-macos out-win sha256sums
 
 version:  
 	touch release/$(TAG)_$(VERSION)-$(MOMENT)
