@@ -43,7 +43,7 @@ jobs:
         run: sudo apt-get update -y
 
       - name: Make all release artifacts
-        run: make with-docker
+        run: make gh-actions
 
       - name: Set output
         id: tags

@@ -9,6 +9,8 @@ all: purge-output prepare compress-tool windows linux macos out-full out-linux o
 
 with-docker : purge-output prepare windows linux macos out-devbox out-linux out-macos out-win sha256sums
 
+gh-actions : purge-output prepare linux out-gh-actions out-linux 
+
 version:  
 	touch release/$(TAG)_$(VERSION)-$(MOMENT)
 	echo $(TAG) > bin/_version
@@ -69,6 +71,10 @@ compress-docker:
 	docker run --rm -w $(shell pwd) -v $(shell pwd):$(shell pwd) xfhg/upx:latest -9 bin/interceptm
 	docker run --rm -w $(shell pwd) -v $(shell pwd):$(shell pwd) xfhg/upx:latest -9 bin/intercept.exe
 
+compress-docker-gh-actions:
+	docker run --rm -w $(shell pwd) -v $(shell pwd):$(shell pwd) xfhg/upx:latest -9 bin/interceptl
+
+
 # docker run --rm -w $(shell pwd) -v $(shell pwd):$(shell pwd) xfhg/upx:latest --best --lzma bin/intercept.exe
 
 out-full: purge version release-raw compress-bin release
@@ -84,6 +90,10 @@ out-devbox: purge version release-raw compress-docker release
 	cp bin/intercept.exe release/intercept.exe
 	cp .ignore release/.ignore
 	cd release/ ; zip -9 -T -x "*.DS_Store*" -r ../output/x-intercept.zip *
+
+out-gh-actions: purge version compress-docker-gh-actions 
+	cp bin/interceptl release/interceptl
+	cp .ignore release/.ignore
 
 preserve-raw:
 	cp -f bin/interceptl bin/intercept-linux_amd64
