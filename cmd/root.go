@@ -15,6 +15,7 @@ var cfgEnv string
 // subcommand flags
 var (
 	configReset  bool
+	configb64    bool
 	auditNox     bool
 	systemSetup  bool
 	systemUpdate bool
@@ -67,6 +68,7 @@ func initConfig() {
 	}
 
 	configReset = configCmdisReset()
+	configb64 = configCmdisB64()
 	auditNox = auditCmdisNoExceptions()
 	systemSetup = systemCmdisSetup()
 	systemUpdate = systemCmdisUpdate()
@@ -87,7 +89,13 @@ func systemCmdisUpdate() bool {
 
 func configCmdisReset() bool {
 
-	reset, _ := configCmd.PersistentFlags().GetBool("reset")
+	b64, _ := configCmd.PersistentFlags().GetBool("reset")
+	return b64
+}
+
+func configCmdisB64() bool {
+
+	reset, _ := configCmd.PersistentFlags().GetBool("b64")
 	return reset
 }
 

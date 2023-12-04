@@ -1,6 +1,8 @@
 package cmd
 
 import (
+	"bufio"
+	"encoding/base64"
 	"encoding/json"
 	"errors"
 	"io"
@@ -297,7 +299,7 @@ func GenerateSarif(calledby string) {
 		pb.Add("impact", r.RuleError)
 		pb.Add("resolution", r.RuleSolution)
 
-		run.AddRule(strings.Join([]string{"intercept.cc.audit.policy.", r.RuleID, ": ", r.RuleName}, "")).
+		run.AddRule(strings.Join([]string{"intercept.cc.audit.policy.", r.RuleID, ": ", strings.ToUpper(r.RuleName)}, "")).
 			WithDescription(r.RuleDescription).
 			WithHelpURI("https://intercept.cc").
 			WithProperties(pb.Properties).
@@ -326,7 +328,7 @@ func GenerateSarif(calledby string) {
 			Text: &snippetText,
 		}
 
-		run.CreateResultForRule(strings.Join([]string{"intercept.cc.audit.policy.", r.RuleID, ": ", r.RuleName}, "")).
+		run.CreateResultForRule(strings.Join([]string{"intercept.cc.audit.policy.", r.RuleID, ": ", strings.ToUpper(r.RuleName)}, "")).
 			WithLevel(strings.ToLower(ResultLevel)).
 			WithMessage(sarif.NewTextMessage(r.RuleDescription)).
 			AddLocation(
@@ -347,6 +349,28 @@ func GenerateSarif(calledby string) {
 		LogError(err)
 	}
 
+}
+
+func FileToBase64(filepath string) string {
+	file, err := os.Open(filepath)
+	if err != nil {
+		LogError(err)
+	}
+	defer file.Close()
+
+	fileInfo, _ := file.Stat()
+	var size int64 = fileInfo.Size()
+	fileBytes := make([]byte, size)
+
+	buffer := bufio.NewReader(file)
+	_, err = buffer.Read(fileBytes)
+
+	if err != nil {
+		LogError(err)
+	}
+
+	fileBase64 := base64.StdEncoding.EncodeToString(fileBytes)
+	return fileBase64
 }
 
 func GenerateComplianceSarif(results InterceptComplianceOutput) {

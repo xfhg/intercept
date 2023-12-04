@@ -75,6 +75,17 @@ var configCmd = &cobra.Command{
 
 		}
 
+		if configb64 {
+
+			if !fromURL {
+				fmt.Println("│")
+				colorGreenBold.Println("│ Policy b64")
+				fmt.Println("│")
+				fmt.Println(FileToBase64(addCfgFile))
+				fmt.Println("│")
+			}
+		}
+
 		if FileExists(defaultCfgFile) && (fromFile || fromURL) {
 			// merge
 			var master map[string]interface{}
@@ -108,10 +119,10 @@ var configCmd = &cobra.Command{
 					colorRedBold.Println("│")
 					colorRedBold.Println("│ Error")
 					colorRedBold.Println("│")
-					log.Fatal("Aborting : MD5 checksum does not match")
+					log.Fatal("Aborting : SHA256 checksum does not match")
 				} else {
 					fmt.Println("│")
-					colorGreenBold.Println("│ MD5 Config Match")
+					colorGreenBold.Println("│ SHA256 Config Match")
 					fmt.Println("│")
 				}
 			}
@@ -120,10 +131,12 @@ var configCmd = &cobra.Command{
 				LogError(err)
 			}
 
+			config_protected := false
 			for k, v := range override {
 				if strings.Contains(k, "Rules") {
 					fmt.Println("│ Protected from rewriting [Rules]")
 					fmt.Println("│ This component is declared once, cannot be merged")
+					config_protected = !config_protected
 				} else {
 					master[k] = v
 				}
@@ -139,7 +152,11 @@ var configCmd = &cobra.Command{
 			}
 
 			fmt.Println("│")
-			fmt.Println("│ Config Updated")
+			if !config_protected {
+				colorGreenBold.Println("│ Config Updated")
+			} else {
+				colorRedBold.Println("│ Config Not Updated")
+			}
 			fmt.Println("│")
 			fmt.Println("└")
 
@@ -171,10 +188,10 @@ var configCmd = &cobra.Command{
 					colorRedBold.Println("│")
 					colorRedBold.Println("│ Error")
 					colorRedBold.Println("│")
-					log.Fatal("Aborting : MD5 checksum does not match")
+					log.Fatal("Aborting : SHA256 checksum does not match")
 				} else {
 					fmt.Println("│")
-					colorGreenBold.Println("│ MD5 Config Hash Match")
+					colorGreenBold.Println("│ SHA256 Config Hash Match")
 					fmt.Println("│")
 				}
 			}
@@ -196,7 +213,7 @@ var configCmd = &cobra.Command{
 
 		} else {
 			fmt.Println("│")
-			fmt.Println("│ No updates detected")
+			colorYellowBold.Println("│ No updates detected")
 			fmt.Println("│")
 			fmt.Println("└")
 		}
@@ -207,6 +224,7 @@ var configCmd = &cobra.Command{
 func init() {
 
 	configCmd.PersistentFlags().BoolP("reset", "r", false, "Reset config file")
+	configCmd.PersistentFlags().BoolP("b64", "b", false, "Return the policy file in B64")
 	configCmd.PersistentFlags().StringVarP(&addCfgFile, "add", "a", "", "Add config file (yaml)")
 	configCmd.PersistentFlags().StringVarP(&hashCfgFile, "hash", "k", "", "Config file SHA256 Hash")
 
