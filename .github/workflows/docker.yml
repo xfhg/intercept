@@ -67,3 +67,10 @@ jobs:
         context: .
         push: true
         tags: ghcr.io/${{ github.repository }}:latest
+
+    - name: Build and push Docker image to GHCR
+      uses: docker/build-push-action@v2
+      with:
+        context: .
+        push: true
+        tags: ghcr.io/${{ github.repository }}:${{ steps.get_version.outputs.VERSION }}
