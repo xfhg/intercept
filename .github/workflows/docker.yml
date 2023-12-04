@@ -20,8 +20,10 @@ jobs:
 
     - name: Fetch Tags
       run: |
-        git fetch --tags -f
-        git describe --tags --always
+          git fetch --tags -f
+          TAG=$(git describe --tags --always)
+          VERSION=${TAG#v}
+          echo "VERSION=$VERSION" >> $GITHUB_ENV
 
     - name: Get dependencies
       run: |
@@ -54,6 +56,13 @@ jobs:
         push: true
         tags: xfhg/intercept:latest
 
+    - name: Build and push Docker image with TAG
+      uses: docker/build-push-action@v2
+      with:
+        context: .
+        push: true
+        tags: xfhg/intercept:${{ env.VERSION }}
+
     - name: Login to GitHub Container Registry
       uses: docker/login-action@v1
       with:
@@ -68,9 +77,12 @@ jobs:
         push: true
         tags: ghcr.io/${{ github.repository }}:latest
 
-    - name: Build and push Docker image to GHCR
+    - name: Build and push Docker image to GHCR with TAG
       uses: docker/build-push-action@v2
       with:
         context: .
         push: true
-        tags: ghcr.io/${{ github.repository }}:${{ steps.get_version.outputs.VERSION }}
+        tags: ghcr.io/${{ github.repository }}:${{ env.VERSION }}
+
+        
+
