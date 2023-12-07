@@ -105,7 +105,7 @@ docker run -v --rm -w $PWD -v $PWD:$PWD -e TERM=xterm-256color ghcr.io/xfhg/inte
 Build & mess around with it :
 
 ```
-make with-docker
+make gh-actions
 ```
 
 <center>
