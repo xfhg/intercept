@@ -9,7 +9,7 @@ all: purge-output prepare compress-tool windows linux macos out-full out-linux o
 
 with-docker : purge-output prepare windows linux macos out-devbox out-linux out-macos out-win sha256sums
 
-gh-actions : purge-output prepare linux out-gh-actions out-linux 
+gh-actions : purge-output prepare linux out-gh-actions out-linux run-testbox
 
 version:  
 	touch release/$(TAG)_$(VERSION)-$(MOMENT)
@@ -31,15 +31,18 @@ compress-tool:
 mod-needs-update:
 	go list -m -u all
 
-mod:
+mod-update:
 	go get -u
 	go mod verify
+	go mod tidy
+
+mod-safe:
 	go mod tidy
 
 global: windows linux macos
 	go install
 
-clean: mod
+clean: mod-safe
 	go clean
 	rm -rf bin/
 
