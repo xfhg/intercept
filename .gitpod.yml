@@ -1,6 +1,6 @@
 
 tasks:
   - init: make clean
-    command: make with-docker
+    command: make gh-actions
 
 
