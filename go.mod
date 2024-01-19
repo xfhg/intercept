@@ -6,7 +6,7 @@ require (
 	cuelang.org/go v0.6.0
 	github.com/BurntSushi/toml v1.3.2
 	github.com/blang/semver v3.5.1+incompatible
-	github.com/go-resty/resty/v2 v2.10.0
+	github.com/go-resty/resty/v2 v2.11.0
 	github.com/gookit/color v1.5.4
 	github.com/gosuri/uitable v0.0.4
 	github.com/itchyny/gojq v0.12.14
