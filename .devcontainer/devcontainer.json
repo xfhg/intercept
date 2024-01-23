@@ -1,4 +1,5 @@
 // For format details, see https://aka.ms/devcontainer.json. For config options, see the
+
 // README at: https://github.com/devcontainers/templates/tree/main/src/go
 {
 	"name": "Go",
@@ -12,10 +13,12 @@
 	// Features to add to the dev container. More info: https://containers.dev/features.
 	// "features": {},
 
+
 	// Use 'forwardPorts' to make a list of ports inside the container available locally.
 	// "forwardPorts": [],
 
 	// Use 'postCreateCommand' to run commands after the container is created.
+
 	// "postCreateCommand": "go version",
 
 	// Configure tool-specific properties.

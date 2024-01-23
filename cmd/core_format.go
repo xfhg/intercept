@@ -299,7 +299,7 @@ func GenerateSarif(calledby string) {
 		pb.Add("impact", r.RuleError)
 		pb.Add("resolution", r.RuleSolution)
 
-		run.AddRule(strings.Join([]string{"intercept.cc.audit.policy.", r.RuleID, ": ", strings.ToUpper(r.RuleName)}, "")).
+		run.AddRule(strings.Join([]string{"intercept.cc.", strings.ToLower(r.RuleType), ".policy.", r.RuleID, ": ", strings.ToUpper(r.RuleName)}, "")).
 			WithDescription(r.RuleDescription).
 			WithHelpURI("https://intercept.cc").
 			WithProperties(pb.Properties).
@@ -328,7 +328,7 @@ func GenerateSarif(calledby string) {
 			Text: &snippetText,
 		}
 
-		run.CreateResultForRule(strings.Join([]string{"intercept.cc.audit.policy.", r.RuleID, ": ", strings.ToUpper(r.RuleName)}, "")).
+		run.CreateResultForRule(strings.Join([]string{"intercept.cc.", strings.ToLower(r.RuleType), ".policy.", r.RuleID, ": ", strings.ToUpper(r.RuleName)}, "")).
 			WithLevel(strings.ToLower(ResultLevel)).
 			WithMessage(sarif.NewTextMessage(r.RuleDescription)).
 			AddLocation(
