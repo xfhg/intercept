@@ -71,10 +71,10 @@ func validateJSONAndCUEContent(jsonContent string, cueContent string) (bool, str
 
 	var keysA, keysB KeyArray
 	if err := json.Unmarshal([]byte(cueoutputJSON), &keysA); err != nil {
-		return false, fmt.Sprintf("Error unmarshaling :", err)
+		return false, fmt.Sprintf("Error unmarshaling %v", err)
 	}
 	if err := json.Unmarshal([]byte(alloutputJSON), &keysB); err != nil {
-		return false, fmt.Sprintf("Error unmarshaling :", err)
+		return false, fmt.Sprintf("Error unmarshaling %v", err)
 	}
 	keysExist := allKeysExist(keysA.Keys, keysB.Keys)
 

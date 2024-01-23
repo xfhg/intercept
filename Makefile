@@ -166,7 +166,7 @@ dev-test:
 	./tests/venom run tests/suite.yml
 
 x-docker:
-	docker build -t intercept .
+	docker build --platform linux/amd64,linux/arm64,linux/arm/v7 -t intercept .
 
 build-testbox:
 	docker build -t test/intercept -f Dockerfile.test .
