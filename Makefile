@@ -9,7 +9,7 @@ all: purge-output prepare compress-tool windows linux macos out-full out-linux o
 
 with-docker : purge-output prepare windows linux macos out-devbox out-linux out-macos out-win sha256sums
 
-gh-actions : purge-output prepare linux out-gh-actions out-linux run-testbox
+gh-actions : purge-output prepare linux out-gh-actions out-linux
 
 version:  
 	touch release/$(TAG)_$(VERSION)-$(MOMENT)
