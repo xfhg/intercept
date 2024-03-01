@@ -16,10 +16,21 @@ import (
 	"github.com/kardianos/osext"
 	homedir "github.com/mitchellh/go-homedir"
 	"github.com/pelletier/go-toml"
+	"github.com/spf13/viper"
 )
 
 type KeyArray struct {
 	Keys []string `json:"keys"`
+}
+
+func loadUpRules() *allRules {
+
+	err := viper.Unmarshal(&rules)
+	if err != nil {
+		colorRedBold.Println("│ Unable to decode config struct : ", err)
+	}
+	return rules
+
 }
 
 func cleanupFiles() {
