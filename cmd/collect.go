@@ -16,9 +16,9 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var auditCmd = &cobra.Command{
-	Use:   "audit",
-	Short: "INTERCEPT / AUDIT - Scan a target path against configured policy rules",
+var collectCmd = &cobra.Command{
+	Use:   "collect",
+	Short: "INTERCEPT / collect - collect a target path against configured policy rules",
 	Long:  ``,
 	Run: func(cmd *cobra.Command, args []string) {
 
@@ -140,7 +140,7 @@ var auditCmd = &cobra.Command{
 
 				case "scan":
 
-					processScanType(value)
+					// processScanType(value)
 
 				case "collect":
 
@@ -154,7 +154,7 @@ var auditCmd = &cobra.Command{
 
 			}
 
-			GenerateSarif("audit")
+			GenerateSarif("collect")
 
 			fmt.Println("│")
 			fmt.Println("│")
@@ -267,12 +267,12 @@ var auditCmd = &cobra.Command{
 
 func init() {
 
-	auditCmd.PersistentFlags().StringVarP(&scanPath, "target", "t", ".", "scanning Target path")
-	auditCmd.PersistentFlags().BoolP("no-exceptions", "x", false, "disables the option to deactivate rules by eXception")
-	auditCmd.PersistentFlags().StringVarP(&scanTags, "tags", "i", "", "include only rules with the specified tag")
-	auditCmd.PersistentFlags().StringVarP(&scanBreak, "break", "b", "true", "disable exit 1 for fatal rules")
-	auditCmd.PersistentFlags().StringVarP(&scanTurbo, "silenturbo", "s", "false", "disable verbose output enabling turbo mode")
+	collectCmd.PersistentFlags().StringVarP(&scanPath, "target", "t", ".", "scanning Target path")
+	collectCmd.PersistentFlags().BoolP("no-exceptions", "x", false, "disables the option to deactivate rules by eXception")
+	collectCmd.PersistentFlags().StringVarP(&scanTags, "tags", "i", "", "include only rules with the specified tag")
+	collectCmd.PersistentFlags().StringVarP(&scanBreak, "break", "b", "true", "disable exit 1 for fatal rules")
+	collectCmd.PersistentFlags().StringVarP(&scanTurbo, "silenturbo", "s", "false", "disable verbose output enabling turbo mode")
 
-	rootCmd.AddCommand(auditCmd)
+	rootCmd.AddCommand(collectCmd)
 
 }

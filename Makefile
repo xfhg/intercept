@@ -171,9 +171,12 @@ x-docker:
 build-testbox:
 	docker build -t test/intercept -f Dockerfile.test .
 
-run-testbox: build-testbox
+testbox: build-testbox
 	docker run -it -v $(shell pwd)/examples:/app/examples test/intercept
 
+alfred:
+	docker run -d -p 5000:5000 dolevf/alfred:latest
+	
 ## help: prints this help message
 help:
 	@echo "Usage: \n"

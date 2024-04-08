@@ -6,8 +6,7 @@
 	// Or use a Dockerfile or Docker Compose file. More info: https://containers.dev/guide/dockerfile
 	"image": "mcr.microsoft.com/devcontainers/go:1-1.21-bullseye",
 	"features": {
-		"ghcr.io/devcontainers/features/docker-in-docker:2": {},
-		"ghcr.io/devcontainers-contrib/features/upx:1": {}
+		"ghcr.io/devcontainers/features/docker-in-docker:2": {}
 	}
 
 	// Features to add to the dev container. More info: https://containers.dev/features.

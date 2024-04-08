@@ -1,0 +1,42 @@
+Banner: |
+
+  | REGO file tests
+
+Rules:
+  # - name: REGO SIMPLE
+  #   id: 100
+  #   description: Rego test
+  #   error: This violation immediately blocks your code deployment
+  #   tags: KEY
+  #   type: rego
+  #   fatal: true
+  #   enforcement: true
+  #   environment: all
+  #   confidence: high
+  #   rego_filepattern: '^_.*\.json$'
+  #   rego_policy_file: simple.rego
+  #   rego_policy_query: data.examples.is_big
+    
+  - name: REGO COMPLEX
+    id: 101
+    description: Rego test
+    error: This violation immediately blocks your code deployment
+    tags: KEY
+    type: rego
+    fatal: true
+    enforcement: true
+    environment: all
+    confidence: high
+    rego_filepattern: '^input_test.json$'
+    rego_policy_file: complex.rego
+    rego_policy_data: policy_data.json
+    rego_policy_query: |
+      data.app.abac.result
+
+
+
+
+
+ExitCritical: "Critical irregularities found in your code"
+ExitWarning: "Irregularities found in your code"
+ExitClean: "Clean report"
