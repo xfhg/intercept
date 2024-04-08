@@ -4,7 +4,7 @@
 
 </p>
 
-# INTERCEPT v0.15.X
+# INTERCEPT v0.16.X
 
 **intercept** is a DevSecOps cli multi-tool designed to provide Static Application Security Testing (SAST) capabilities to software development teams. The tool aims to help developers identify and address security vulnerabilities in their code and API endpoints early in the software development life cycle, reducing the risk of security breaches and ensuring compliance with industry regulations. intercept leverages a range of security scanning techniques to analyze code, including pattern matching, code analysis, and vulnerability scanning. It is seamless to integrate, with a simple sub-second command-line interface and granular customizable configuration options. With intercept, developers can speed up security and integration testing into their development workflows and make security a critical yet seamless part of their software development process.
 
@@ -40,15 +40,15 @@
 
 - **Pattern matching:** intercept uses regex pattern matching technique to scan code for known vulnerabilities and customised patterns, reducing the time and effort required to identify and fix these common issues. [Library with more than 1500 patterns](https://github.com/xfhg/intercept/tree/master/policy/unstable.yaml) 
 - **Customizable rules:** intercept allows users to customize all security rules used to scan their code, making it possible to tailor the scanning process to the specific requirements of their application or organization.
+- **REGO/OPA Compatible Ruleset:** Leverage REGO for Open Policy Agent (OPA) policies to enforce comprehensive governance across your cloud-native stack. Validate, audit, and ensure full compatibility of JSON/YAML configurations, Kubernetes resources, Terraform plans, and inter-service API requests. Streamline policy enforcement and backward compatibility checks within distributed systems and microservices architecture.
 - **API endpoint checks:** intercept supports gathering API data and applying the same pattern matching policies throughout it's response, complete with full telemetry.
 - **Integration with CI/CD:** intercept can easily be integrated into continuous integration and continuous deployment (CI/CD) pipelines, allowing security testing to be performed automatically as part of the development process.
 - **Detailed reporting:** intercept provides detailed reports on vulnerabilities and security issues, _fully compliant SARIF output_, including severity ratings and remediation advice, making it easy for developers to prioritize and address security concerns early on.
 - **Support for any programming language:** intercept supports scanning through any programming languages or file types,  making it a versatile tool for security testing across a range of applications and environments.
-- **CUE Lang compatible ruleset:** intercept CUE Lang policies reduce boilerplate in large-scale configurations. Validate text-based YML/TOML data files or programmatic data such as incoming RPCs and validate backwards compatibility.
+- **CUE Lang compatible ruleset:** intercept CUE Lang policies/schemas reduce boilerplate in large-scale configurations. Validate text-based YAML/TOML/JSON data files or programmatic data such as incoming RPCs and validate backwards compatibility.
 - **No daemons, low footprint, self-updatable binary**
-- **Ultra flexible fine-grained regex policies**
+- **Ultra flexible fine-grained regex policies or highly detailed REGO logic**
 - **No custom policy language, reduced complexity**
-- New **CUE Lang schemas** normalized and simplified representations of constraints
 - **Weaponised** ripgrep on steroids (CUE Lang + API checks)
 - **Open source**
 
@@ -100,12 +100,13 @@ docker run -v --rm -w $PWD -v $PWD:$PWD -e TERM=xterm-256color ghcr.io/xfhg/inte
 
 <img src="static/1F6DD.svg " width="80">
 
-# Sandbox Playground + [CUE](https://cuelang.org/play/#cue@export@cue)
+# Sandbox Playground + [CUE](https://cuelang.org/play/#cue@export@cue) + REGO
 
 Build & mess around with it :
 
 ```
 make gh-actions
+make alfred
 ```
 
 <center>
@@ -113,7 +114,6 @@ make gh-actions
 [![Open in Gitpod](https://gitpod.io/button/open-in-gitpod.svg)](https://gitpod.io/#https://github.com/xfhg/intercept)
 
 </center>
-
 
 <br>
 <br>
@@ -172,7 +172,7 @@ intercept audit -t examples/target -e "development" -i "AWS"
 
 ## Policy File Structure
 
-These are 7 types of policies available :
+These are 8 types of policies available :
 
 - **scan** : where we enforce breaking rules on matched patterns
 - **collect** : where we just collect matched patterns
@@ -181,6 +181,7 @@ These are 7 types of policies available :
 - **yml** : assure rules with CUE Lang schemas for YAML
 - **toml** : assure rules with CUE Lang schemas for TOML
 - **json** : assure rules with CUE Lang schemas for JSON
+- **rego** : assure rules/queries within REGO policies for JSON
 
 Easy to read and compose the rules file have this minimal required structure:
 
@@ -330,10 +331,8 @@ intercept audit -t examples/target -i "AWS,OWASP"
 ```sh
 intercept api -i "AWS,OWASP"
 ```
-- TURBO SILENT mode
-```sh
-intercept audit -t examples/target -s true
-```
+
+
 - Run only the YML type checks
 ```sh
 intercept yml -t examples/target 
@@ -407,7 +406,7 @@ You can set three enforcement levels:
 
 
 
-# Standing on the shoulders of giants - [ripgrep](https://github.com/BurntSushi/ripgrep) + [cue](https://github.com/cue-lang/cue)
+# Standing on the shoulders of giants - [ripgrep](https://github.com/BurntSushi/ripgrep) + [cue](https://github.com/cue-lang/cue) + [rego](https://play.openpolicyagent.org/p/ZWGVA8oCSE)
 
 - It is built on top of Rust's regex engine. Rust's regex engine uses finite automata, SIMD and aggressive literal optimizations to make searching very fast. (PCRE2 support)
 - Rust's regex library maintains performance with full Unicode support by building UTF-8 decoding directly into its deterministic finite automaton engine.
@@ -415,6 +414,7 @@ It supports searching with either memory maps or by searching incrementally with
 - Applies your ignore patterns in .gitignore files using a RegexSet. That means a single file path can be matched against multiple glob patterns simultaneously.
 - It uses a lock-free parallel recursive directory iterator, courtesy of crossbeam and ignore.
 - **same engine used on vscode search**
+- **Rego** was inspired by Datalog, which is a well understood, decades old query language. Rego extends Datalog to support structured document models such as JSON. Rego queries are assertions on your data. These queries can be used to define policies that enumerate instances of data that violate the expected state of the system.
 - **CUE** merges the notion of schema and data. The same CUE definition can simultaneously be used for validating data and act as a template to reduce boilerplate. Schema definition is enriched with fine-grained value definitions and default values. At the same time, data can be simplified by removing values implied by such detailed definitions. The merging of these two concepts enables many tasks to be handled in a principled way.
 - Constraints provide a simple and well-defined, yet powerful, alternative to inheritance, a common source of complexity with configuration languages.
 
@@ -464,17 +464,6 @@ A straight-up comparison between ripgrep, ugrep and GNU grep on a single large f
 
 <br>
 <br>
-<br>
-<br>
-
-
-## Patterns optimized with
-
-<p>
-
-<img src="static/openai.svg" width="275">
-
-</p>
 <br>
 <br>
 
