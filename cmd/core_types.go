@@ -53,7 +53,11 @@ type Rule struct {
 	Toml_Structure   string   `yaml:"toml_structure,omitempty"`
 	Json_Filepattern string   `yaml:"json_filepattern,omitempty"`
 	Json_Structure   string   `yaml:"json_structure,omitempty"`
-	Patterns         []string `yaml:"patterns"`
+	Rego_Filepattern string   `yaml:"rego_filepattern,omitempty"`
+	Rego_Policy_File      string   `yaml:"rego_policy_file,omitempty"`
+	Rego_Policy_Data      string   `yaml:"rego_policy_data,omitempty"`
+	Rego_Policy_Query       string   `yaml:"rego_policy_query,omitempty"`
+	Patterns         []string `yaml:"patterns,omitempty"`
 }
 
 type allRules struct {

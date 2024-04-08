@@ -178,7 +178,7 @@ var scanCmd = &cobra.Command{
 				LogError(_jerr)
 			}
 
-			_jwerr := os.WriteFile("stats.json", jsonstats, 0644)
+			_jwerr := os.WriteFile("intercept.stats.json", jsonstats, 0644)
 			if _jwerr != nil {
 				LogError(_jwerr)
 			}

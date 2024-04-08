@@ -4,21 +4,17 @@ import (
 	"encoding/json"
 	"fmt"
 	"path/filepath"
-	"runtime"
-	"strconv"
-	"sync"
 	"time"
 
 	"os"
-	"strings"
 
 	"github.com/gosuri/uitable"
 	"github.com/spf13/cobra"
 )
 
-var auditCmd = &cobra.Command{
-	Use:   "audit",
-	Short: "INTERCEPT / AUDIT - Scan a target path against configured policy rules",
+var regoCmd = &cobra.Command{
+	Use:   "rego",
+	Short: "INTERCEPT / REGO - Scan a target path against OPA policy rules",
 	Long:  ``,
 	Run: func(cmd *cobra.Command, args []string) {
 
@@ -120,10 +116,10 @@ var auditCmd = &cobra.Command{
 					continue
 				}
 
-				searchPatternFile := strings.Join([]string{pwddir, "/", "search_regex_", strconv.Itoa(value.ID)}, "")
+				// searchPatternFile := strings.Join([]string{pwddir, "/", "search_regex_", strconv.Itoa(value.ID)}, "")
 
-				searchPattern := []byte(strings.Join(value.Patterns, "\n") + "\n")
-				_ = os.WriteFile(searchPatternFile, searchPattern, 0644)
+				// searchPattern := []byte(strings.Join(value.Patterns, "\n") + "\n")
+				// _ = os.WriteFile(searchPatternFile, searchPattern, 0644)
 
 				switch value.Type {
 
@@ -140,21 +136,26 @@ var auditCmd = &cobra.Command{
 
 				case "scan":
 
-					processScanType(value)
+					// processScanType(value)
+
+				case "rego":
+
+					processRegoType(value)
 
 				case "collect":
 
-					processCollectType(value)
+					// processCollectType(value)
 
 				default:
 
 				}
 
-				_ = os.Remove(searchPatternFile)
+				// _ = os.Remove(searchPatternFile)
 
 			}
 
-			GenerateSarif("audit")
+			GenerateSarif("rego")
+			GenerateComplianceSarif(rCompliance)
 
 			fmt.Println("│")
 			fmt.Println("│")
@@ -216,45 +217,10 @@ var auditCmd = &cobra.Command{
 
 			}
 
-		} else {
+		} 
 
-			startTime = time.Now()
-			formattedTime := startTime.Format("2006-01-02 15:04:05")
-			fmt.Println("├ S ", formattedTime)
-			fmt.Print("│")
+		
 
-			numCPU := runtime.NumCPU()
-
-			var wg sync.WaitGroup
-			wg.Add(len(rules.Rules))
-
-			sem := make(chan struct{}, numCPU*2)
-
-			rulesChan := make(chan Rule, len(rules.Rules))
-
-			for i := 0; i < numCPU; i++ {
-				go func(workerID int) {
-					for rule := range rulesChan {
-						sem <- struct{}{} // Acquire a token
-
-						tagfound := FindMatchingString(scanTags, rule.Tags, ",")
-						if tagfound || scanTags == "" {
-							worker(workerID, sem, &wg, rgembed, pwddir, scanPath, rule)
-						} else {
-							wg.Done() // Call wg.Done() if the worker skips the rule
-						}
-					}
-				}(i)
-			}
-
-			for _, policy := range rules.Rules {
-				rulesChan <- policy
-			}
-
-			close(rulesChan)
-
-			wg.Wait()
-		}
 		endTime := time.Now()
 		duration := endTime.Sub(startTime)
 		formattedTime = endTime.Format("2006-01-02 15:04:05")
@@ -267,12 +233,12 @@ var auditCmd = &cobra.Command{
 
 func init() {
 
-	auditCmd.PersistentFlags().StringVarP(&scanPath, "target", "t", ".", "scanning Target path")
-	auditCmd.PersistentFlags().BoolP("no-exceptions", "x", false, "disables the option to deactivate rules by eXception")
-	auditCmd.PersistentFlags().StringVarP(&scanTags, "tags", "i", "", "include only rules with the specified tag")
-	auditCmd.PersistentFlags().StringVarP(&scanBreak, "break", "b", "true", "disable exit 1 for fatal rules")
-	auditCmd.PersistentFlags().StringVarP(&scanTurbo, "silenturbo", "s", "false", "disable verbose output enabling turbo mode")
+	regoCmd.PersistentFlags().StringVarP(&scanPath, "target", "t", ".", "scanning Target path")
+	regoCmd.PersistentFlags().BoolP("no-exceptions", "x", false, "disables the option to deactivate rules by eXception")
+	regoCmd.PersistentFlags().StringVarP(&scanTags, "tags", "i", "", "include only rules with the specified tag")
+	regoCmd.PersistentFlags().StringVarP(&scanBreak, "break", "b", "true", "disable exit 1 for fatal rules")
+	regoCmd.PersistentFlags().StringVarP(&scanTurbo, "silenturbo", "s", "false", "disable verbose output enabling turbo mode")
 
-	rootCmd.AddCommand(auditCmd)
+	rootCmd.AddCommand(regoCmd)
 
 }

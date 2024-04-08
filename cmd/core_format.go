@@ -303,7 +303,7 @@ func GenerateSarif(calledby string) {
 			WithDescription(r.RuleDescription).
 			WithHelpURI("https://intercept.cc").
 			WithProperties(pb.Properties).
-			WithMarkdownHelp("# INTERCEPT.CC").WithTextHelp(r.RuleSolution)
+			WithMarkdownHelp("# INTERCEPT.CC ").WithTextHelp(r.RuleSolution)
 
 		run.AddDistinctArtifact(r.Data.Path.Text)
 
@@ -372,6 +372,8 @@ func FileToBase64(filepath string) string {
 	fileBase64 := base64.StdEncoding.EncodeToString(fileBytes)
 	return fileBase64
 }
+
+
 
 func GenerateComplianceSarif(results InterceptComplianceOutput) {
 
@@ -525,4 +527,22 @@ func GenerateApiSARIF() {
 		}
 	}
 
+}
+
+
+func readExternalData(filePath string) (map[string]interface{}, error) {
+    var data map[string]interface{}
+
+    // Read the file
+    fileData, err := os.ReadFile(filePath)
+    if err != nil {
+        return nil, err
+    }
+
+    // Unmarshal the JSON data into a map
+    if err := json.Unmarshal(fileData, &data); err != nil {
+        return nil, err
+    }
+
+    return data, nil
 }

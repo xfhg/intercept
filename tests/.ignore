@@ -1,2 +1,4 @@
 search_regex
 config.yaml
+intercept.*
+stats.json
