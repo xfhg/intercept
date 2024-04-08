@@ -49,7 +49,7 @@
 - **No daemons, low footprint, self-updatable binary**
 - **Ultra flexible fine-grained regex policies or highly detailed REGO logic**
 - **No custom policy language, reduced complexity**
-- **Weaponised** ripgrep on steroids (CUE Lang + API checks)
+- **Weaponised** ripgrep on steroids (REGO policies + CUE Lang schemas + API data checks)
 - **Open source**
 
 <br>
