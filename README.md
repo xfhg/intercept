@@ -23,7 +23,7 @@
 [![docker size](https://badgen.net/docker/size/xfhg/intercept)](https://badgen.net/docker/size/xfhg/intercept)
 [![docker pulls](https://badgen.net/docker/pulls/xfhg/intercept)](https://badgen.net/docker/pulls/xfhg/intercept)
 
-[![CodeQL](https://github.com/xfhg/intercept/actions/workflows/codeql.yml/badge.svg)](https://github.com/xfhg/intercept/actions/workflows/codeql.yml)
+
 ![GitHub pull requests](https://img.shields.io/github/issues-pr-raw/xfhg/intercept)
 [![intercept Release](https://github.com/xfhg/intercept/actions/workflows/release.yml/badge.svg)](https://github.com/xfhg/intercept/actions/workflows/release.yml)
 
@@ -100,13 +100,12 @@ docker run -v --rm -w $PWD -v $PWD:$PWD -e TERM=xterm-256color ghcr.io/xfhg/inte
 
 <img src="static/1F6DD.svg " width="80">
 
-# Sandbox Playground + [CUE](https://cuelang.org/play/#cue@export@cue) + REGO
+# Sandbox Playground + [CUE](https://cuelang.org/play/#cue@export@cue) + [REGO](https://play.openpolicyagent.org/p/ZWGVA8oCSE)
 
 Build & mess around with it :
 
 ```
 make gh-actions
-make alfred
 ```
 
 <center>
@@ -406,7 +405,7 @@ You can set three enforcement levels:
 
 
 
-# Standing on the shoulders of giants - [ripgrep](https://github.com/BurntSushi/ripgrep) + [cue](https://github.com/cue-lang/cue) + [rego](https://play.openpolicyagent.org/p/ZWGVA8oCSE)
+## Standing on the shoulders of giants - [ripgrep](https://github.com/BurntSushi/ripgrep) + [cue](https://github.com/cue-lang/cue) + [rego](https://play.openpolicyagent.org/p/ZWGVA8oCSE)
 
 - It is built on top of Rust's regex engine. Rust's regex engine uses finite automata, SIMD and aggressive literal optimizations to make searching very fast. (PCRE2 support)
 - Rust's regex library maintains performance with full Unicode support by building UTF-8 decoding directly into its deterministic finite automaton engine.
