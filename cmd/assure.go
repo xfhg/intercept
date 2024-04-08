@@ -195,7 +195,7 @@ var assureCmd = &cobra.Command{
 			LogError(_jerr)
 		}
 
-		_jwerr := os.WriteFile("stats.json", assurestats, 0644)
+		_jwerr := os.WriteFile("intercept.stats.json", assurestats, 0644)
 		if _jwerr != nil {
 			LogError(_jwerr)
 		}
