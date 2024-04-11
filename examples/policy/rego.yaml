@@ -1,35 +1,21 @@
 Banner: |
 
-  | REGO file tests
+  | REGO COMPLEX SETUP
 
-Rules:
-  # - name: REGO SIMPLE
-  #   id: 100
-  #   description: Rego test
-  #   error: This violation immediately blocks your code deployment
-  #   tags: KEY
-  #   type: rego
-  #   fatal: true
-  #   enforcement: true
-  #   environment: all
-  #   confidence: high
-  #   rego_filepattern: '^_.*\.json$'
-  #   rego_policy_file: simple.rego
-  #   rego_policy_query: data.examples.is_big
-    
-  - name: REGO COMPLEX
-    id: 101
-    description: Rego test
+Rules:    
+  - name: REGO COMPLEX With DATA
+    id: 901
+    description: Rego Validation with external data
     error: This violation immediately blocks your code deployment
-    tags: KEY
+    tags: REGO
     type: rego
     fatal: true
     enforcement: true
     environment: all
     confidence: high
     rego_filepattern: '^input_test.json$'
-    rego_policy_file: complex.rego
-    rego_policy_data: policy_data.json
+    rego_policy_file: /app/examples/data/complex.rego
+    rego_policy_data: /app/examples/data/policy_data.json
     rego_policy_query: |
       data.app.abac.result
 

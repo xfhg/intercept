@@ -17,13 +17,11 @@ import (
 )
 
 var (
-
-	rCompliance   InterceptComplianceOutput
-	rRule         InterceptCompliance
+	rCompliance InterceptComplianceOutput
+	rRule       InterceptCompliance
 )
 
 func processRegoType(value Rule) {
-
 
 	exception := ContainsInt(rules.Exceptions, value.ID)
 
@@ -53,7 +51,6 @@ func processRegoType(value Rule) {
 			fmt.Println("│ REGO Query : ", value.Rego_Policy_Query)
 			fmt.Println("│ ")
 
-
 			// SARIF Structure for REGO
 			rRule = InterceptCompliance{}
 			rRule.RuleDescription = value.Description
@@ -64,15 +61,13 @@ func processRegoType(value Rule) {
 			rRule.RuleSolution = value.Solution
 			rRule.RuleType = value.Type
 
-
-			// Load REGO POLICY 
+			// Load REGO POLICY
 			policyBytes, err := os.ReadFile(value.Rego_Policy_File)
 			if err != nil {
 				LogError(fmt.Errorf("error reading REGO policy file: %s", err))
 				return
 			}
 			policyRules := string(policyBytes)
-
 
 			// Compile regex pattern
 			regex, err := regexp.Compile(value.Rego_Filepattern)
@@ -97,174 +92,170 @@ func processRegoType(value Rule) {
 			}
 
 			// Function to match files
-			err = filepath.Walk(scanPath, 
+			err = filepath.Walk(scanPath,
 				func(path string, info os.FileInfo, err error) error {
 
-				if err != nil {
-					return err
-				}
+					if err != nil {
+						return err
+					}
 
-				rFinding := InterceptComplianceFinding{}
+					rFinding := InterceptComplianceFinding{}
 
+					// Ignore directories and match files against regex pattern
+					if !info.IsDir() && regex.MatchString(info.Name()) {
 
-				// Ignore directories and match files against regex pattern
-				if !info.IsDir() && regex.MatchString(info.Name()) {
+						fmt.Println("│ Scanning..")
+						fmt.Println("│ File : " + path) // Print matched file path
+						filehash, _ := calculateSHA256(path)
+						fmt.Println("│ Hash : " + filehash)
+						fmt.Println("│")
 
-					fmt.Println("│ Scanning..")
-					fmt.Println("│ File : " + path) // Print matched file path
-					filehash, _ := calculateSHA256(path)
-					fmt.Println("│ Hash : " + filehash)
-					fmt.Println("│")
+						// -------------------------------------------------------------- Tracer
 
+						// Setup a Tracer for debugging
+						ctx := context.Background()
+						tracer := topdown.NewBufferTracer()
 
-					// -------------------------------------------------------------- Tracer
-					
-					// Setup a Tracer for debugging
-					ctx := context.Background()
-					tracer := topdown.NewBufferTracer()
+						// -------------------------------------------------------------- Input file
 
+						var input map[string]interface{}
 
-					
-					// -------------------------------------------------------------- Input file
-					
-					var input map[string]interface{}
-
-					input, err = readExternalData(path)
+						input, err = readExternalData(path)
 						if err != nil {
 							fmt.Println("Error reading external data:", err)
 							return nil
-					}
+						}
 
-					
+						// -------------------------------------------------------------- External Data
+						r := rego.New()
 
-					// -------------------------------------------------------------- External Data
+						if value.Rego_Policy_Data != "" {
+							var externalData map[string]interface{}
 
-
-					var externalData map[string]interface{}
-
-					externalData, err = readExternalData(value.Rego_Policy_Data)
-						if err != nil {
-							fmt.Println("Error reading external data:", err)
-							return nil
-					}
-
-					store := inmem.NewFromObject(externalData)
-
-
-					// -------------------------------------------------------------- New REGO
-					
-					r := rego.New(
-						rego.Query(value.Rego_Policy_Query),
-						rego.Module(value.Rego_Policy_File, policyRules),
-						rego.Input(input),
-						rego.Store(store),
-						rego.Tracer(tracer),
-					)
-				
-
-					// -------------------------------------------------------------- Prepare for Evaluation
-					query, err := r.PrepareForEval(ctx)
-					if err != nil {
-						LogError(fmt.Errorf("error preparing query: %s", err))
-						return nil
-					}
-					
-
-					// -------------------------------------------------------------- Evaluate
-					results, err := query.Eval(ctx,rego.EvalTracer(tracer))
-					if err != nil {
-						LogError(fmt.Errorf("error evaluating policy: %s", err))
-						return nil
-					}
-					
-				
-
-					// -------------------------------------------------------------- Print Tracer
-
-					fmt.Println("│ ")
-					colorGreenBold.Println("│ REGO Tracer : ")
-					fmt.Println("")
-					topdown.PrettyTrace(os.Stdout, *tracer)
-					fmt.Println("")
-					fmt.Println("│ ")
-
-				
-
-					// -------------------------------------------------------------- Check Compliance
-
-					rFinding = InterceptComplianceFinding{
-						FileName: path,
-						FileHash: filehash,
-						ParentID: value.ID,
-					}
-
-					for _, result := range results {
-						// Each result can have one or more expressions
-						for i, expression := range result.Expressions {
-						
-							fmt.Printf("│ Query %d : %s \n", i, expression.Text)
-							fmt.Printf("│ Result %d : ", i)
-							switch value := expression.Value.(type) {
-							case bool:
-								fmt.Println(value)
-							case float64, int, json.Number:
-								fmt.Println(value)
-							case string:
-								fmt.Println(value)
-							case map[string]interface{}:
-								for key, val := range value {
-									fmt.Printf(" %s : %v \n", key, val)
-								}
-							default:
-								fmt.Println("Unsupported type")
+							externalData, err = readExternalData(value.Rego_Policy_Data)
+							if err != nil {
+								fmt.Println("Error reading external data:", err)
+								return nil
 							}
 
+							store := inmem.NewFromObject(externalData)
+
+							// -------------------------------------------------------------- New REGO
+
+							r = rego.New(
+								rego.Query(value.Rego_Policy_Query),
+								rego.Module(value.Rego_Policy_File, policyRules),
+								rego.Input(input),
+								rego.Store(store),
+								rego.Tracer(tracer),
+							)
+
+						} else {
+							r = rego.New(
+								rego.Query(value.Rego_Policy_Query),
+								rego.Module(value.Rego_Policy_File, policyRules),
+								rego.Input(input),
+								rego.Tracer(tracer),
+							)
 						}
-					}
-					fmt.Println("│ ")
 
-					if results.Allowed() {
+						// -------------------------------------------------------------- Prepare for Evaluation
+						query, err := r.PrepareForEval(ctx)
+						if err != nil {
+							LogError(fmt.Errorf("error preparing query: %s", err))
+							return nil
+						}
 
-									colorGreenBold.Println("│ ")
-									colorGreenBold.Println("│ Compliant")
-									colorGreenBold.Println("│ ")
-									colorGreenBold.Println("├── ─")
-									fmt.Println("│")
-									stats.Clean++
-									stats.Total++
-									rFinding.Output = "COMPLIANT"
-									rFinding.Compliant = true
-									rFinding.Missing = false
+						// -------------------------------------------------------------- Evaluate
+						results, err := query.Eval(ctx, rego.EvalTracer(tracer))
+						if err != nil {
+							LogError(fmt.Errorf("error evaluating policy: %s", err))
+							return nil
+						}
 
-					}else{
-									colorRedBold.Println("│")
-									colorRedBold.Println("│ NON COMPLIANT : ")
-									colorRedBold.Println("│ ", value.Error)
-									colorRedBold.Println("│ ", value.Solution)
-									colorRedBold.Println("│")
-									colorRedBold.Println("├── ─")
-									fmt.Println("│")
-									stats.Dirty++
-									stats.Total++
-									rFinding.Output = "NON COMPLIANT"
-									rFinding.Compliant = false
-									rFinding.Missing = false
-									warning = true
-									envfound := FindMatchingString(cfgEnv, value.Environment, ",")
-									if (envfound || strings.Contains(value.Environment, "all") || value.Environment == "") && value.Fatal {
-										fatal = true
-										stats.Fatal++
+						// -------------------------------------------------------------- Print Tracer
+
+						fmt.Println("│ ")
+						colorGreenBold.Println("│ REGO Tracer : ")
+						fmt.Println("")
+						topdown.PrettyTrace(os.Stdout, *tracer)
+						fmt.Println("")
+						fmt.Println("│ ")
+
+						// -------------------------------------------------------------- Check Compliance
+
+						rFinding = InterceptComplianceFinding{
+							FileName: path,
+							FileHash: filehash,
+							ParentID: value.ID,
+						}
+
+						for _, result := range results {
+							// Each result can have one or more expressions
+							for i, expression := range result.Expressions {
+
+								fmt.Printf("│ Query %d : %s \n", i, expression.Text)
+								fmt.Printf("│ Result %d : ", i)
+								switch value := expression.Value.(type) {
+								case bool:
+									fmt.Println(value)
+								case float64, int, json.Number:
+									fmt.Println(value)
+								case string:
+									fmt.Println(value)
+								case map[string]interface{}:
+									for key, val := range value {
+										fmt.Printf(" %s : %v \n", key, val)
 									}
+								default:
+									fmt.Println("Unsupported type")
+								}
+
+							}
+						}
+						fmt.Println("│ ")
+
+						if results.Allowed() {
+
+							colorGreenBold.Println("│ ")
+							colorGreenBold.Println("│ Compliant")
+							colorGreenBold.Println("│ ")
+							colorGreenBold.Println("├── ─")
+							fmt.Println("│")
+							stats.Clean++
+							stats.Total++
+							rFinding.Output = "COMPLIANT"
+							rFinding.Compliant = true
+							rFinding.Missing = false
+
+						} else {
+							colorRedBold.Println("│")
+							colorRedBold.Println("│ NON COMPLIANT : ")
+							colorRedBold.Println("│ ", value.Error)
+							colorRedBold.Println("│ ", value.Solution)
+							colorRedBold.Println("│")
+							colorRedBold.Println("├── ─")
+							fmt.Println("│")
+							stats.Dirty++
+							stats.Total++
+							rFinding.Output = "NON COMPLIANT"
+							rFinding.Compliant = false
+							rFinding.Missing = false
+							warning = true
+							envfound := FindMatchingString(cfgEnv, value.Environment, ",")
+							if (envfound || strings.Contains(value.Environment, "all") || value.Environment == "") && value.Fatal {
+								fatal = true
+								stats.Fatal++
+							}
+						}
+
+						rRule.RuleFindings = append(rRule.RuleFindings, rFinding)
+
 					}
-
-					rRule.RuleFindings = append(rRule.RuleFindings, rFinding)
-
-					} 
 
 					return nil
 
 				},
-
 			)
 			if err != nil {
 
@@ -277,7 +268,6 @@ func processRegoType(value Rule) {
 
 		}
 
-		
 		rCompliance = append(rCompliance, rRule)
 
 	}

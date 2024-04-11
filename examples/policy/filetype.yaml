@@ -4,11 +4,11 @@ Banner: |
 
 Rules:
 
-  - name: YML ASSURE ingress enabled
+  - name: YML ASSURE - ingress enabled
     id: 151
     description: Assure ingress enabled
     error: Misconfiguration or omission is fatal
-    tags: KEY
+    tags: INGRESS
     type: yml
     fatal: false
     enforcement: true
@@ -20,11 +20,11 @@ Rules:
       ...
 
 
-  - name: YML ASSURE ingress disabled
+  - name: YML ASSURE - ingress disabled
     id: 152
     description: Assure ingress disabled
     error: Misconfiguration or omission is fatal
-    tags: KEY
+    tags: INGRESS
     type: yml
     fatal: false
     enforcement: true
@@ -35,11 +35,11 @@ Rules:
       ingress: {enabled: false}
       ...
 
-  - name: YML ASSURE memory limit
+  - name: YML ASSURE - memory limit
     id: 153
     description: Assure resources
     error: Misconfiguration or omission is fatal
-    tags: KEY
+    tags: MEMORY
     type: yml
     fatal: false
     enforcement: true
@@ -51,11 +51,11 @@ Rules:
       resources: {limits: { memory: "128Mi" }}
       ...
 
-  - name: TOML ASSURE database port
+  - name: TOML ASSURE - database port
     id: 133
     description: Assure database port
     error: Misconfiguration or omission is fatal
-    tags: KEY
+    tags: DB
     type: toml
     fatal: false
     enforcement: true
@@ -67,11 +67,11 @@ Rules:
       logging: {level : "info"}
       ...
 
-  - name: TOML ASSURE missing database port
+  - name: TOML ASSURE - missing database port
     id: 134
     description: Assure database port
     error: Misconfiguration or omission is fatal
-    tags: KEY
+    tags: PORT
     type: toml
     fatal: false
     enforcement: true
@@ -82,11 +82,11 @@ Rules:
       db: {port: 666 }
       ...
 
-  - name: JSON ASSURE missing database port
-    id: 134
+  - name: JSON ASSURE - missing database port
+    id: 144
     description: Assure database port
     error: Misconfiguration or omission is fatal
-    tags: KEY
+    tags: PORT
     type: json
     fatal: false
     enforcement: true
