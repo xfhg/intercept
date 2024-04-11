@@ -7,7 +7,8 @@ Rules:
     id: 100
     description: Private key committed to code version control
     error: This violation immediately blocks your code deployment
-    tags: AWS
+    solution: Revoke the detected key
+    tags: KEY,CERT,AWS
     type: scan
     fatal: true
     enforcement: true

@@ -16,3 +16,5 @@ config.yaml
 tests/venom
 venom*
 search_regex
+
+docs/node_modules/
