@@ -373,8 +373,6 @@ func FileToBase64(filepath string) string {
 	return fileBase64
 }
 
-
-
 func GenerateComplianceSarif(results InterceptComplianceOutput) {
 
 	report, err := sarif.New(sarif.Version210)
@@ -439,7 +437,7 @@ func GenerateComplianceSarif(results InterceptComplianceOutput) {
 							WithArtifactLocation(
 								sarif.NewSimpleArtifactLocation(rf.FileName),
 							).WithRegion(
-							sarif.NewSimpleRegion(0, 0).WithSnippet(&artifactContent),
+							sarif.NewSimpleRegion(1, 1).WithSnippet(&artifactContent),
 						),
 					),
 				)
@@ -529,20 +527,51 @@ func GenerateApiSARIF() {
 
 }
 
+func GenerateAssureSARIF() {
+
+	if FileExists("intercept.audit.sarif.json") && FileExists("intercept.assure.sarif.json") {
+
+		mergedSARIF, err := MergeSARIFFiles("intercept.audit.sarif.json", "intercept.assure.sarif.json")
+		if err != nil {
+			LogError(err)
+		}
+
+		mergedData, err := json.MarshalIndent(mergedSARIF, "", "    ")
+		if err != nil {
+			LogError(err)
+		}
+
+		if err := os.WriteFile("intercept.assure.full.sarif.json", mergedData, 0644); err != nil {
+			LogError(err)
+		}
+
+	} else {
+
+		auditdata, err := os.ReadFile("intercept.audit.sarif.json")
+		if err != nil {
+			LogError(err)
+		}
+
+		if err := os.WriteFile("intercept.assure.full.sarif.json", auditdata, 0644); err != nil {
+			LogError(err)
+		}
+	}
+
+}
 
 func readExternalData(filePath string) (map[string]interface{}, error) {
-    var data map[string]interface{}
+	var data map[string]interface{}
 
-    // Read the file
-    fileData, err := os.ReadFile(filePath)
-    if err != nil {
-        return nil, err
-    }
+	// Read the file
+	fileData, err := os.ReadFile(filePath)
+	if err != nil {
+		return nil, err
+	}
 
-    // Unmarshal the JSON data into a map
-    if err := json.Unmarshal(fileData, &data); err != nil {
-        return nil, err
-    }
+	// Unmarshal the JSON data into a map
+	if err := json.Unmarshal(fileData, &data); err != nil {
+		return nil, err
+	}
 
-    return data, nil
+	return data, nil
 }

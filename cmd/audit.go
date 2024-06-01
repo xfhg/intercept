@@ -135,8 +135,7 @@ var auditCmd = &cobra.Command{
 
 				case "assure":
 
-					// moved to its own command - will compile here later
-					// processAssureType(value)
+					processAssureType(value)
 
 				case "scan":
 

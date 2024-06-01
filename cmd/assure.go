@@ -143,6 +143,7 @@ var assureCmd = &cobra.Command{
 
 			GenerateSarif("assure")
 			GenerateComplianceSarif(aCompliance)
+			GenerateAssureSARIF()
 
 		} else {
 

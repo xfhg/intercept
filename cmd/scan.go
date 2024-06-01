@@ -127,24 +127,9 @@ var scanCmd = &cobra.Command{
 
 				switch value.Type {
 
-				case "api":
-
-					// moved to its own command - will compile here later
-					// gatheringData(value, false)
-					// processAPIType(value, false)
-
-				case "assure":
-
-					// moved to its own command - will compile here later
-					// processAssureType(value)
-
 				case "scan":
 
 					processScanType(value)
-
-				case "collect":
-
-					// processCollectType(value)
 
 				default:
 

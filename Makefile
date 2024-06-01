@@ -158,6 +158,10 @@ dev-macos: clean purge prepare macos
 	cp bin/interceptm release/interceptm
 	cp .ignore release/.ignore
 
+dev-arm-macos: clean purge prepare macos-arm
+	cp bin/interceptma release/interceptma
+	cp .ignore release/.ignore
+
 dev-linux: clean purge prepare linux 
 	cp bin/interceptl release/interceptl
 	cp .ignore release/.ignore
@@ -176,7 +180,16 @@ testbox: build-testbox
 
 alfred:
 	docker run -d -p 5000:5000 dolevf/alfred:latest
-	
+
+
+sbom:
+	spdx-sbom-generator -f json
+# https://github.com/opensbom-generator/spdx-sbom-generator/blob/main/README.md
+
+sbom-check:
+#https://github.com/devops-kung-fu/bomber
+	bomber scan bom-go-mod.json
+
 ## help: prints this help message
 help:
 	@echo "Usage: \n"

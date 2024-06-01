@@ -42,6 +42,6 @@ pet_is_adopted if data.pet_attributes[input.resource].adopted == true
 
 controlstat := 5 if allow
 
-result if controlstat > 3
+result if controlstat > 5
 
 
