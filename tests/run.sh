@@ -19,15 +19,15 @@ intercept config -r
 intercept config -a /app/examples/policy/assure.yaml
 # #
 
-intercept audit -t /app/examples/target -i "AWS" -b "false"
+intercept audit -t /app/examples/target -i "AWS" -b "false" -s "false"
 cat intercept.audit.sarif.json
 
-intercept scan -t /app/examples/target -i "AWS" -b "false"
-cat intercept.audit.sarif.json
+# intercept scan -t /app/examples/target -i "AWS" -b "false"
+# cat intercept.audit.sarif.json
 
-intercept assure -t /app/examples/target -i "AWS" -b "false"
-ls -la
-cat intercept.audit.sarif.json
+# intercept assure -t /app/examples/target -i "AWS" -b "false"
+# ls -la
+# cat intercept.audit.sarif.json
 
 ##################################
 

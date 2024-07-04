@@ -5,27 +5,25 @@ import (
 	"fmt"
 
 	"cuelang.org/go/cue"
+	"cuelang.org/go/cue/cuecontext"
 	xdiff "github.com/yudai/gojsondiff"
 	"github.com/yudai/gojsondiff/formatter"
 	"gopkg.in/yaml.v3"
 )
 
-func validateYAMLAndCUEContent(yamlContent string, cueContent string) (bool, string) {
+func validateYAMLAndCUEContent(yamlContent, cueContent string) (bool, string) {
 	var yamlObj interface{}
-	err := yaml.Unmarshal([]byte(yamlContent), &yamlObj)
-	if err != nil {
+	if err := yaml.Unmarshal([]byte(yamlContent), &yamlObj); err != nil {
 		return false, fmt.Sprintf("error unmarshaling YAML data: %v", err)
 	}
 
-	var r cue.Runtime
-	binst, err := r.Compile("", cueContent)
-	if err != nil {
-		return false, fmt.Sprintf("error compiling CUE content: %v", err)
+	ctx := cuecontext.New()
+	cueValue := ctx.CompileString(cueContent)
+	if cueValue.Err() != nil {
+		return false, fmt.Sprintf("error compiling CUE content: %v", cueValue.Err())
 	}
 
-	cueValue := binst.Value()
-	err = cueValue.Validate(cue.Concrete(true))
-	if err != nil {
+	if err := cueValue.Validate(cue.Concrete(true)); err != nil {
 		return false, fmt.Sprintf("error validating CUE value: %v", err)
 	}
 
@@ -34,28 +32,34 @@ func validateYAMLAndCUEContent(yamlContent string, cueContent string) (bool, str
 		return false, fmt.Sprintf("error marshaling YAML object to JSON: %v", err)
 	}
 
-	yamlCueValue, err := r.Compile("", string(jsonData))
-	if err != nil {
-		return false, fmt.Sprintf("error compiling JSON data to CUE value: %v", err)
+	yamlCueValue := ctx.CompileBytes(jsonData)
+	if yamlCueValue.Err() != nil {
+		return false, fmt.Sprintf("error compiling JSON data to CUE value: %v", yamlCueValue.Err())
 	}
 
-	cuepolicy, err := cueValue.Value().MarshalJSON()
-	yamlcontent, err := yamlCueValue.Value().MarshalJSON()
-
-	err = cueValue.Unify(yamlCueValue.Value()).Validate(cue.Concrete(true))
+	cuepolicy, err := cueValue.MarshalJSON()
 	if err != nil {
+		return false, fmt.Sprintf("error marshaling CUE policy to JSON: %v", err)
+	}
+
+	yamlcontent, err := yamlCueValue.MarshalJSON()
+	if err != nil {
+		return false, fmt.Sprintf("error marshaling YAML content to JSON: %v", err)
+	}
+
+	if err := cueValue.Unify(yamlCueValue).Validate(cue.Concrete(true)); err != nil {
 		return false, fmt.Sprintf("error validating YAML data against CUE schema: %v", err)
 	}
 
 	var a, b map[string]interface{}
-
-	json.Unmarshal(cuepolicy, &a)
-	json.Unmarshal(yamlcontent, &b)
-
-	// collect keys
+	if err := json.Unmarshal(cuepolicy, &a); err != nil {
+		return false, fmt.Sprintf("error unmarshaling CUE policy: %v", err)
+	}
+	if err := json.Unmarshal(yamlcontent, &b); err != nil {
+		return false, fmt.Sprintf("error unmarshaling YAML content: %v", err)
+	}
 
 	var cuekeys, allkeys []string
-
 	collectKeys(b, "", &allkeys)
 	alloutput := map[string][]string{"keys": allkeys}
 	alloutputJSON, _ := json.Marshal(alloutput)
@@ -64,46 +68,35 @@ func validateYAMLAndCUEContent(yamlContent string, cueContent string) (bool, str
 	cueoutputJSON, _ := json.Marshal(cueoutput)
 
 	var keysA, keysB KeyArray
-	if err := json.Unmarshal([]byte(cueoutputJSON), &keysA); err != nil {
-		return false, fmt.Sprintf("Error unmarshaling %v", err)
+	if err := json.Unmarshal(cueoutputJSON, &keysA); err != nil {
+		return false, fmt.Sprintf("error unmarshaling CUE keys: %v", err)
 	}
-	if err := json.Unmarshal([]byte(alloutputJSON), &keysB); err != nil {
-		return false, fmt.Sprintf("Error unmarshaling %v", err)
+	if err := json.Unmarshal(alloutputJSON, &keysB); err != nil {
+		return false, fmt.Sprintf("error unmarshaling all keys: %v", err)
 	}
 	keysExist := allKeysExist(keysA.Keys, keysB.Keys)
-
-	// diff
 
 	differ := xdiff.New()
 	d, err := differ.Compare(cuepolicy, yamlcontent)
 	if err != nil {
-		return false, fmt.Sprintf("error unmarshaling content: %s\n", err.Error())
+		return false, fmt.Sprintf("error comparing CUE and YAML content: %v", err)
 	}
 
 	if d.Modified() && !keysExist {
-
-		var diffString string
-
-		var aJson map[string]interface{}
-		json.Unmarshal(cuepolicy, &aJson)
-
 		config := formatter.AsciiFormatterConfig{
 			ShowArrayIndex: true,
 			Coloring:       true,
 		}
 
-		zformatter := formatter.NewAsciiFormatter(aJson, config)
-		diffString, err = zformatter.Format(d)
+		formatter := formatter.NewAsciiFormatter(a, config)
+		diffString, err := formatter.Format(d)
 		if err != nil {
-			return false, fmt.Sprintf("Internal error: %v", err)
+			return false, fmt.Sprintf("error formatting diff: %v", err)
 		}
 
 		fmt.Println(diffString)
-
-		return false, fmt.Sprintf("Missing required keys \n")
-
-	} else {
-		return true, ""
+		return false, "Missing required keys"
 	}
 
+	return true, ""
 }
