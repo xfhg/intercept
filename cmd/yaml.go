@@ -7,7 +7,6 @@ import (
 	"os"
 	"path/filepath"
 	"regexp"
-	"strconv"
 	"strings"
 	"sync"
 	"time"
@@ -105,7 +104,7 @@ var yamlCmd = &cobra.Command{
 						oyRule.RuleDescription = value.Description
 						oyRule.RuleError = value.Error
 						oyRule.RuleFatal = value.Fatal
-						oyRule.RuleID = strconv.Itoa(value.ID)
+						oyRule.RuleID = value.ID
 						oyRule.RuleName = value.Name
 						oyRule.RuleSolution = value.Solution
 						oyRule.RuleType = value.Type

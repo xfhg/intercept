@@ -55,7 +55,7 @@ type InterceptComplianceFinding struct {
 	Output    string `yaml:"output"`
 	Compliant bool   `yaml:"compliant"`
 	Missing   bool   `yaml:"missing"`
-	ParentID  int    `yaml:"parentID"`
+	ParentID  string `yaml:"parentID"`
 }
 
 type InterceptCompliance struct {

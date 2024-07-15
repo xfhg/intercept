@@ -8,7 +8,6 @@ import (
 	"os"
 	"path/filepath"
 	"regexp"
-	"strconv"
 	"strings"
 
 	"github.com/open-policy-agent/opa/rego"
@@ -23,9 +22,10 @@ var (
 
 func processRegoType(value Rule) {
 
-	exception := ContainsInt(rules.Exceptions, value.ID)
+	//exception := ContainsInt(rules.Exceptions, value.ID)
 
-	if exception && !auditNox && !value.Enforcement {
+	//if exception && !auditNox && !value.Enforcement {
+	if !auditNox && !value.Enforcement {
 
 		colorRedBold.Println("│")
 		colorRedBold.Println("│ ", rules.ExceptionMessage)
@@ -56,7 +56,7 @@ func processRegoType(value Rule) {
 			rRule.RuleDescription = value.Description
 			rRule.RuleError = value.Error
 			rRule.RuleFatal = value.Fatal
-			rRule.RuleID = strconv.Itoa(value.ID)
+			rRule.RuleID = value.ID
 			rRule.RuleName = value.Name
 			rRule.RuleSolution = value.Solution
 			rRule.RuleType = value.Type

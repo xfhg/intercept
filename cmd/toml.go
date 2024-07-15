@@ -7,7 +7,6 @@ import (
 	"os"
 	"path/filepath"
 	"regexp"
-	"strconv"
 	"strings"
 	"sync"
 	"time"
@@ -105,7 +104,7 @@ var tomlCmd = &cobra.Command{
 						otRule.RuleDescription = value.Description
 						otRule.RuleError = value.Error
 						otRule.RuleFatal = value.Fatal
-						otRule.RuleID = strconv.Itoa(value.ID)
+						otRule.RuleID = value.ID
 						otRule.RuleName = value.Name
 						otRule.RuleSolution = value.Solution
 						otRule.RuleType = value.Type

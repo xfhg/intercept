@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
-	"strconv"
 	"strings"
 	"time"
 
@@ -122,7 +121,7 @@ var assureCmd = &cobra.Command{
 					continue
 				}
 
-				searchPatternFile := strings.Join([]string{pwddir, "/", "search_regex_", strconv.Itoa(value.ID)}, "")
+				searchPatternFile := strings.Join([]string{pwddir, "/", "search_regex_", value.ID}, "")
 
 				searchPattern := []byte(strings.Join(value.Patterns, "\n") + "\n")
 				_ = os.WriteFile(searchPatternFile, searchPattern, 0644)
