@@ -157,7 +157,7 @@ var iniCmd = &cobra.Command{
 								//var iniObj interface{}
 								_, err = ini.Load(ymlContentBytes)
 								if err != nil {
-									LogError(fmt.Errorf("error unmarshaling INI data 1: %v", err))
+									LogError(fmt.Errorf("error unmarshaling INI data: %v", err))
 									return nil
 								}
 
@@ -303,10 +303,10 @@ var iniCmd = &cobra.Command{
 										return nil
 									}
 
-									var iniObj interface{}
-									_, err = ini.Load(ymlContentBytes, &iniObj)
+									//var iniObj interface{}
+									_, err = ini.Load(ymlContentBytes)
 									if err != nil {
-										LogError(fmt.Errorf("error unmarshaling ini data 2: %v", err))
+										LogError(fmt.Errorf("error unmarshaling ini data: %v", err))
 										return nil
 									}
 

@@ -13,7 +13,7 @@ func validateINIAndCUEContent(iniContent string, cueContent string) (bool, strin
 	// Parse INI content
 	cfg, err := ini.Load([]byte(iniContent))
 	if err != nil {
-		return false, fmt.Sprintf("error unmarshaling INI data 3: %v", err)
+		return false, fmt.Sprintf("error unmarshaling INI data: %v", err)
 	}
 
 	// Convert INI data to a map for JSON marshaling
