@@ -1,6 +1,8 @@
 //go:build goss
 // +build goss
 
+// WIP - not built
+
 package cmd
 
 import (

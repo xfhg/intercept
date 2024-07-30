@@ -190,6 +190,13 @@ sbom-check:
 #https://github.com/devops-kung-fu/bomber
 	bomber scan bom-go-mod.json
 
+linux-rt: clean
+	CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -tags goss -ldflags="-s -w -X 'github.com/xfhg/intercept/cmd.buildVersion=$(TAG)'" -mod=readonly -o bin/interceptl
+
+dev-linux-rt: clean purge prepare linux-rt 
+	cp bin/interceptl release/interceptl
+	cp .ignore release/.ignore
+
 ## help: prints this help message
 help:
 	@echo "Usage: \n"
