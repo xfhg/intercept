@@ -7,7 +7,6 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
-	"strconv"
 	"strings"
 	"time"
 
@@ -56,7 +55,7 @@ func gatheringData(value Rule, turbo bool) {
 	cfg := yacspin.Config{
 		Frequency:         100 * time.Millisecond,
 		CharSet:           yacspin.CharSets[3],
-		Suffix:            strconv.Itoa(value.ID) + " API Gathering Data ",
+		Suffix:            value.ID + " API Gathering Data ",
 		SuffixAutoColon:   true,
 		StopCharacter:     "│ ✓ ",
 		StopMessage:       "OK",
@@ -117,7 +116,7 @@ func gatheringData(value Rule, turbo bool) {
 		LogError(errors.New("API Auth not defined"))
 	}
 
-	_ = os.Remove("output_" + strconv.Itoa(value.ID))
+	_ = os.Remove("output_" + value.ID)
 
 	err = spinner.Start()
 	if err != nil {
@@ -130,14 +129,14 @@ func gatheringData(value Rule, turbo bool) {
 			resp, err = client.R().
 				EnableTrace().
 				SetAuthToken(token_auth).
-				SetOutput("output_" + strconv.Itoa(value.ID)).
+				SetOutput("output_" + value.ID).
 				Get(value.Api_Endpoint)
 
 		} else {
 			resp, err = client.R().
 				EnableTrace().
 				SetBasicAuth(basic_username, basic_password).
-				SetOutput("output_" + strconv.Itoa(value.ID)).
+				SetOutput("output_" + value.ID).
 				Get(value.Api_Endpoint)
 		}
 
@@ -149,7 +148,7 @@ func gatheringData(value Rule, turbo bool) {
 				SetAuthToken(token_auth).
 				SetHeader("Content-Type", contentType).
 				SetBody(value.Api_Body).
-				SetOutput("output_" + strconv.Itoa(value.ID)).
+				SetOutput("output_" + value.ID).
 				Post(value.Api_Endpoint)
 
 		} else {
@@ -159,7 +158,7 @@ func gatheringData(value Rule, turbo bool) {
 				SetBasicAuth(basic_username, basic_password).
 				SetHeader("Content-Type", contentType).
 				SetBody(value.Api_Body).
-				SetOutput("output_" + strconv.Itoa(value.ID)).
+				SetOutput("output_" + value.ID).
 				Post(value.Api_Endpoint)
 
 		}
@@ -233,9 +232,9 @@ func processAPIType(value Rule, turbo bool) {
 
 	rgembed, _ := prepareEmbeddedExecutable()
 
-	searchPatternFile := strings.Join([]string{pwddir, "/", "search_regex_", strconv.Itoa(value.ID)}, "")
+	searchPatternFile := strings.Join([]string{pwddir, "/", "search_regex_", value.ID}, "")
 
-	scanPath := "output_" + strconv.Itoa(value.ID)
+	scanPath := "output_" + value.ID
 
 	if !FileExists(scanPath) {
 		LogError(errors.New("API Output not found"))
@@ -245,14 +244,15 @@ func processAPIType(value Rule, turbo bool) {
 	apiRule.RuleDescription = value.Description
 	apiRule.RuleError = value.Error
 	apiRule.RuleFatal = value.Fatal
-	apiRule.RuleID = strconv.Itoa(value.ID)
+	apiRule.RuleID = value.ID
 	apiRule.RuleName = value.Name
 	apiRule.RuleSolution = value.Solution
 	apiRule.RuleType = value.Type
 
-	exception := ContainsInt(rules.Exceptions, value.ID)
+	//exception := ContainsInt(rules.Exceptions, value.ID)
 
-	if exception && !auditNox && !value.Enforcement {
+	//if exception && !auditNox && !value.Enforcement {
+	if !auditNox && !value.Enforcement {
 
 		colorRedBold.Println("│")
 		colorRedBold.Println("│ ", rules.ExceptionMessage)
@@ -346,7 +346,7 @@ func processAPIType(value Rule, turbo bool) {
 
 	apiCompliance = append(apiCompliance, apiRule)
 
-	jsonOutputFile := strings.Join([]string{pwddir, "/", strconv.Itoa(value.ID), ".json"}, "")
+	jsonOutputFile := strings.Join([]string{pwddir, "/", value.ID, ".json"}, "")
 	jsonoutfile, erroutjson := os.Create(jsonOutputFile)
 	if erroutjson != nil {
 		LogError(erroutjson)
@@ -369,7 +369,7 @@ func processAPIType(value Rule, turbo bool) {
 			os.Remove(jsonOutputFile)
 		}
 	} else {
-		ProcessOutput(strings.Join([]string{strconv.Itoa(value.ID), ".json"}, ""), strconv.Itoa(value.ID), value.Type, value.Name, value.Description, value.Error, value.Solution, value.Fatal)
+		ProcessOutput(strings.Join([]string{value.ID, ".json"}, ""), value.ID, value.Type, value.Name, value.Description, value.Error, value.Solution, value.Fatal)
 		colorRedBold.Println("│ ")
 
 	}

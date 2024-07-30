@@ -45,7 +45,7 @@ ExitClean: "Clean report"
 
 ```go
 type Rule struct {
-	ID               int      `yaml:"id"`
+	ID               string   `yaml:"id"`
 	Name             string   `yaml:"name"`
 	Description      string   `yaml:"description"`
 	Solution         string   `yaml:"solution"`

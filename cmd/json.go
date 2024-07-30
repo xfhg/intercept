@@ -7,7 +7,6 @@ import (
 	"os"
 	"path/filepath"
 	"regexp"
-	"strconv"
 	"strings"
 	"sync"
 	"time"
@@ -104,7 +103,7 @@ var jsonCmd = &cobra.Command{
 						oRule.RuleDescription = value.Description
 						oRule.RuleError = value.Error
 						oRule.RuleFatal = value.Fatal
-						oRule.RuleID = strconv.Itoa(value.ID)
+						oRule.RuleID = value.ID
 						oRule.RuleName = value.Name
 						oRule.RuleSolution = value.Solution
 						oRule.RuleType = value.Type
