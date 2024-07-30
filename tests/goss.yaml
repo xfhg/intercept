@@ -1,0 +1,9 @@
+file:
+  /workspaces/intercept/tests/run.sh:
+    exists: true
+    mode: "0755"
+    size: 1139
+    owner: vscode
+    group: vscode
+    filetype: file
+    contains: []

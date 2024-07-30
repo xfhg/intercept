@@ -189,11 +189,15 @@ var regoCmd = &cobra.Command{
 			fmt.Println("│")
 			fmt.Println("│")
 
-			if fatal {
+			if fatal || stats.Total == 0 {
 
 				colorRedBold.Println("│")
 				colorRedBold.Println("├ ", rules.ExitCritical)
 				colorRedBold.Println("│")
+				if stats.Total == 0 {
+					colorRedBold.Println("├──────── NO POLICIES WERE SCANNED ────────")
+					colorRedBold.Println("│")
+				}
 				PrintClose()
 				fmt.Println("")
 				if scanBreak != "false" {
@@ -217,9 +221,7 @@ var regoCmd = &cobra.Command{
 
 			}
 
-		} 
-
-		
+		}
 
 		endTime := time.Now()
 		duration := endTime.Sub(startTime)

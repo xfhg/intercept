@@ -391,14 +391,18 @@ var yamlCmd = &cobra.Command{
 		fmt.Println("│")
 		fmt.Println("│")
 
-		if fatal {
+		if fatal || stats.Total == 0 {
 
 			colorRedBold.Println("│")
 			colorRedBold.Println("├ ", rules.ExitCritical)
 			colorRedBold.Println("│")
+			if stats.Total == 0 {
+				colorRedBold.Println("├──────── NO POLICIES WERE SCANNED ────────")
+				colorRedBold.Println("│")
+			}
 			PrintClose()
 			fmt.Println("")
-			if yamlscanBreak != "false" {
+			if scanBreak != "false" {
 				colorRedBold.Println("► break signal ")
 				os.Exit(1)
 			}
