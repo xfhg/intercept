@@ -49,6 +49,8 @@ type Rule struct {
 	Filepattern       string   `yaml:"filepattern,omitempty"`
 	Yml_Filepattern   string   `yaml:"yml_filepattern,omitempty"`
 	Yml_Structure     string   `yaml:"yml_structure,omitempty"`
+	Ini_Filepattern   string   `yaml:"ini_filepattern,omitempty"`
+	Ini_Structure     string   `yaml:"ini_structure,omitempty"`
 	Toml_Filepattern  string   `yaml:"toml_filepattern,omitempty"`
 	Toml_Structure    string   `yaml:"toml_structure,omitempty"`
 	Json_Filepattern  string   `yaml:"json_filepattern,omitempty"`
