@@ -7,7 +7,6 @@ import (
 	"os"
 	"path/filepath"
 	"regexp"
-	"strconv"
 	"strings"
 	"sync"
 	"time"
@@ -105,7 +104,7 @@ var iniCmd = &cobra.Command{
 						oiRule.RuleDescription = value.Description
 						oiRule.RuleError = value.Error
 						oiRule.RuleFatal = value.Fatal
-						oiRule.RuleID = strconv.Itoa(value.ID)
+						oiRule.RuleID = value.ID
 						oiRule.RuleName = value.Name
 						oiRule.RuleSolution = value.Solution
 						oiRule.RuleType = value.Type

@@ -19,7 +19,7 @@ intercept config -r
 intercept config -a /app/examples/policy/filetype.yaml
 # #
 
-intercept audit -t /app/examples/target
+intercept ini -t /app/examples/target
 # cat intercept.audit.sarif.json
 
 # intercept scan -t /app/examples/target -i "AWS" -b "false"

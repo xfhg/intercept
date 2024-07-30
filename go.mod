@@ -8,6 +8,7 @@ require (
 	cuelang.org/go v0.8.1
 	github.com/BurntSushi/toml v1.3.2
 	github.com/blang/semver v3.5.1+incompatible
+	github.com/go-ini/ini v1.67.0
 	github.com/go-resty/resty/v2 v2.12.0
 	github.com/gookit/color v1.5.4
 	github.com/gosuri/uitable v0.0.4
@@ -30,7 +31,6 @@ require (
 	github.com/agnivade/levenshtein v1.1.1 // indirect
 	github.com/beorn7/perks v1.0.1 // indirect
 	github.com/cespare/xxhash/v2 v2.3.0 // indirect
-	github.com/go-ini/ini v1.67.0 // indirect
 	github.com/go-logr/logr v1.4.1 // indirect
 	github.com/go-logr/stdr v1.2.2 // indirect
 	github.com/gobwas/glob v0.2.3 // indirect
@@ -80,7 +80,7 @@ require (
 	golang.org/x/sys v0.19.0 // indirect
 	golang.org/x/text v0.14.0 // indirect
 	google.golang.org/protobuf v1.33.0 // indirect
-	gopkg.in/ini.v1 v1.67.0 // indirect
+	gopkg.in/ini.v1 v1.67.0
 	gopkg.in/yaml.v3 v3.0.1
 )
 
