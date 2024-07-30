@@ -402,7 +402,7 @@ var yamlCmd = &cobra.Command{
 			}
 			PrintClose()
 			fmt.Println("")
-			if scanBreak != "false" {
+			if yamlscanBreak != "false" {
 				colorRedBold.Println("► break signal ")
 				os.Exit(1)
 			}

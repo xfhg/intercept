@@ -401,7 +401,7 @@ var tomlCmd = &cobra.Command{
 			}
 			PrintClose()
 			fmt.Println("")
-			if scanBreak != "false" {
+			if tomlscanBreak != "false" {
 				colorRedBold.Println("► break signal ")
 				os.Exit(1)
 			}

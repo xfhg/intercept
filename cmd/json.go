@@ -400,7 +400,7 @@ var jsonCmd = &cobra.Command{
 			}
 			PrintClose()
 			fmt.Println("")
-			if scanBreak != "false" {
+			if jsonscanBreak != "false" {
 				colorRedBold.Println("► break signal ")
 				os.Exit(1)
 			}

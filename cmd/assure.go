@@ -217,7 +217,7 @@ var assureCmd = &cobra.Command{
 			}
 			PrintClose()
 			fmt.Println("")
-			if scanBreak != "false" {
+			if assurescanBreak != "false" {
 				colorRedBold.Println("► break signal ")
 				os.Exit(1)
 			}
