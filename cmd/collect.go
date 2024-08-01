@@ -64,7 +64,7 @@ var collectCmd = &cobra.Command{
 			return
 		}
 
-		err = os.WriteFile("intercept.scannedSHA256.json", jsonData, 0644)
+		err = os.WriteFile("intercept.scannedSHA256.json", jsonData, 0600)
 		if err != nil {
 			LogError(err)
 		}
