@@ -354,8 +354,9 @@ var tomlCmd = &cobra.Command{
 			wg.Wait() // Wait for all goroutines to finish
 
 		}
-
-		GenerateComplianceSarif(otCompliance)
+		if outputType == "full" || outputType == "sarif" {
+			GenerateComplianceSarif(otCompliance)
+		}
 
 		fmt.Println("│")
 		fmt.Println("│")

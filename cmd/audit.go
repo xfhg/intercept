@@ -151,8 +151,9 @@ var auditCmd = &cobra.Command{
 				_ = os.Remove(searchPatternFile)
 
 			}
-
-			GenerateSarif("audit")
+			if outputType == "full" || outputType == "sarif" {
+				GenerateSarif("audit")
+			}
 
 			fmt.Println("│")
 			fmt.Println("│")

@@ -134,8 +134,9 @@ var gossCmd = &cobra.Command{
 				}
 
 			}
-
-			GenerateSarif("scan")
+			if outputType == "full" || outputType == "sarif" {
+				GenerateSarif("scan")
+			}
 
 			fmt.Println("│")
 			fmt.Println("│")
