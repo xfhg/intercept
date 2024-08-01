@@ -5,7 +5,7 @@ RANDOM=$(shell awk 'BEGIN{srand();printf("%d", 65536*rand())}')
 TAG=$(shell git describe --abbrev=0)
 PTAG=$(shell git describe --tags --abbrev=0 @^)
 
-all: purge-output prepare compress-tool windows linux macos out-full out-linux out-macos out-win sha256sums
+all: purge-output prepare windows linux macos macos-arm linux-arm out-full out-linux out-macos out-win sha256sums
 
 with-docker : purge-output prepare windows linux macos out-devbox out-linux out-macos out-win sha256sums
 
@@ -64,14 +64,15 @@ macos-arm: clean
 linux-arm: clean
 	CGO_ENABLED=0 GOOS=linux GOARCH=arm64 go build -ldflags="-s -w -X 'github.com/xfhg/intercept/cmd.buildVersion=$(TAG)'" -mod=readonly -o bin/interceptla
 
-compress-bin:
-	upx -9 bin/interceptl || upx-ucl -9 bin/interceptl
-	upx -9 bin/interceptm || upx-ucl -9 bin/interceptm
-	upx -9 bin/intercept.exe || upx-ucl -9 bin/intercept.exe
+# compress-bin:
+# 	upx -9 bin/interceptl || upx-ucl -9 bin/interceptl
+# 	upx -9 bin/interceptm || upx-ucl -9 bin/interceptm
+# 	upx -9 bin/intercept.exe || upx-ucl -9 bin/intercept.exe
 
 compress-docker:
 	docker run --rm -w $(shell pwd) -v $(shell pwd):$(shell pwd) xfhg/upx:latest -9 bin/interceptl
-	docker run --rm -w $(shell pwd) -v $(shell pwd):$(shell pwd) xfhg/upx:latest -9 bin/interceptm
+	docker run --rm -w $(shell pwd) -v $(shell pwd):$(shell pwd) xfhg/upx:latest -9 bin/interceptla
+	# docker run --rm -w $(shell pwd) -v $(shell pwd):$(shell pwd) xfhg/upx:latest -9 bin/interceptma
 	docker run --rm -w $(shell pwd) -v $(shell pwd):$(shell pwd) xfhg/upx:latest -9 bin/intercept.exe
 
 compress-docker-gh-actions:
@@ -80,7 +81,7 @@ compress-docker-gh-actions:
 
 # docker run --rm -w $(shell pwd) -v $(shell pwd):$(shell pwd) xfhg/upx:latest --best --lzma bin/intercept.exe
 
-out-full: purge version release-raw compress-bin release
+out-full: purge version release-raw compress-docker release
 	cp bin/interceptl release/interceptl
 	cp bin/interceptm release/interceptm
 	cp bin/intercept.exe release/intercept.exe
@@ -196,6 +197,11 @@ linux-rt: clean
 dev-linux-rt: clean purge prepare linux-rt 
 	cp bin/interceptl release/interceptl
 	cp .ignore release/.ignore
+
+docker-test-bin:
+	docker build --platform linux/amd64 -t amd64/test -f Dockerfile.amd64 .
+	docker build --platform linux/arm64 -t arm64/test -f Dockerfile.arm64 .
+
 
 ## help: prints this help message
 help:

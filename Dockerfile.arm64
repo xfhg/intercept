@@ -1,0 +1,6 @@
+FROM arm64v8/ubuntu:latest
+
+COPY bin/interceptla /usr/local/bin/intercept
+RUN chmod +x /usr/local/bin/intercept
+
+CMD ["intercept"]
