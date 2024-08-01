@@ -122,7 +122,7 @@ var collectCmd = &cobra.Command{
 				searchPatternFile := strings.Join([]string{pwddir, "/", "search_regex_", value.ID}, "")
 
 				searchPattern := []byte(strings.Join(value.Patterns, "\n") + "\n")
-				_ = os.WriteFile(searchPatternFile, searchPattern, 0644)
+				_ = os.WriteFile(searchPatternFile, searchPattern, 0600)
 
 				switch value.Type {
 
@@ -177,7 +177,7 @@ var collectCmd = &cobra.Command{
 				LogError(_jerr)
 			}
 
-			_jwerr := os.WriteFile("intercept.stats.json", jsonstats, 0644)
+			_jwerr := os.WriteFile("intercept.stats.json", jsonstats, 0600)
 			if _jwerr != nil {
 				LogError(_jwerr)
 			}
