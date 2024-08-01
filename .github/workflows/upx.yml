@@ -1,6 +1,10 @@
 name: Publish xfhg/upx Docker Image
 
 on:
+  push:
+    tags:
+      - "*"
+  
   workflow_dispatch:
     inputs:
       logLevel:
