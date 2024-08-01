@@ -71,7 +71,7 @@ var assureCmd = &cobra.Command{
 			return
 		}
 
-		err = os.WriteFile("intercept.scannedSHA256.json", jsonData, 0644)
+		err := os.WriteFile("intercept.scannedSHA256.json", jsonData, 0600)
 		if err != nil {
 			LogError(err)
 		}
@@ -196,7 +196,7 @@ var assureCmd = &cobra.Command{
 			LogError(_jerr)
 		}
 
-		_jwerr := os.WriteFile("intercept.stats.json", assurestats, 0644)
+		_jwerr := os.WriteFile("intercept.stats.json", assurestats, 0600)
 		if _jwerr != nil {
 			LogError(_jwerr)
 		}
