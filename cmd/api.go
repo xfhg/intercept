@@ -100,7 +100,7 @@ var apiCmd = &cobra.Command{
 				}
 
 			}
-			if outputType == "full" || outputType == "sarif" {
+			if outputType == "full" || outputType == "sarif" || outputType == "compliance" {
 				GenerateSarif("api")
 				GenerateComplianceSarif(apiCompliance)
 				GenerateApiSARIF()
