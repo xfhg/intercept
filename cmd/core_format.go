@@ -8,7 +8,9 @@ import (
 	"io"
 	"os"
 	"regexp"
+	"strconv"
 	"strings"
+	"time"
 
 	"github.com/itchyny/gojq"
 	"github.com/lens-vm/jsonmerge"
@@ -452,11 +454,13 @@ func GenerateComplianceSarif(results InterceptComplianceOutput) {
 
 	report.AddRun(run)
 
-	sarifOutputFilename := strings.Join([]string{"intercept.", strings.ToLower(results[0].RuleType), ".sarif.json"}, "")
-
-	if FileExists(sarifOutputFilename) {
-		_ = os.Remove(sarifOutputFilename)
-	}
+	sarifOutputFilename := strings.Join([]string{"intercept.", strings.ToLower(results[0].RuleType), ".", strconv.FormatInt(time.Now().UnixNano(), 10), ".sarif.json"}, "")
+	// Commenting existing check to see if the file exists and the subsequent removal as it is not required for unique file names
+	/*
+		if FileExists(sarifOutputFilename) {
+			_ = os.Remove(sarifOutputFilename)
+		}
+	*/
 	if findings > 0 {
 		if err := report.WriteFile(sarifOutputFilename); err != nil {
 			LogError(err)

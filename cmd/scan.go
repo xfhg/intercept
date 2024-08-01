@@ -137,8 +137,9 @@ var scanCmd = &cobra.Command{
 				_ = os.Remove(searchPatternFile)
 
 			}
-
-			GenerateSarif("scan")
+			if outputType == "full" || outputType == "sarif" {
+				GenerateSarif("scan")
+			}
 
 			fmt.Println("│")
 			fmt.Println("│")

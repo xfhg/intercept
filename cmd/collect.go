@@ -152,8 +152,9 @@ var collectCmd = &cobra.Command{
 				_ = os.Remove(searchPatternFile)
 
 			}
-
-			GenerateSarif("collect")
+			if outputType == "full" || outputType == "sarif" {
+				GenerateSarif("collect")
+			}
 
 			fmt.Println("│")
 			fmt.Println("│")

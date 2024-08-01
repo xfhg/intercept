@@ -100,11 +100,11 @@ var apiCmd = &cobra.Command{
 				}
 
 			}
-
-			GenerateSarif("api")
-			GenerateComplianceSarif(apiCompliance)
-			GenerateApiSARIF()
-
+			if outputType == "full" || outputType == "sarif" {
+				GenerateSarif("api")
+				GenerateComplianceSarif(apiCompliance)
+				GenerateApiSARIF()
+			}
 		} else {
 
 			values := make(chan Rule, len(rules.Rules))

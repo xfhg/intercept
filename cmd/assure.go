@@ -139,10 +139,11 @@ var assureCmd = &cobra.Command{
 				_ = os.Remove(searchPatternFile)
 
 			}
-
-			GenerateSarif("assure")
-			GenerateComplianceSarif(aCompliance)
-			GenerateAssureSARIF()
+			if outputType == "full" || outputType == "sarif" {
+				GenerateSarif("assure")
+				GenerateComplianceSarif(aCompliance)
+				GenerateAssureSARIF()
+			}
 
 		} else {
 

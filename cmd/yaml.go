@@ -355,8 +355,9 @@ var yamlCmd = &cobra.Command{
 			wg.Wait() // Wait for all goroutines to finish
 
 		}
-
-		GenerateComplianceSarif(oyCompliance)
+		if outputType == "full" || outputType == "sarif" {
+			GenerateComplianceSarif(oyCompliance)
+		}
 
 		fmt.Println("│")
 		fmt.Println("│")

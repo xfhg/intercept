@@ -55,7 +55,9 @@ func ripTurbo(rgbin string, pwddir string, scanPath string, policy Rule) {
 
 		} else {
 			ProcessOutput(strings.Join([]string{policy.ID, ".json"}, ""), policy.ID, policy.Type, policy.Name, policy.Description, policy.Error, policy.Solution, policy.Fatal)
-			GenerateSarif("audit")
+			if outputType == "full" || outputType == "sarif" {
+				GenerateSarif("audit")
+			}
 			colorRedBold.Print("│")
 		}
 

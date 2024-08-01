@@ -353,8 +353,9 @@ var jsonCmd = &cobra.Command{
 			wg.Wait() // Wait for all goroutines to finish
 
 		}
-
-		GenerateComplianceSarif(oCompliance)
+		if outputType == "full" || outputType == "sarif" {
+			GenerateComplianceSarif(oCompliance)
+		}
 
 		fmt.Println("│")
 		fmt.Println("│")

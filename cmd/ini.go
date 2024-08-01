@@ -355,8 +355,9 @@ var iniCmd = &cobra.Command{
 
 		}
 
-		GenerateComplianceSarif(oiCompliance)
-
+		if outputType == "full" || outputType == "sarif" {
+			GenerateComplianceSarif(oiCompliance)
+		}
 		fmt.Println("│")
 		fmt.Println("│")
 		fmt.Println("│")

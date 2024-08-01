@@ -153,9 +153,10 @@ var regoCmd = &cobra.Command{
 				// _ = os.Remove(searchPatternFile)
 
 			}
-
-			GenerateSarif("rego")
-			GenerateComplianceSarif(rCompliance)
+			if outputType == "full" || outputType == "sarif" {
+				GenerateSarif("rego")
+				GenerateComplianceSarif(rCompliance)
+			}
 
 			fmt.Println("│")
 			fmt.Println("│")
