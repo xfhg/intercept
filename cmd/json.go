@@ -7,7 +7,6 @@ import (
 	"os"
 	"path/filepath"
 	"regexp"
-	"strconv"
 	"strings"
 	"sync"
 	"time"
@@ -104,7 +103,7 @@ var jsonCmd = &cobra.Command{
 						oRule.RuleDescription = value.Description
 						oRule.RuleError = value.Error
 						oRule.RuleFatal = value.Fatal
-						oRule.RuleID = strconv.Itoa(value.ID)
+						oRule.RuleID = value.ID
 						oRule.RuleName = value.Name
 						oRule.RuleSolution = value.Solution
 						oRule.RuleType = value.Type
@@ -389,11 +388,15 @@ var jsonCmd = &cobra.Command{
 		fmt.Println("│")
 		fmt.Println("│")
 
-		if fatal {
+		if fatal || stats.Total == 0 {
 
 			colorRedBold.Println("│")
 			colorRedBold.Println("├ ", rules.ExitCritical)
 			colorRedBold.Println("│")
+			if stats.Total == 0 {
+				colorRedBold.Println("├──────── NO POLICIES WERE SCANNED ────────")
+				colorRedBold.Println("│")
+			}
 			PrintClose()
 			fmt.Println("")
 			if jsonscanBreak != "false" {

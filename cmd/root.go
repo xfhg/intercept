@@ -11,6 +11,7 @@ import (
 // main command flags
 var cfgFile string
 var cfgEnv string
+var outputType string
 
 // subcommand flags
 var (
@@ -24,7 +25,7 @@ var (
 
 var rootCmd = &cobra.Command{
 	Use:   "intercept",
-	Short: "INTERCEPT / Policy as Code Static Analysis Auditor",
+	Short: "INTERCEPT / Policy as Code / Audit & Compliance",
 	Long:  ``,
 }
 
@@ -42,6 +43,7 @@ func init() {
 	cobra.OnInitialize(initConfig)
 	rootCmd.PersistentFlags().StringVarP(&cfgFile, "config", "c", "config.yaml", "global Config file (config.yaml)")
 	rootCmd.PersistentFlags().StringVarP(&cfgEnv, "environment", "e", "", "global Environment id")
+	rootCmd.PersistentFlags().StringVarP(&outputType, "output", "o", "full", "output type full/json/sarif/console")
 
 }
 

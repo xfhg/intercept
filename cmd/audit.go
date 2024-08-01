@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"path/filepath"
 	"runtime"
-	"strconv"
 	"sync"
 	"time"
 
@@ -65,7 +64,7 @@ var auditCmd = &cobra.Command{
 			return
 		}
 
-		err = os.WriteFile("intercept.scannedSHA256.json", jsonData, 0644)
+		err = os.WriteFile("intercept.scannedSHA256.json", jsonData, 0600)
 		if err != nil {
 			LogError(err)
 		}
@@ -120,10 +119,10 @@ var auditCmd = &cobra.Command{
 					continue
 				}
 
-				searchPatternFile := strings.Join([]string{pwddir, "/", "search_regex_", strconv.Itoa(value.ID)}, "")
+				searchPatternFile := strings.Join([]string{pwddir, "/", "search_regex_", value.ID}, "")
 
 				searchPattern := []byte(strings.Join(value.Patterns, "\n") + "\n")
-				_ = os.WriteFile(searchPatternFile, searchPattern, 0644)
+				_ = os.WriteFile(searchPatternFile, searchPattern, 0400)
 
 				switch value.Type {
 
@@ -177,7 +176,7 @@ var auditCmd = &cobra.Command{
 				LogError(_jerr)
 			}
 
-			_jwerr := os.WriteFile("intercept.stats.json", jsonstats, 0644)
+			_jwerr := os.WriteFile("intercept.stats.json", jsonstats, 0600)
 			if _jwerr != nil {
 				LogError(_jwerr)
 			}
@@ -187,11 +186,15 @@ var auditCmd = &cobra.Command{
 			fmt.Println("│")
 			fmt.Println("│")
 
-			if fatal {
+			if fatal || stats.Total == 0 {
 
 				colorRedBold.Println("│")
 				colorRedBold.Println("├ ", rules.ExitCritical)
 				colorRedBold.Println("│")
+				if stats.Total == 0 {
+					colorRedBold.Println("├──────── NO POLICIES WERE SCANNED ────────")
+					colorRedBold.Println("│")
+				}
 				PrintClose()
 				fmt.Println("")
 				if scanBreak != "false" {

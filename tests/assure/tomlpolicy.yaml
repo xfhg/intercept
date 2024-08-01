@@ -1,0 +1,29 @@
+Banner: |
+
+  | TOML Test Updated Code
+
+Rules:
+
+
+  - name: TOML ASSURE - test
+    id: 133
+    description: Assure test
+    error: Misconfiguration or omission is fatal
+    tags: test
+    type: toml
+    fatal: false
+    enforcement: true
+    environment: all
+    confidence: high
+    toml_filepattern: "^sample.toml$"
+    toml_structure: |
+      let grafana_password = "notcompliant"
+      servers: [{
+            bind_password: grafana_password
+      }]
+      ...
+
+
+ExitCritical: "Critical irregularities found in your configuration"
+ExitWarning: "Irregularities found in your configuration"
+ExitClean: "Clean report"

@@ -45,7 +45,7 @@ ExitClean: "Clean report"
 
 ```go
 type Rule struct {
-	ID               int      `yaml:"id"`
+	ID               string   `yaml:"id"`
 	Name             string   `yaml:"name"`
 	Description      string   `yaml:"description"`
 	Solution         string   `yaml:"solution"`
@@ -72,6 +72,9 @@ type Rule struct {
 	
     Yml_Filepattern  string   `yaml:"yml_filepattern,omitempty"`
 	Yml_Structure    string   `yaml:"yml_structure,omitempty"`
+
+	Ini_Filepattern string   `yaml:"ini_filepattern,omitempty"`
+	Ini_Structure   string   `yaml:"ini_structure,omitempty"`
 	
     Toml_Filepattern string   `yaml:"toml_filepattern,omitempty"`
 	Toml_Structure   string   `yaml:"toml_structure,omitempty"`

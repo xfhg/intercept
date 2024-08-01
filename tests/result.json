@@ -1,0 +1,130 @@
+{
+  "results": [
+    {
+      "duration": 1232000,
+      "err": null,
+      "expected": [
+        "true"
+      ],
+      "found": [
+        "true"
+      ],
+      "human": "",
+      "meta": null,
+      "property": "exists",
+      "resource-id": "/workspaces/intercept/tests/run.sh",
+      "resource-type": "File",
+      "result": 0,
+      "successful": true,
+      "summary-line": "File: /workspaces/intercept/tests/run.sh: exists: matches expectation: [true]",
+      "test-type": 0,
+      "title": ""
+    },
+    {
+      "duration": 423000,
+      "err": null,
+      "expected": [
+        "\"0755\""
+      ],
+      "found": [
+        "\"0755\""
+      ],
+      "human": "",
+      "meta": null,
+      "property": "mode",
+      "resource-id": "/workspaces/intercept/tests/run.sh",
+      "resource-type": "File",
+      "result": 0,
+      "successful": true,
+      "summary-line": "File: /workspaces/intercept/tests/run.sh: mode: matches expectation: [\"0755\"]",
+      "test-type": 0,
+      "title": ""
+    },
+    {
+      "duration": 472000,
+      "err": null,
+      "expected": [
+        "\"vscode\""
+      ],
+      "found": [
+        "\"vscode\""
+      ],
+      "human": "",
+      "meta": null,
+      "property": "owner",
+      "resource-id": "/workspaces/intercept/tests/run.sh",
+      "resource-type": "File",
+      "result": 0,
+      "successful": true,
+      "summary-line": "File: /workspaces/intercept/tests/run.sh: owner: matches expectation: [\"vscode\"]",
+      "test-type": 0,
+      "title": ""
+    },
+    {
+      "duration": 227000,
+      "err": null,
+      "expected": [
+        "\"vscode\""
+      ],
+      "found": [
+        "\"vscode\""
+      ],
+      "human": "",
+      "meta": null,
+      "property": "group",
+      "resource-id": "/workspaces/intercept/tests/run.sh",
+      "resource-type": "File",
+      "result": 0,
+      "successful": true,
+      "summary-line": "File: /workspaces/intercept/tests/run.sh: group: matches expectation: [\"vscode\"]",
+      "test-type": 0,
+      "title": ""
+    },
+    {
+      "duration": 52000,
+      "err": null,
+      "expected": [
+        "\"file\""
+      ],
+      "found": [
+        "\"file\""
+      ],
+      "human": "",
+      "meta": null,
+      "property": "filetype",
+      "resource-id": "/workspaces/intercept/tests/run.sh",
+      "resource-type": "File",
+      "result": 0,
+      "successful": true,
+      "summary-line": "File: /workspaces/intercept/tests/run.sh: filetype: matches expectation: [\"file\"]",
+      "test-type": 0,
+      "title": ""
+    },
+    {
+      "duration": 166000,
+      "err": null,
+      "expected": [
+        "1139"
+      ],
+      "found": [
+        "1139"
+      ],
+      "human": "",
+      "meta": null,
+      "property": "size",
+      "resource-id": "/workspaces/intercept/tests/run.sh",
+      "resource-type": "File",
+      "result": 0,
+      "successful": true,
+      "summary-line": "File: /workspaces/intercept/tests/run.sh: size: matches expectation: [1139]",
+      "test-type": 0,
+      "title": ""
+    }
+  ],
+  "summary": {
+    "failed-count": 0,
+    "summary-line": "Count: 6, Failed: 0, Duration: 0.008s",
+    "test-count": 6,
+    "total-duration": 7793000
+  }
+}

@@ -5,71 +5,71 @@ import (
 	"fmt"
 
 	"cuelang.org/go/cue"
-	"github.com/BurntSushi/toml"
-	xtoml "github.com/pelletier/go-toml"
+	"cuelang.org/go/cue/cuecontext"
+	"github.com/pelletier/go-toml/v2"
 )
 
-func validateTOMLAndCUEContent(tomlContent string, cueContent string) (bool, string) {
-	var tomlObj interface{}
-	err := toml.Unmarshal([]byte(tomlContent), &tomlObj)
-	if err != nil {
-		return false, fmt.Sprintf("error unmarshaling toml data: %v", err)
+func validateTOMLAndCUEContent(tomlContent, cueContent string) (bool, string) {
+	// Parse TOML content
+	var tomlObj map[string]interface{}
+	if err := toml.Unmarshal([]byte(tomlContent), &tomlObj); err != nil {
+		return false, fmt.Sprintf("error unmarshaling TOML data: %v", err)
 	}
 
-	var r cue.Runtime
-	binst, err := r.Compile("", cueContent)
-	if err != nil {
-		return false, fmt.Sprintf("error compiling CUE content: %v", err)
+	// Create a new CUE context
+	ctx := cuecontext.New()
+
+	// Compile CUE content
+	cueValue := ctx.CompileString(cueContent)
+	if cueValue.Err() != nil {
+		return false, fmt.Sprintf("error compiling CUE content: %v", cueValue.Err())
 	}
 
-	cueValue := binst.Value()
-	err = cueValue.Validate(cue.Concrete(true))
-	if err != nil {
+	if err := cueValue.Validate(cue.Concrete(true)); err != nil {
 		return false, fmt.Sprintf("error validating CUE value: %v", err)
 	}
 
+	// Convert TOML to JSON
 	jsonData, err := json.Marshal(tomlObj)
 	if err != nil {
-		return false, fmt.Sprintf("error marshaling toml object to JSON: %v", err)
+		return false, fmt.Sprintf("error marshaling TOML object to JSON: %v", err)
 	}
 
-	tomlCueValue, err := r.Compile("", string(jsonData))
+	// Parse JSON data to CUE value
+	tomlCueValue := ctx.CompileBytes(jsonData)
+	if tomlCueValue.Err() != nil {
+		return false, fmt.Sprintf("error compiling JSON data to CUE value: %v", tomlCueValue.Err())
+	}
+
+	// Validate TOML data against CUE schema
+	unifiedValue := cueValue.Unify(tomlCueValue)
+	if err := unifiedValue.Validate(cue.Concrete(true)); err != nil {
+		return false, fmt.Sprintf("error validating TOML data against CUE schema: %v", err)
+	}
+
+	// Validate TOML accept data against CUE schema
+	acceptedValue := cueValue.UnifyAccept(cueValue, tomlCueValue)
+	if err := acceptedValue.Validate(cue.Concrete(true)); err != nil {
+		return false, fmt.Sprintf("error validating TOML accept data against CUE schema: %v", err)
+	}
+
+	// Check for missing keys in TOML
+	cuePolicyJSON, err := cueValue.MarshalJSON()
 	if err != nil {
-		return false, fmt.Sprintf("error compiling JSON data to CUE value: %v", err)
+		return false, fmt.Sprintf("error marshaling CUE policy to JSON: %v", err)
 	}
-
-	err = cueValue.Unify(tomlCueValue.Value()).Validate(cue.Concrete(true))
-	if err != nil {
-		return false, fmt.Sprintf("error validating toml data against CUE schema: %v", err)
-	}
-
-	cuepolicy, _ := cueValue.Value().MarshalJSON()
-	tomlcontent, _ := tomlCueValue.Value().MarshalJSON()
-
-	err = cueValue.UnifyAccept(cueValue.Value(), tomlCueValue.Value()).Validate(cue.Concrete(true))
-	if err != nil {
-		return false, fmt.Sprintf("error validating toml accept data against CUE schema: %v", err)
-	}
-
-	// keys present
 
 	var jsonObj map[string]interface{}
-	if err := json.Unmarshal([]byte(cuepolicy), &jsonObj); err != nil {
-		return false, fmt.Sprintf("Error parsing policy: %v", err)
+	if err := json.Unmarshal(cuePolicyJSON, &jsonObj); err != nil {
+		return false, fmt.Sprintf("error parsing policy: %v", err)
 	}
+
 	rootKeys := getJSONRootKeys(jsonObj)
 
-	tree, err := xtoml.Load(string(tomlcontent))
-	if err != nil {
-		colorYellow.Println("│ Warning : TOML File not valid")
-		colorYellow.Println("├ Missing keys feature not available")
-		fmt.Println("│ ")
-		return true, ""
-	} else {
-		for _, key := range rootKeys {
-			if isTOMLKeyAbsent(tree, key) {
-				return false, fmt.Sprintf("TOML Key '%s' is absent", key)
-			}
+	// Check for missing keys in TOML
+	for _, key := range rootKeys {
+		if _, exists := tomlObj[key]; !exists {
+			return false, fmt.Sprintf("TOML key '%s' is absent", key)
 		}
 	}
 

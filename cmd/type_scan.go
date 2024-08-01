@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
-	"strconv"
 	"strings"
 )
 
@@ -21,7 +20,7 @@ func processScanType(value Rule) {
 
 	rgembed, _ := prepareEmbeddedExecutable()
 
-	searchPatternFile := strings.Join([]string{pwddir, "/", "search_regex_", strconv.Itoa(value.ID)}, "")
+	searchPatternFile := strings.Join([]string{pwddir, "/", "search_regex_", value.ID}, "")
 
 	fmt.Println("│ ")
 	fmt.Println(line)
@@ -34,10 +33,10 @@ func processScanType(value Rule) {
 	fmt.Println("│ Tags : ", value.Tags)
 	fmt.Println("│ ")
 
-	exception := ContainsInt(rules.Exceptions, value.ID)
+	//exception := ContainsInt(rules.Exceptions, value.ID)
 
-	if exception && !auditNox && !value.Enforcement {
-
+	//if exception && !auditNox && !value.Enforcement {
+	if !auditNox && !value.Enforcement {
 		colorRedBold.Println("│")
 		colorRedBold.Println("│ ", rules.ExceptionMessage)
 		colorRedBold.Println("│")
@@ -90,7 +89,7 @@ func processScanType(value Rule) {
 			stats.Dirty++
 		}
 
-		jsonOutputFile := strings.Join([]string{pwddir, "/", strconv.Itoa(value.ID), ".json"}, "")
+		jsonOutputFile := strings.Join([]string{pwddir, "/", value.ID, ".json"}, "")
 		jsonoutfile, erroutjson := os.Create(jsonOutputFile)
 		if erroutjson != nil {
 			LogError(erroutjson)
@@ -113,7 +112,7 @@ func processScanType(value Rule) {
 				os.Remove(jsonOutputFile)
 			}
 		} else {
-			ProcessOutput(strings.Join([]string{strconv.Itoa(value.ID), ".json"}, ""), strconv.Itoa(value.ID), value.Type, value.Name, value.Description, value.Error, value.Solution, value.Fatal)
+			ProcessOutput(strings.Join([]string{value.ID, ".json"}, ""), value.ID, value.Type, value.Name, value.Description, value.Error, value.Solution, value.Fatal)
 			colorRedBold.Println("│ ")
 
 		}

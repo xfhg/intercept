@@ -7,6 +7,7 @@ import (
 	"errors"
 	"io"
 	"os"
+	"regexp"
 	"strings"
 
 	"github.com/itchyny/gojq"
@@ -55,7 +56,7 @@ type InterceptComplianceFinding struct {
 	Output    string `yaml:"output"`
 	Compliant bool   `yaml:"compliant"`
 	Missing   bool   `yaml:"missing"`
-	ParentID  int    `yaml:"parentID"`
+	ParentID  string `yaml:"parentID"`
 }
 
 type InterceptCompliance struct {
@@ -244,6 +245,10 @@ func ProcessOutput(filename string, ruleId string, ruleType string, ruleName str
 		return
 	}
 
+	if FileExists(filename) {
+		os.Remove(filename)
+	}
+
 }
 
 // package rg output into intercept results struct for SARIF
@@ -303,7 +308,7 @@ func GenerateSarif(calledby string) {
 			WithDescription(r.RuleDescription).
 			WithHelpURI("https://intercept.cc").
 			WithProperties(pb.Properties).
-			WithMarkdownHelp("# INTERCEPT.CC ").WithTextHelp(r.RuleSolution)
+			WithMarkdownHelp(ToPascalCase(strings.ToUpper(r.RuleName))).WithTextHelp(r.RuleSolution)
 
 		run.AddDistinctArtifact(r.Data.Path.Text)
 
@@ -402,7 +407,7 @@ func GenerateComplianceSarif(results InterceptComplianceOutput) {
 			WithDescription(r.RuleDescription).
 			WithHelpURI("https://intercept.cc").
 			WithProperties(pb.Properties).
-			WithMarkdownHelp("# INTERCEPT.CC").WithTextHelp(r.RuleSolution)
+			WithMarkdownHelp(ToPascalCase(strings.ToUpper(r.RuleName))).WithTextHelp(r.RuleSolution)
 
 		for _, rf := range r.RuleFindings {
 
@@ -441,7 +446,6 @@ func GenerateComplianceSarif(results InterceptComplianceOutput) {
 						),
 					),
 				)
-
 		}
 
 	}
@@ -574,4 +578,23 @@ func readExternalData(filePath string) (map[string]interface{}, error) {
 	}
 
 	return data, nil
+}
+
+func ToPascalCase(s string) string {
+	// Remove non-alphanumeric characters
+	re := regexp.MustCompile(`[^a-zA-Z0-9\s]`)
+	s = re.ReplaceAllString(s, "")
+
+	// Split the string into words
+	words := strings.Fields(s)
+
+	// Capitalize the first letter of each word and join them
+	var pascalCase string
+	for _, word := range words {
+		if len(word) > 0 {
+			pascalCase += strings.ToUpper(string(word[0])) + strings.ToLower(word[1:])
+		}
+	}
+
+	return pascalCase
 }

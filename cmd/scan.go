@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"path/filepath"
 	"runtime"
-	"strconv"
 	"sync"
 	"time"
 
@@ -120,7 +119,7 @@ var scanCmd = &cobra.Command{
 					continue
 				}
 
-				searchPatternFile := strings.Join([]string{pwddir, "/", "search_regex_", strconv.Itoa(value.ID)}, "")
+				searchPatternFile := strings.Join([]string{pwddir, "/", "search_regex_", value.ID}, "")
 
 				searchPattern := []byte(strings.Join(value.Patterns, "\n") + "\n")
 				_ = os.WriteFile(searchPatternFile, searchPattern, 0644)
@@ -173,11 +172,15 @@ var scanCmd = &cobra.Command{
 			fmt.Println("│")
 			fmt.Println("│")
 
-			if fatal {
+			if fatal || stats.Total == 0 {
 
 				colorRedBold.Println("│")
 				colorRedBold.Println("├ ", rules.ExitCritical)
 				colorRedBold.Println("│")
+				if stats.Total == 0 {
+					colorRedBold.Println("├──────── NO POLICIES WERE SCANNED ────────")
+					colorRedBold.Println("│")
+				}
 				PrintClose()
 				fmt.Println("")
 				if scanBreak != "false" {

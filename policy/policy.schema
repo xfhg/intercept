@@ -2,7 +2,7 @@ Banner: string
 
 Rules: [...{
 
-    id:          int
+    id:          string
 
     type:        string
     
@@ -31,6 +31,9 @@ Rules: [...{
     
     toml_filepattern?: string
     toml_structure?:  string
+
+    ini_filepattern?: string
+    ini_structure?:  string
     
     json_filepattern?: string
     json_structure?:  string

@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
-	"strconv"
 	"strings"
 	"time"
 
@@ -71,7 +70,7 @@ var assureCmd = &cobra.Command{
 			return
 		}
 
-		err = os.WriteFile("intercept.scannedSHA256.json", jsonData, 0644)
+		err = os.WriteFile("intercept.scannedSHA256.json", jsonData, 0600)
 		if err != nil {
 			LogError(err)
 		}
@@ -122,7 +121,7 @@ var assureCmd = &cobra.Command{
 					continue
 				}
 
-				searchPatternFile := strings.Join([]string{pwddir, "/", "search_regex_", strconv.Itoa(value.ID)}, "")
+				searchPatternFile := strings.Join([]string{pwddir, "/", "search_regex_", value.ID}, "")
 
 				searchPattern := []byte(strings.Join(value.Patterns, "\n") + "\n")
 				_ = os.WriteFile(searchPatternFile, searchPattern, 0644)
@@ -196,7 +195,7 @@ var assureCmd = &cobra.Command{
 			LogError(_jerr)
 		}
 
-		_jwerr := os.WriteFile("intercept.stats.json", assurestats, 0644)
+		_jwerr := os.WriteFile("intercept.stats.json", assurestats, 0600)
 		if _jwerr != nil {
 			LogError(_jwerr)
 		}
@@ -206,11 +205,15 @@ var assureCmd = &cobra.Command{
 		fmt.Println("│")
 		fmt.Println("│")
 
-		if fatal {
+		if fatal || stats.Total == 0 {
 
 			colorRedBold.Println("│")
 			colorRedBold.Println("├ ", rules.ExitCritical)
 			colorRedBold.Println("│")
+			if stats.Total == 0 {
+				colorRedBold.Println("├──────── NO POLICIES WERE SCANNED ────────")
+				colorRedBold.Println("│")
+			}
 			PrintClose()
 			fmt.Println("")
 			if assurescanBreak != "false" {

@@ -82,6 +82,21 @@ Rules:
       db: {port: 666 }
       ...
 
+  - name: INI ASSURE - Protocol is HTTPS
+    id: 1002
+    description: Assure protocol is https
+    error: Misconfiguration or omission is fatal
+    tags: TLS
+    type: ini
+    fatal: false
+    enforcement: true
+    environment: all
+    confidence: high
+    ini_filepattern: "^development-\\d+\\.ini$"
+    ini_structure: |
+      server: {protocol: "https"}
+      ...
+
   - name: JSON ASSURE - missing database port
     id: 144
     description: Assure database port
