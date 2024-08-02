@@ -124,7 +124,7 @@ var assureCmd = &cobra.Command{
 				searchPatternFile := strings.Join([]string{pwddir, "/", "search_regex_", value.ID}, "")
 
 				searchPattern := []byte(strings.Join(value.Patterns, "\n") + "\n")
-				_ = os.WriteFile(searchPatternFile, searchPattern, 0644)
+				_ = os.WriteFile(searchPatternFile, searchPattern, 0600)
 
 				switch value.Type {
 

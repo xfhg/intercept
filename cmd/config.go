@@ -203,7 +203,7 @@ var configCmd = &cobra.Command{
 			if err != nil {
 				LogError(err)
 			}
-			if err := os.WriteFile("config.yaml", nf, 0644); err != nil {
+			if err := os.WriteFile("config.yaml", nf, 0600); err != nil {
 				LogError(err)
 			}
 			fmt.Println("│")

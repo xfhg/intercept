@@ -133,7 +133,7 @@ func ProcessOutput(filename string, ruleId string, ruleType string, ruleName str
 		return
 	}
 
-	err = os.WriteFile(filename, []byte(string(output)), 0644)
+	err = os.WriteFile(filename, []byte(string(output)), 0600)
 	if err != nil {
 		LogError(err)
 		return
@@ -144,7 +144,7 @@ func ProcessOutput(filename string, ruleId string, ruleType string, ruleName str
 	var outfile *os.File
 
 	if FileExists("intercept.audit.output.json") {
-		outfile, err = os.OpenFile("intercept.audit.output.json", os.O_RDWR, 0644)
+		outfile, err = os.OpenFile("intercept.audit.output.json", os.O_RDWR, 0600)
 		if err != nil {
 			LogError(err)
 		}
@@ -173,7 +173,7 @@ func ProcessOutput(filename string, ruleId string, ruleType string, ruleName str
 		}
 
 		// Write the JSON to a file
-		err = os.WriteFile("intercept.audit.output.json", emptyJSON, 0644)
+		err = os.WriteFile("intercept.audit.output.json", emptyJSON, 0600)
 		if err != nil {
 			LogError(err)
 		}
@@ -230,7 +230,7 @@ func ProcessOutput(filename string, ruleId string, ruleType string, ruleName str
 		LogError(ferr)
 		return
 	}
-	err = os.WriteFile(filename, []byte(string(finaloutput)), 0644)
+	err = os.WriteFile(filename, []byte(string(finaloutput)), 0600)
 	if err != nil {
 		LogError(err)
 		return
@@ -241,7 +241,7 @@ func ProcessOutput(filename string, ruleId string, ruleType string, ruleName str
 		LogError(ferr)
 		return
 	}
-	err = os.WriteFile("intercept.audit.output.json", []byte(string(compiledoutput)), 0644)
+	err = os.WriteFile("intercept.audit.output.json", []byte(string(compiledoutput)), 0600)
 	if err != nil {
 		LogError(err)
 		return
