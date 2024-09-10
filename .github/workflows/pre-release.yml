@@ -1,0 +1,49 @@
+name: Intercept Binary Pre-Release
+
+on:
+  push:
+    tags:
+      - "*"
+  workflow_dispatch:
+    inputs:
+      logLevel:
+        description: 'Log level'
+        required: true
+        default: 'warning'
+    
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    steps:
+
+      - name: Check out code 
+        uses: actions/checkout@v4
+
+      - name: Get the version
+        id: get_version
+        run: echo ::set-output name=VERSION::${GITHUB_REF/refs\/tags\//}
+
+      - name: Upload All artifacts
+        uses: meeDamian/github-release@2.0
+        with:
+          allow_override: "true"
+          draft: "true"
+          token: ${{ secrets.GITHUB_TOKEN }}
+          name: ${{ steps.get_version.outputs.VERSION }}
+          body: >
+            Pre-Release for ${{ steps.get_version.outputs.VERSION }}
+          gzip: "false"
+          files: >
+            release/intercept-darwin-amd64
+            release/intercept-darwin-amd64.sha256
+            release/intercept-darwin-arm64
+            release/intercept-darwin-arm64.sha256
+            release/intercept-linux-amd64
+            release/intercept-linux-amd64.sha256
+            release/intercept-linux-arm
+            release/intercept-linux-arm.sha256
+            release/intercept-linux-arm64
+            release/intercept-linux-arm64.sha256
+            release/intercept-windows-amd64.exe
+            release/intercept-windows-amd64.exe.sha256
