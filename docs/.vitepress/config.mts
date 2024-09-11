@@ -5,13 +5,16 @@ export default defineConfig({
   title: "INTERCEPT",
   description: "Policy as Code Engine",
   lastUpdated: true,
+  head: [
+    ['link', { rel: 'icon', type: 'image/svg+xml', href: '/intercept-icon.svg' }],
+  ],
   themeConfig: {
     search: {
       provider: 'local'
     },
     // https://vitepress.dev/reference/default-theme-config
     nav: [
-      // { text: 'Home', link: '/' },
+      { text: 'Code', link: 'https://github.com/xfhg/intercept' },
       { text: 'Documentation', link: '/docs/tbd' },
       { text: 'Features', link: '/docs/tbd' },
       { text: 'Latest Release', link: 'https://github.com/xfhg/intercept/releases' }
