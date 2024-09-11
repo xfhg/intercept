@@ -24,7 +24,7 @@ features:
   - title: CODE
     details: REGEX patterns, REGO Policies, CUE Lang Schemas, SERVERSPEC Monitoring
     icon: 🧬
-  - title: SATANDARD
+  - title: STANDARD
     details: Policy as Code, No custom languages, Reduced complexity, Industry Standards
     icon: 📡
 
