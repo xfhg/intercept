@@ -1,0 +1,47 @@
+
+Version: "1.0.0"
+
+Policies:
+
+  - id: "TOML-001"
+    type: "toml"
+    filepattern: "\\.toml$"
+    enforcement:
+      - environment: "all"
+        fatal: "false"
+        exceptions: "development"
+        msg_solution: "Ensure all required fields are present and comply with the schema."
+        msg_error: "TOML file does not comply with the required schema."
+    metadata:
+      name: "TOML Schema Compliance"
+      description: "Enforce schema compliance on TOML configuration files"
+      tags:
+        - "config"
+        - "toml"
+        - "schema"
+      confidence: "high"
+      score: "8"
+    _schema:
+      structure: |
+        {
+          version: string
+          app: {
+            name:    string
+            version: number
+          }
+          database: {
+            host: string
+            port: >5432
+            name: string
+            user: string
+          }
+          features: {
+            feature1: bool
+            feature2: string | bool
+            feature3: bool
+          }
+          limits: {
+            max_connections: int & >=0
+            timeout:         string
+          }
+        }

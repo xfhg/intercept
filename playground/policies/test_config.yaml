@@ -1,0 +1,33 @@
+Config:
+  Flags:
+    output_type: "sarif"
+    ignore:
+      - "targets/ignorethisfolder/"
+      - "targets/random/development-4985.yml"
+
+Policies:
+  - id: "ASSURE-001 Name key is present"
+    type: "assure"
+    filepattern: ""
+    enforcement:
+      - environment: "production"
+        fatal: "true"
+        exceptions: "false"
+        
+        confidence: "high"
+      - environment: "development"
+        fatal: "false"
+        exceptions: "false"
+        
+        confidence: "low"
+    metadata:
+      name: "Detect private keys"
+      description: "Ensure all connections use HTTPS"
+      msg_solution: "Generic solution message to production issue."
+      msg_error: "Generic error message for production issue"
+      tags:
+        - "compliance"
+        - "name"
+      score: "9"
+    _regex:
+      - ("vname":\s*"([^"]*)")

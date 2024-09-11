@@ -1,0 +1,29 @@
+{
+    "app": {
+      "name": "MyApp",
+      "version": "1.0.0",
+      "port": "8080"
+    },
+    "database": {
+      "host": "localhost",
+      "port": 5432,
+      "name": "mydb",
+      "user": "admin"
+    },
+    "logging": {
+      "level": "debug",
+      "format": "yaml"
+    },
+    "features": {
+      "featureA": true,
+      "featureB": false,
+      "featureC": true,
+      "flags":{
+        "blocker": true
+      }
+    },
+    "extra_field": "This shouldn't be here",
+    "password":{
+      "salted": "jsdhfjks"
+    }
+  }

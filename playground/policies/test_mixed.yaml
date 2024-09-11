@@ -1,0 +1,198 @@
+
+Policies:
+
+  - id: "ASSURE-001"
+    type: "assure"
+    filepattern: "example.*"
+    enforcement:
+      - environment: "production"
+        fatal: "true"
+        exceptions: "none"
+        confidence: "high"
+    metadata:
+      name: "Detect private keys"
+      description: "Ensure all connections use HTTPS"
+      msg_solution: "Update the security settings as per the latest guidelines."
+      msg_error: "Critical security policy violation detected."
+      tags:
+        - "security"
+        - "encryption"
+      score: "9"
+    _regex:
+      - ("name":\s*"([^"]*)")
+
+  - id: "SCAN-002"
+    type: "scan"
+    enforcement:
+      - environment: "production"
+        fatal: "true"
+        exceptions: "none"
+        confidence: "high"
+    metadata:
+      name: "Detect private keys"
+      description: "Ensure all connections use HTTPS"
+      msg_solution: "Update the security settings as per the latest guidelines."
+      msg_error: "Critical security policy violation detected."
+      tags:
+        - "security"
+        - "encryption"
+      score: "9"
+    _regex:
+      - \s*rdsSNdDwGJOKEMFv42TfPSMz3ij7y
+
+
+  - id: "ASSURE-002"
+    type: "assure"
+    filepattern: "example.*"
+    enforcement:
+      - environment: "production"
+        fatal: "true"
+        exceptions: "none"
+        confidence: "high"
+    metadata:
+      name: "Detect private keys"
+      description: "Ensure all connections use HTTPS"
+      msg_solution: "Update the security settings as per the latest guidelines."
+      msg_error: "Critical security policy violation detected."
+      tags:
+        - "security"
+        - "encryption"
+      score: "9"
+    _regex:
+      - ("user":\s*"([^"]*)")
+      
+  - id: "SCAN-001"
+    type: "scan"
+    enforcement:
+      - environment: "production"
+        fatal: "true"
+        exceptions: "none"
+        confidence: "high"
+    metadata:
+      name: "Detect private keys"
+      description: "Ensure all connections use HTTPS"
+      msg_solution: "Update the security settings as per the latest guidelines."
+      msg_error: "Critical security policy violation detected."
+      tags:
+        - "security"
+        - "encryption"
+      score: "9"
+    _regex:
+      - \s*(-----BEGIN PRIVATE KEY-----)
+      - \s*(-----BEGIN RSA PRIVATE KEY-----)
+      - \s*(-----BEGIN DSA PRIVATE KEY-----)
+      - \s*(-----BEGIN EC PRIVATE KEY-----)
+      - \s*(-----BEGIN OPENSSH PRIVATE KEY-----)
+      - \s*(-----BEGIN PGP PRIVATE KEY BLOCK-----)
+
+  - id: "JSON-001"
+    type: "json"
+    filepattern: "example.json$"
+    enforcement:
+      - environment: "all"
+        fatal: "false"
+        exceptions: "development"
+    metadata:
+      name: "JSON Schema Compliance"
+      description: "Enforce schema compliance on JSON configuration files"
+      tags:
+        - "config"
+        - "json"
+        - "schema"
+      confidence: "high"
+      score: "8"
+    _schema:
+      strict: false
+      patch: false
+      structure: |
+        {
+          app: {
+            name: "pato"
+            version: "v0"
+            port: 8080
+          }
+          logging: {
+            level: "silent",
+          }
+        }
+
+
+  - id: "JSON-002"
+    type: "json"
+    filepattern: "development-2048.json$"
+    enforcement:
+      - environment: "all"
+        fatal: "false"
+        exceptions: "development"
+    metadata:
+      name: "JSON Schema Compliance"
+      description: "Enforce schema compliance on JSON configuration files"
+      tags:
+        - "config"
+        - "json"
+        - "schema"
+      confidence: "high"
+      score: "8"
+    _schema:
+      strict: false
+      patch: false
+      structure: |
+        {
+          autoscaling: {enabled: true}
+        }
+
+
+  - id: "API-003"
+    type: "api"
+    enforcement:
+      - environment: "all"
+        fatal: "false"
+        exceptions: "development"
+    metadata:
+      name: "API Regex Compliance"
+      description: "Enforce schema compliance on API configuration files"
+      tags:
+        - "config"
+        - "ini"
+        - "schema"
+      confidence: "high"
+      score: "8"
+    _api:
+      endpoint: "https://httpbin.org/bearer"
+      insecure: false
+      request: "GET"
+      body: |
+        {"employee":{ "name":"Emma", "age":28, "city":"Boston" }} 
+      auth: 
+        type: bearer
+        token_env: TOKEN 
+    _regex:
+      - \"authenticated\"\s*:\s*true\s*,?
+
+  - id: "API-004"
+    type: "api"
+    enforcement:
+      - environment: "all"
+        fatal: "false"
+        exceptions: "development"
+    metadata:
+      name: "API Regex Compliance"
+      description: "Enforce schema compliance on API configuration files"
+      tags:
+        - "config"
+        - "ini"
+        - "schema"
+      confidence: "high"
+      score: "8"
+    _api:
+      endpoint: "https://httpbin.org/bearer"
+      insecure: false
+      request: "GET"
+      body: |
+        {"employee":{ "name":"Emma", "age":28, "city":"Boston" }} 
+      auth: 
+        type: bearer
+        token_env: TOKEN 
+    _schema:
+      structure: |
+        { authenticated : false}

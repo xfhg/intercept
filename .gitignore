@@ -45,8 +45,9 @@ playground/intercept_*
 
 playground/_*
 
-# release/
+release/
 
-docs/
+docs/.vitepress/dist/
+docs/.vitepress/cache/
 
 local/

@@ -1,0 +1,151 @@
+
+Config: 
+  Flags:
+    policy_schedule: "20 * * * * *"
+    report_schedule:  "10 * * * * *"
+    target: "targets_extra/"
+  Observe:
+    max_report_size:
+    compression_age:
+    deletion_age:
+  Hooks:
+    # - name: "Test Webhook Report"
+    #   endpoint: "https://webhook.site/ea939de5-d1bc-4078-8f6e-8873103e77bd"
+    #   insecure: false
+    #   method: "POST"
+    #   auth: 
+    #     type: bearer
+    #     token_env: TOKEN 
+    #   headers:
+    #     Content-Type: "application/json"
+    #   retry_attempts: 3
+    #   retry_delay: "5s"
+    #   timeout_seconds: 30
+    #   event_types:
+    #     - "report"
+    # - name: "Test Webhook Results"
+    #   endpoint: "https://webhook.site/3191679d-67c2-49e8-a722-7c20cefa6ab0"
+    #   insecure: false
+    #   method: "POST"
+    #   auth: 
+    #     type: bearer
+    #     token_env: TOKEN 
+    #   headers:
+    #     Content-Type: "application/json"
+    #   retry_attempts: 3
+    #   retry_delay: "5s"
+    #   timeout_seconds: 30
+    #   event_types:
+    #     - "results"
+    # - name: "Test Webhook Policy"
+    #   endpoint: "https://webhook.site/3191679d-67c2-49e8-a722-7c20cefa6ab0"
+    #   insecure: false
+    #   method: "POST"
+    #   auth: 
+    #     type: bearer
+    #     token_env: TOKEN 
+    #   headers:
+    #     Content-Type: "application/json"
+    #   retry_attempts: 3
+    #   retry_delay: "5s"
+    #   timeout_seconds: 30
+    #   event_types:
+    #     - "policy"
+
+
+Policies:
+
+  - id: "RUNTIM-001"
+    type: "runtime"
+    schedule: "5 * * * * *"
+    enforcement:
+      - environment: "all"
+        fatal: "false"
+        exceptions: "development"
+    metadata:
+      msg_solution: "SOLUTION"
+      msg_error: "YOU MADE A BOOBOO"
+      name: "RUNTIME System Compliance"
+      description: "Enforce system compliance at runtime"
+      tags:
+        - "config"
+        - "runtime"
+        - "enforce"
+      confidence: "high"
+      score: "8"
+    _runtime:
+      config: runtime/simple_https.yaml
+      observe: "/Users/glitch/Workspace/Code/Production/track-me.md"
+      
+
+  # - id: "RUNTIM-002"
+  #   type: "runtime"
+  #   enforcement:
+  #     - environment: "all"
+  #       fatal: "false"
+  #       exceptions: "development"
+  #   metadata:
+  #     name: "RUNTIME System Compliance"
+  #     description: "Enforce system compliance at runtime"
+  #     tags:
+  #       - "config"
+  #       - "runtime"
+  #       - "enforce"
+  #     confidence: "high"
+  #     score: "8"
+  #   _runtime:
+  #     config: runtime/simple_https.yaml
+      
+  # - id: "API-001"
+  #   type: "api"
+  #   schedule: "*/15 * * * * *"
+  #   enforcement:
+  #     - environment: "production"
+  #       fatal: "true"
+  #       exceptions: "false"
+  #       confidence: "high"
+  #     - environment: "development"
+  #       fatal: "true"
+  #       exceptions: "false"
+  #       confidence: "high"
+  #   metadata:
+  #     name: "API Regex Compliance"
+  #     description: "Enforce schema compliance on API configuration files"
+  #     tags:
+  #       - "config"
+  #       - "ini"
+  #       - "schema"
+  #     confidence: "high"
+  #     score: "8"
+  #   _api:
+  #     endpoint: "https://httpbin.org/user-agent"
+  #     insecure: false
+  #     request: "GET"
+  #     response_type: "application/json"
+  #     auth: 
+  #       type: bearer
+  #       token_env: TOKEN 
+  #   _regex:
+  #     - \s*user-agent\s*
+
+
+  # - id: "SCAN-002 Custom"
+  #   type: "scan" 
+  #   enforcement:
+  #     - environment: "production"
+  #       fatal: "true"
+  #       exceptions: "false"
+  #       confidence: "high"
+  #     - environment: "development"
+  #       fatal: "false"
+  #       exceptions: "true"
+  #       confidence: "low"
+  #   metadata:
+  #     name: "Detect special Characters"
+  #     description: "Generic long description for (metadata) policy"
+  #     tags:
+  #       - "security"
+  #       - "encryption"
+  #     score: "9"
+  #   _regex:
+  #     - \s*55e24a0

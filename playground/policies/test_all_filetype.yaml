@@ -1,0 +1,218 @@
+
+Version: "1.0.0"
+
+Policies:
+  - id: "JSON-001"
+    type: "json"
+    filepattern: "\\.json$"
+    enforcement:
+      - environment: "all"
+        fatal: "false"
+        exceptions: "development"
+        
+    metadata:
+      name: "JSON Schema Compliance"
+      description: "Enforce schema compliance on JSON configuration files"
+      msg_solution: "Ensure all required fields are present and comply with the schema."
+      msg_error: "JSON file does not comply with the required schema."
+      tags:
+        - "config"
+        - "json"
+        - "schema"
+      confidence: "high"
+      score: "8"
+    _schema:
+      structure: |
+        {
+          app: {
+            name: string
+            version: string
+            port: int | *8080
+          }
+          database: {
+            host: string
+            port: int
+            name: string
+            user: string
+            password: string
+          }
+          logging: {
+            level: "debug" | "info" | "warn" | "error"
+            format: "json" | "text"
+            endpoint: string
+          }
+          features: {
+            featureA: bool
+            featureB: bool
+            flags: {
+            blocker : false }
+          }
+          password: "ganso"
+        }
+
+  - id: "JSON-002"
+    type: "json"
+    filepattern: "\\.json$"
+    enforcement:
+      - environment: "all"
+        fatal: "false"
+        exceptions: "development"
+        
+    metadata:
+      name: "JSON Schema Compliance"
+      description: "Enforce schema compliance on JSON configuration files"
+      msg_solution: "Ensure all required fields are present and comply with the schema."
+      msg_error: "JSON file does not comply with the required schema."
+      tags:
+        - "config"
+        - "json"
+        - "schema"
+      confidence: "high"
+      score: "8"
+    _schema:
+      strict: false
+      patch: false
+      structure: |
+        {
+          app: {
+            name: "pato"
+            version: "v0"
+            port: 8080
+          }
+          logging: {
+            level: "silent",
+          }
+        }
+
+  - id: "INI-001"
+    type: "ini"
+    filepattern: "\\.ini$"
+    enforcement:
+      - environment: "all"
+        fatal: "false"
+        exceptions: "development"
+        
+    metadata:
+      name: "INI Schema Compliance"
+      description: "Enforce schema compliance on INI configuration files"
+      msg_solution: "Ensure all required fields are present and comply with the schema."
+      msg_error: "INI file does not comply with the required schema."
+      tags:
+        - "config"
+        - "ini"
+        - "schema"
+      confidence: "high"
+      score: "8"
+    _schema:
+      structure: |
+        {
+          version: string
+          date:    string & =~"^\\d{4}/\\d{2}/\\d{2}$"
+
+          database: {
+            host: string
+            port: int & >=0 & <=65535
+            name: string
+            user: string
+          }
+
+          server: {
+            port:  int & >=0 & <=65535
+            debug: bool
+          }
+
+          logging: {
+            level: "trace" | "debug" | "info" | "warn" | "error" | "fatal"
+            file:  string
+          }
+        }
+
+
+  - id: "TOML-001"
+    type: "toml"
+    filepattern: "\\.toml$"
+    enforcement:
+      - environment: "all"
+        fatal: "false"
+        exceptions: "development"
+    metadata:
+      name: "TOML Schema Compliance"
+      description: "Enforce schema compliance on TOML configuration files"
+      msg_solution: "Ensure all required fields are present and comply with the schema."
+      msg_error: "TOML file does not comply with the required schema."
+      tags:
+        - "config"
+        - "toml"
+        - "schema"
+      confidence: "high"
+      score: "8"
+    _schema:
+      structure: |
+        {
+          version: string
+          app: {
+            name:    string
+            version: number
+          }
+          database: {
+            host: string
+            port: >5432
+            name: string
+            user: string
+          }
+          features: {
+            feature1: bool
+            feature2: string | bool
+            feature3: bool
+          }
+          limits: {
+            max_connections: int & >=0
+            timeout:         string
+          }
+        }
+
+
+  - id: "YAML-001"
+    type: "yml"
+    filepattern: "\\.ya?ml$"
+    enforcement:
+      - environment: "all"
+        fatal: "false"
+        exceptions: "development"
+    metadata:
+      name: "YAML Schema Compliance"
+      description: "Enforce schema compliance on YAML configuration files"
+      msg_solution: "Ensure all required fields are present and comply with the schema."
+      msg_error: "YAML file does not comply with the required schema."
+      tags:
+        - "config"
+        - "yaml"
+        - "schema"
+      confidence: "high"
+      score: "8"
+    _schema:
+      patch: false
+      structure: |
+          service: {
+            name:     string
+            replicas: string | int
+            ports: [...{
+              port:       int
+              targetPort: int
+            }]
+          }
+          environment: [...{
+            name:  string
+            value: string | int
+          }]
+          resources: {
+            limits: {
+              cpu:    string
+              memory: string
+            }
+            requests: {
+              cpu:    "600m"
+              memory: string
+            }
+          }
+     

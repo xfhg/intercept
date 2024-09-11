@@ -1,0 +1,6 @@
+
+tasks:
+  - init: K
+    command: make build
+
+

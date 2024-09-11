@@ -1,0 +1,50 @@
+
+Version: "1.0"
+
+Policies:
+
+  - id: "INI-001"
+    type: "ini"
+    filepattern: "\\.ini$"
+    enforcement:
+      - environment: "all"
+        fatal: "false"
+        exceptions: "development"
+      - environment: "dev"
+        fatal: "false"
+        exceptions: "development"
+        confidence: "high"
+    metadata:
+      name: "INI Schema Compliance"
+      description: "Enforce schema compliance on INI configuration files"
+      msg_solution: "Ensure all required fields are present and comply with the schema."
+      msg_error: "INI file does not comply with the required schema."
+      tags:
+        - "config"
+        - "ini"
+        - "schema"
+      score: "8"
+    _schema:
+      structure: |
+        {
+          version: string
+          date:    string & =~"^\\d{4}/\\d{2}/\\d{2}$"
+
+          database: {
+            host: string
+            port: int & >=0 & <=65535
+            name: string
+            user: string
+          }
+
+          server: {
+            port:  int & >=0 & <=65535
+            debug: bool
+          }
+
+          logging: {
+            level: "trace" | "debug" | "info" | "warn" | "error" | "fatal"
+            file:  string
+          }
+        }
+

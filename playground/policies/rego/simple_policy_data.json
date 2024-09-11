@@ -1,0 +1,14 @@
+{
+    "user_roles": {
+      "alice": ["reader", "commenter"],
+      "bob": ["writer", "editor"],
+      "charlie": ["viewer"]
+    },
+    "action_permissions": {
+      "read": ["reader", "writer", "editor"],
+      "write": ["writer", "editor"],
+      "comment": ["commenter", "writer", "editor"],
+      "view": ["viewer", "reader", "commenter", "writer", "editor"]
+    }
+  }
+  

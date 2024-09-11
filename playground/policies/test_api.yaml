@@ -1,0 +1,120 @@
+
+
+Version: "1.0.0"
+
+Policies:
+
+  - id: "API-001"
+    type: "api"
+    enforcement:
+      - environment: "production"
+        fatal: "true"
+        exceptions: "false"
+        confidence: "high"
+      - environment: "development"
+        fatal: "true"
+        exceptions: "false"
+        confidence: "high"
+    metadata:
+      name: "API Regex Compliance"
+      description: "Enforce schema compliance on API configuration files"
+      msg_solution: "Generic solution message to development issue."
+      msg_error: "Generic error message for development issue"
+      tags:
+        - "config"
+        - "ini"
+        - "schema"
+      confidence: "high"
+      score: "8"
+    _api:
+      endpoint: "https://httpbin.org/user-agent"
+      insecure: false
+      request: "GET"
+      response_type: "application/json"
+      auth: 
+        type: bearer
+        token_env: TOKEN 
+    _regex:
+      - \s*user-agent\s*
+
+  # - id: "API-002"
+  #   type: "api"
+  #   enforcement:
+  #     - environment: "all"
+  #       fatal: "false"
+  #       exceptions: "development"
+  #       msg_solution: "Ensure all required fields are present and comply with the schema."
+  #       msg_error: "API file does not comply with the required schema."
+  #   metadata:
+  #     name: "API Regex Compliance"
+  #     description: "Enforce schema compliance on API configuration files"
+  #     tags:
+  #       - "config"
+  #       - "ini"
+  #       - "schema"
+  #     confidence: "high"
+  #     score: "8"
+  #   _api:
+  #     endpoint: "https://httpbin.org/ip"
+  #     insecure: false
+  #     request: "GET"
+  #     auth: 
+  #       type: bearer
+  #       token_env: TOKEN 
+  #   _regex:
+  #     - \s*user-agent\s*
+
+  # - id: "API-003"
+  #   type: "api"
+  #   enforcement:
+  #     - environment: "all"
+  #       fatal: "false"
+  #       exceptions: "development"
+  #       msg_solution: "Ensure all required fields are present and comply with the schema."
+  #       msg_error: "API file does not comply with the required schema."
+  #   metadata:
+  #     name: "API Regex Compliance"
+  #     description: "Enforce schema compliance on API configuration files"
+  #     tags:
+  #       - "config"
+  #       - "ini"
+  #       - "schema"
+  #     confidence: "high"
+  #     score: "8"
+  #   _api:
+  #     endpoint: "https://httpbin.org/bearer"
+  #     insecure: false
+  #     request: "GET"
+  #     auth: 
+  #       type: bearer
+  #       token_env: TOKEN 
+  #   _regex:
+  #     - \"authenticated\"\s*:\s*true\s*,?
+
+  - id: "API-004"
+    type: "api"
+    enforcement:
+      - environment: "all"
+        fatal: "false"
+        exceptions: "development"
+        msg_solution: "Ensure all required fields are present and comply with the schema."
+        msg_error: "API file does not comply with the required schema."
+    metadata:
+      name: "API Regex Compliance"
+      description: "Enforce schema compliance on API configuration files"
+      tags:
+        - "config"
+        - "ini"
+        - "schema"
+      confidence: "high"
+      score: "8"
+    _api:
+      endpoint: "https://httpbin.org/bearer"
+      insecure: false
+      request: "GET"
+      auth: 
+        type: bearer
+        token_env: TOKEN 
+    _schema:
+      structure: |
+        { authenticated : true}

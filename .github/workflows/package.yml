@@ -1,0 +1,84 @@
+name: Intercept Image Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      logLevel:
+        description: 'Log level'
+        required: true
+        default: 'warning'
+  push:
+    tags:
+      - "*"
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup Go
+      uses: actions/setup-go@v4
+      with:
+        go-version-file: go.mod
+
+    - name: Fetch Tags
+      run: |
+        git fetch --tags -f
+        TAG=$(git describe --tags --always)
+        VERSION=${TAG#v}
+        echo "VERSION=$VERSION" >> $GITHUB_ENV
+
+    - name: Get dependencies
+      run: |
+        go get -v -t -d ./...
+        if [ -f Gopkg.toml ]; then
+            curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
+            dep ensure
+        fi
+
+    - name: Update
+      run: sudo apt-get update -y
+
+    - name: Make all release artifacts
+      run: make build-all
+
+    - name: Set up QEMU
+      uses: docker/setup-qemu-action@v2
+
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v2
+
+    - name: Login to DockerHub
+      uses: docker/login-action@v2
+      with:
+        username: ${{ secrets.DOCKERHUB_USERNAME }}
+        password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+    - name: Login to GitHub Container Registry
+      uses: docker/login-action@v2
+      with:
+        registry: ghcr.io
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Build and push Docker images
+      run: |
+        PLATFORMS=(linux/amd64 linux/arm linux/arm64)
+        for platform in "${PLATFORMS[@]}"; do
+          os=$(echo $platform | cut -d'/' -f1)
+          arch=$(echo $platform | cut -d'/' -f2)
+          
+          docker buildx build --platform $platform \
+            --build-arg BINARY=release/intercept-$os-$arch \
+            -t xfhg/intercept:${{ env.VERSION }}-$os-$arch \
+            -t xfhg/intercept:latest-$os-$arch \
+            -t ghcr.io/${{ github.repository }}:${{ env.VERSION }}-$os-$arch \
+            -t ghcr.io/${{ github.repository }}:latest-$os-$arch \
+            --push \
+            .
+        done
+
+    

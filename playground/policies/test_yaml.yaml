@@ -1,0 +1,55 @@
+Config:
+  Flags:
+    output_type: "sarif"
+    ignore:
+      - "targets/ignorethisfolder/"
+      - "targets/random/development-4985.yml"
+
+Version: "1.0.0"
+
+Policies:
+
+  - id: "YAML-001"
+    type: "yml"
+    filepattern: "\\.ya?ml$"
+    enforcement:
+      - environment: "all"
+        fatal: "false"
+        exceptions: "development"
+    metadata:
+      name: "YAML Schema Compliance"
+      description: "Enforce schema compliance on YAML configuration files"
+      msg_solution: "Ensure all required fields are present and comply with the schema."
+      msg_error: "YAML file does not comply with the required schema."
+      tags:
+        - "config"
+        - "yaml"
+        - "schema"
+      confidence: "high"
+      score: "8"
+    _schema:
+      patch: false
+      structure: |
+          service: {
+            name:     string
+            replicas: string | int
+            ports: [...{
+              port:       int
+              targetPort: int
+            }]
+          }
+          environment: [...{
+            name:  string
+            value: string | int
+          }]
+          resources: {
+            limits: {
+              cpu:    string
+              memory: string
+            }
+            requests: {
+              cpu:    "600m"
+              memory: string
+            }
+          }
+          

@@ -1,0 +1,24 @@
+version = "v"
+obsolete = true
+
+[app]
+name = "MyApp"
+version = 1.0
+
+[database]
+host = "localhost"
+port = 5431
+name = "mydb"
+user = "admin"
+
+[features]
+feature1 = true
+feature2 = "yes"
+feature3 = false
+
+[limits]
+max_connections = 100
+timeout = "30s"
+
+[extra_section]
+should_not = "be_here"

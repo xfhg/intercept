@@ -1,0 +1,26 @@
+
+Version: "1.0.0"
+
+Policies:
+
+  - id: "REGO-001"
+    type: "rego"
+    filepattern: 'input_\w+\.json$'
+    enforcement:
+      - environment: "all"
+        fatal: "false"
+        exceptions: "development"
+        confidence: "high"
+    metadata:
+      name: "REGO Schema Compliance"
+      description: "Enforce schema compliance on JSON configuration file"
+      tags:
+        - "config"
+        - "ini"
+        - "schema"
+      score: "8"
+    _rego:
+      policy_file: policies/rego/simple.rego
+      policy_data: policies/rego/simple_policy_data.json
+      policy_query: data.policies.allow
+

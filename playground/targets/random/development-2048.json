@@ -1,0 +1,54 @@
+{
+  "affinity": {},
+  "app": {
+    "name": "pato",
+    "port": 8080,
+    "version": "v0"
+  },
+  "autoscaling": {
+    "enabled": false,
+    "maxReplicas": 100,
+    "minReplicas": 1,
+    "targetCPUUtilizationPercentage": 80
+  },
+  "fullnameOverride": "",
+  "image": {
+    "pullPolicy": "IfNotPresent",
+    "repository": "nginx",
+    "tag": "latest"
+  },
+  "ingress": {
+    "enabled": false,
+    "hosts": [
+      {
+        "host": "chart-example.local",
+        "paths": [
+          "/"
+        ]
+      }
+    ]
+  },
+  "logging": {
+    "level": "silent"
+  },
+  "nameOverride": "",
+  "nodeSelector": {},
+  "replicaCount": 2,
+  "resources": {
+    "limits": {
+      "cpu": "200m",
+      "memory": "128Mi"
+    },
+    "requests": {
+      "cpu": "100m",
+      "memory": "128Mi"
+    }
+  },
+  "service": {
+    "annotations": {},
+    "port": 80,
+    "type": "ClusterIP"
+  },
+  "tolerations": [],
+  "version": "1.2"
+}

@@ -1,0 +1,108 @@
+
+Version: "1.0.0"
+
+Policies:
+  # - id: "JSON-001"
+  #   type: "json"
+  #   filepattern: "\\.json$"
+  #   enforcement:
+  #     - environment: "all"
+  #       fatal: "false"
+  #       exceptions: "development"
+  #       confidence: "high"  
+  #   metadata:
+  #     name: "JSON Schema Compliance"
+  #     description: "Enforce schema compliance on JSON configuration files"
+  #     tags:
+  #       - "config"
+  #       - "json"
+  #       - "schema"
+
+  #     score: "8"
+  #   _schema:
+  #     structure: |
+  #       {
+  #         app: {
+  #           name: string
+  #           version: string
+  #           port: int | *8080
+  #         }
+  #         database: {
+  #           host: string
+  #           port: int
+  #           name: string
+  #           user: string
+  #           password: string
+  #         }
+  #         logging: {
+  #           level: "debug" | "info" | "warn" | "error"
+  #           format: "json" | "text"
+  #           endpoint: string
+  #         }
+  #         features: {
+  #           featureA: bool
+  #           featureB: bool
+  #           flags: {
+  #           blocker : false }
+  #         }
+  #         password: "ganso"
+  #       }
+
+  - id: "JSON-001"
+    type: "json"
+    filepattern: "example.json$"
+    enforcement:
+      - environment: "all"
+        fatal: "false"
+        exceptions: "development"
+        confidence: "high"
+    metadata:
+      name: "JSON Schema Compliance"
+      description: "Enforce schema compliance on JSON configuration files"
+      msg_solution: "Ensure all required fields are present and comply with the schema."
+      msg_error: "JSON file does not comply with the required schema."
+      tags:
+        - "config"
+        - "json"
+        - "schema"
+    _schema:
+      strict: false
+      patch: false
+      structure: |
+        {
+          app: {
+            name: "pato"
+            version: "v0"
+            port: 8080
+          }
+          logging: {
+            level: "silent",
+          }
+        }
+
+
+  - id: "JSON-002"
+    type: "json"
+    filepattern: "development-2048.json$"
+    enforcement:
+      - environment: "all"
+        fatal: "false"
+        exceptions: "development"
+    metadata:
+      name: "JSON Schema Compliance"
+      description: "Enforce schema compliance on JSON configuration files"
+      msg_solution: "Ensure all required fields are present and comply with the schema."
+      msg_error: "JSON file does not comply with the required schema."
+      tags:
+        - "config"
+        - "json"
+        - "schema"
+      confidence: "high"
+      score: "8"
+    _schema:
+      strict: false
+      patch: true
+      structure: |
+        {
+          autoscaling: {enabled: true}
+        }

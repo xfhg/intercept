@@ -1,0 +1,75 @@
+
+Policies:
+
+  - id: "ASSURE-001 Name key is present"
+    type: "assure"
+    filepattern: "example.*"
+    enforcement:
+      - environment: "production"
+        fatal: "true"
+        exceptions: "false"
+        msg_solution: "Generic solution message to production issue."
+        msg_error: "Generic error message for production issue"
+        confidence: "high"
+      - environment: "development"
+        fatal: "false"
+        exceptions: "false"
+        msg_solution: "Generic solution message to production issue."
+        msg_error: "Generic error message for production issue"
+        confidence: "low"
+    metadata:
+      name: "Detect private keys"
+      description: "Ensure all connections use HTTPS"
+      tags:
+        - "compliance"
+        - "name"
+      score: "9"
+    _regex:
+      - ("vname":\s*"([^"]*)")
+
+  - id: "ASSURE-002 User key is present"
+    type: "assure"
+    filepattern: "example.*"
+    enforcement:
+      - environment: "production"
+        fatal: "true"
+        exceptions: "false"
+        msg_solution: "Generic solution message to production issue."
+        msg_error: "Generic error message for production issue"
+        confidence: "high"
+      - environment: "development"
+        fatal: "true"
+        exceptions: "false"
+        msg_solution: "Generic solution message to development issue."
+        msg_error: "Generic error message for development issue"
+        confidence: "high"
+    metadata:
+      name: "Detect private keys"
+      description: "Ensure all connections use HTTPS"
+      tags:
+        - "compliance"
+        - "user"
+      score: "9"
+    _regex:
+      - ("vuser":\s*"([^"]*)")
+
+  - id: "ASSURE-003 STAGING ONLY User key is present"
+    type: "assure"
+    filepattern: "example.*"
+    enforcement:
+      - environment: "staging"
+        fatal: "true"
+        exceptions: "false"
+        msg_solution: "Generic solution message to production issue."
+        msg_error: "Generic error message for production issue"
+        confidence: "high"
+    metadata:
+      name: "Detect private keys"
+      description: "Ensure all connections use HTTPS"
+      tags:
+        - "compliance"
+        - "user"
+      score: "9"
+    _regex:
+      - ("vuser":\s*"([^"]*)")
+         

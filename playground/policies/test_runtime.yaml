@@ -1,0 +1,36 @@
+
+Policies:
+
+  - id: "RUNTIM-001"
+    type: "runtime"
+    enforcement:
+      - environment: "all"
+        fatal: "false"
+        exceptions: "development"
+    metadata:
+      name: "RUNTIME System Compliance"
+      description: "Enforce system compliance at runtime"
+      tags:
+        - "config"
+        - "runtime"
+        - "enforce"
+      score: "8"
+    _runtime:
+      config: runtime/simple_https.yaml
+
+  - id: "RUNTIM-002"
+    type: "runtime"
+    enforcement:
+      - environment: "all"
+        fatal: "false"
+        exceptions: "development"
+    metadata:
+      name: "RUNTIME System Compliance"
+      description: "Enforce system compliance at runtime"
+      tags:
+        - "config"
+        - "runtime"
+        - "enforce"
+      score: "8"
+    _runtime:
+      config: runtime/irt_sudoers.yaml

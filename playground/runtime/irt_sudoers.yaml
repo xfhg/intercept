@@ -1,0 +1,41 @@
+
+user:
+  root:
+    exists: true
+    uid: 0
+    gid: 0
+    home: /root
+    shell: /bin/bash
+    groups:
+      - root
+  authorized_user:
+    exists: true
+    uid: 1001
+    gid: 1001
+    home: /home/authorized_user
+    shell: /bin/bash
+    groups:
+      - sudo
+  unauthorized_user:
+    exists: false
+
+file:
+  /etc/sudoers:
+    exists: true
+    mode: "0440"
+    owner: root
+    group: root
+    contents:
+      - "%sudo ALL=(ALL) ALL"
+      - "!NOPASSWD:ALL"
+      - pattern: "ALL=(ALL) NOPASSWD:ALL"
+        invert: true
+      - pattern: "some_dangerous_entry"
+        invert: true
+
+# Check specific user entries in the sudoers file
+command:
+  "grep '^authorized_user' /etc/sudoers":
+    exit-status: 1
+  "grep '^unauthorized_user' /etc/sudoers":
+    exit-status: 1

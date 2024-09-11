@@ -1,0 +1,21 @@
+service:
+  name: my-service
+  replicas: "2"
+  ports:
+    - port: 80
+      targetPort: 8080
+    - port: 443
+      targetPort: 8443
+environment:
+  - name: DB_HOST
+    value: localhost
+  - name: DB_PORT
+    value: 5432
+resources:
+  limits:
+    cpu: 500m
+    memory: 512Mi
+  requests:
+    cpu: 250m
+extra_field:
+  should_not: be_here
