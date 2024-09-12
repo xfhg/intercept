@@ -60,13 +60,24 @@ func runObserve(cmd *cobra.Command, args []string) {
 
 	perf := Performance{StartTime: time.Now()}
 
-	if observePolicyFile != "" {
-		var err error
-		policyData, err = LoadPolicyFile(observePolicyFile)
-		if err != nil {
-			log.Fatal().Err(err).Str("file", observePolicyFile).Msg("Error loading policy file")
-		}
+	sourceType, processedInput, err := DeterminePolicySource(observePolicyFile)
+	if err != nil {
+		log.Fatal().Err(err)
 	}
+
+	switch sourceType {
+	case LocalFile:
+		policyData, err = LoadPolicyFile(processedInput)
+	case RemoteURL:
+		policyData, err = LoadRemotePolicy(processedInput, policyFileSHA256)
+	default:
+		log.Fatal().Msg("unknown policy source type")
+	}
+
+	if err != nil {
+		log.Fatal().Err(err).Str("file", observePolicyFile).Msg("Error loading policy file")
+	}
+
 	// Clean up output directories
 	if err := cleanupOutputDirectories(); err != nil {
 		log.Fatal().Err(err).Msg("Failed to clean up output directories")
@@ -127,6 +138,8 @@ func runObserve(cmd *cobra.Command, args []string) {
 		Tz:      "UTC", // You can change this to your preferred timezone
 	})
 
+	run := false
+
 	for _, policy := range policies {
 
 		// SCHEDULERS
@@ -143,6 +156,8 @@ func runObserve(cmd *cobra.Command, args []string) {
 		if policy.Type != "api" && policy.Type != "runtime" && policy.Type != "rego" {
 			policy.Metadata.TargetInfo = preparePolicyPaths(policy, allFileInfos)
 		}
+
+		run = true
 
 		policyTask := createPolicyTask(policy, dispatcher)
 		taskr.Task(schedule, policyTask)
@@ -179,7 +194,7 @@ func runObserve(cmd *cobra.Command, args []string) {
 				}
 
 			} else {
-				log.Warn().Str("policy", policy.ID).Msg("Runtime observe has invalid path, skipping")
+				log.Warn().Str("policy", policy.ID).Str("path", policy.Runtime.Observe).Msg("Runtime observe has invalid path, skipping")
 			}
 
 		}
@@ -194,6 +209,10 @@ func runObserve(cmd *cobra.Command, args []string) {
 		} else {
 			log.Fatal().Str("schedule", config.Flags.ReportSchedule).Msg("Invalid cron expression for Report, quitting")
 		}
+	}
+
+	if !run {
+		log.Fatal().Msg("No policies fit for OBSERVE, recheck your policy file")
 	}
 
 	// Setup signal handling for graceful shutdown
