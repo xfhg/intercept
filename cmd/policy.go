@@ -1,9 +1,13 @@
 package cmd
 
 import (
+	"fmt"
+	"net/http"
 	"os"
+	"path/filepath"
 	"sync"
 
+	"github.com/go-resty/resty/v2"
 	"gopkg.in/yaml.v3"
 )
 
@@ -108,6 +112,13 @@ type PolicyFile struct {
 	Policies  []Policy `yaml:"Policies"`
 }
 
+type PolicySourceType int
+
+const (
+	LocalFile PolicySourceType = iota
+	RemoteURL
+)
+
 func LoadPolicyFile(filename string) (*PolicyFile, error) {
 	data, err := os.ReadFile(filename)
 	if err != nil {
@@ -128,6 +139,79 @@ func LoadPolicyFile(filename string) (*PolicyFile, error) {
 	}
 
 	return &policyFile, nil
+}
+
+// Load Remote
+
+// LoadRemotePolicy loads a policy file from a remote HTTPS endpoint
+func LoadRemotePolicy(url string, expectedChecksum string) (*PolicyFile, error) {
+	// Create a temporary directory to store the downloaded file
+	tempDir, err := os.MkdirTemp(outputDir, "_remote")
+	if err != nil {
+		return nil, fmt.Errorf("failed to create temporary directory: %w", err)
+	}
+	defer os.RemoveAll(tempDir) // Clean up the temporary directory when done
+
+	// Generate a temporary file name
+	tempFile := filepath.Join(tempDir, "remote_policy.yaml")
+
+	// Create a resty client
+	client := resty.New()
+
+	// Download the file
+	resp, err := client.R().SetOutput(tempFile).Get(url)
+	if err != nil {
+		return nil, fmt.Errorf("failed to download policy file: %w", err)
+	}
+
+	if resp.StatusCode() != http.StatusOK {
+		return nil, fmt.Errorf("failed to download policy file: HTTP status %d", resp.StatusCode())
+	}
+
+	// If a checksum is provided, validate it
+	if expectedChecksum != "" {
+		actualChecksum, err := calculateSHA256(tempFile)
+		if err != nil {
+			log.Fatal().Err(err).Msg("failed to calculate policy checksum")
+		}
+
+		if actualChecksum != expectedChecksum {
+			log.Fatal().Msgf("Policy checksum mismatch: expected %s, got %s", expectedChecksum, actualChecksum)
+
+		}
+	}
+
+	// Load the policy file
+	policyFile, err := LoadPolicyFile(tempFile)
+	if err != nil {
+		log.Fatal().Err(err).Msg("failed to load policy file")
+	}
+
+	return policyFile, nil
+}
+
+func DeterminePolicySource(input string) (PolicySourceType, string, error) {
+	// First, check if it's a valid URL
+	if isURL(input) {
+		return RemoteURL, input, nil
+	}
+
+	// If not a URL, treat it as a file path
+	absPath, err := filepath.Abs(input)
+	if err != nil {
+		return LocalFile, "", err
+	}
+
+	// Check if the file exists
+	_, err = os.Stat(absPath)
+	if err != nil {
+		if os.IsNotExist(err) {
+			return LocalFile, "", fmt.Errorf("file does not exist: %s", absPath)
+		}
+		return LocalFile, "", err
+	}
+
+	return LocalFile, absPath, nil
 }
 
 // Policy store

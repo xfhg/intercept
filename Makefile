@@ -3,6 +3,9 @@ BINARY_NAME=intercept
 
 # Binary Version
 GIT_TAG := $(shell git describe --tags --abbrev=0 2>/dev/null || echo "v1.0.X")
+GIT_COMMIT := $(shell git rev-parse --short HEAD 2>/dev/null || echo "unknown")
+
+
 
 # Go parameters
 GOCMD=go
@@ -14,7 +17,7 @@ GOTEST=$(GOCMD) test
 # LDFLAGS=-ldflags="-s -w"
 # BUILD_FLAGS=-mod=readonly $(LDFLAGS)
 
-BUILD_FLAGS=-mod=readonly -ldflags="-s -w -X intercept/cmd.buildVersion=$(GIT_TAG)" 
+BUILD_FLAGS=-mod=readonly -ldflags="-s -w -X intercept/cmd.buildVersion=$(GIT_TAG)-$(GIT_COMMIT)" 
 
 # All compilation platforms
 ALL_PLATFORMS=darwin/amd64 darwin/arm64 linux/amd64 linux/arm linux/arm64 windows/amd64

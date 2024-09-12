@@ -1,6 +1,6 @@
 module intercept
 
-go 1.22.6
+go 1.23
 
 require (
 	github.com/gookit/event v1.1.2

@@ -75,7 +75,7 @@ Policies:
       score: "8"
     _runtime:
       config: runtime/simple_https.yaml
-      observe: "/Users/glitch/Workspace/Code/Production/track-me.md"
+      observe: "_dispatch_this/_status/20240912T065810Z_intercept_2lxad6.sarif.json"
       
 
   # - id: "RUNTIM-002"

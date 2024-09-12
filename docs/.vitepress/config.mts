@@ -14,7 +14,7 @@ export default defineConfig({
       // { text: 'Home', link: '/' },
       { text: 'Documentation', link: '/docs/tbd' },
       { text: 'Features', link: '/docs/tbd' },
-      { text: 'Latest Release', link: 'https://github.com/interceptd/intercept/releases' }
+      { text: 'Latest Release', link: 'https://github.com/xfhg/intercept/releases' }
     ],
     // head: [['link', { rel: 'icon', href: '/intercept-icon.svg' }]],
     logo: '/intercept-icon.svg',
