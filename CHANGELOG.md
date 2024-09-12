@@ -2,8 +2,32 @@
 
 All notable changes to this project will be documented in this file.
 
+<br><br>
 
-## Unreleased - feature/loadremote
+## EXPERIMENTAL FEATURE - feature/targetid
+
+**Commit**: [e95c0ed](https://github.com/xfhg/intercept/commit/e95c0ed)
+
+**Branch** [feature/loadremote](https://github.com/xfhg/intercept/tree/feature/targetid)
+
+**Summary**: Fingerprint hosts for reporting --experimental
+
+### Breaking 
+- Properties on Final SARIF report key names corrected to kebab case.
+
+### Added
+- Added Global hostData & hostFingerprint
+- Added "host-data" & "host-fingerprint" to Final SARIF Report
+
+### Changed
+- Properties on Final SARIF report key names corrected to kebab case.
+
+### Removed
+- None
+
+<br><br><br><br>
+
+## FEATURE - feature/loadremote
 
 **Commit**: [e95c0ed](https://github.com/xfhg/intercept/commit/e95c0ed)
 

@@ -26,6 +26,12 @@ type Config struct {
 		ReportSchedule string   `yaml:"report_schedule"`
 	} `yaml:"Flags"`
 	Metadata struct {
+		HostOS          string `yaml:"host_os,omitempty"`
+		HostMAC         string `yaml:"host_mac,omitempty"`
+		HostARCH        string `yaml:"host_arch,omitempty"`
+		HostNAME        string `yaml:"host_name,omitempty"`
+		HostFingerprint string `yaml:"host_fingerprint,omitempty"`
+		HostInfo        string `yaml:"host_info,omitempty"`
 		MsgExitClean    string `yaml:"MsgExitClean"`
 		MsgExitWarning  string `yaml:"MsgExitWarning"`
 		MsgExitCritical string `yaml:"MsgExitCritical"`
