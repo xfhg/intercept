@@ -1,5 +1,5 @@
 
-# 🧬 Architecture
+# Architecture
 
 <br><br>
 
