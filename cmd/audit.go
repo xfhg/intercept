@@ -18,17 +18,18 @@ type Performance struct {
 }
 
 var (
-	targetDir    string
-	tagsAny      string
-	tagsAll      string
-	environment  string
-	envDetection bool
-	debugOutput  bool
-	rgPath       string
-	gossPath     string
-	policyFile   string
-	outputType   string
-	policyData   *PolicyFile
+	targetDir        string
+	tagsAny          string
+	tagsAll          string
+	environment      string
+	envDetection     bool
+	debugOutput      bool
+	rgPath           string
+	gossPath         string
+	policyFile       string
+	policyFileSHA256 string
+	outputType       string
+	policyData       *PolicyFile
 )
 
 var runAuditPerfCmd = &cobra.Command{
@@ -41,12 +42,13 @@ var runAuditPerfCmd = &cobra.Command{
 func init() {
 	rootCmd.AddCommand(runAuditPerfCmd)
 	runAuditPerfCmd.Flags().StringVarP(&targetDir, "target", "t", "", "Target directory to audit")
-	runAuditPerfCmd.Flags().StringVar(&tagsAny, "tags_any", "", "Filter policies that match any of the provided tags (comma-separated)")
+	runAuditPerfCmd.Flags().StringVarP(&tagsAny, "tags_any", "f", "", "Filter policies that match any of the provided tags (comma-separated)")
 	runAuditPerfCmd.Flags().StringVar(&tagsAll, "tags_all", "", "Filter policies that match all of the provided tags (comma-separated)")
-	runAuditPerfCmd.Flags().StringVar(&environment, "environment", "", "Filter policies that match the specified environment")
+	runAuditPerfCmd.Flags().StringVarP(&environment, "environment", "e", "", "Filter policies that match the specified environment")
 	runAuditPerfCmd.Flags().BoolVar(&envDetection, "env-detection", false, "Enable environment detection if no environment is specified")
 	runAuditPerfCmd.Flags().BoolVar(&debugOutput, "debug", false, "Enable debug verbose output")
-	runAuditPerfCmd.Flags().StringVar(&policyFile, "policy", "", "policy file")
+	runAuditPerfCmd.Flags().StringVarP(&policyFile, "policy", "p", "", "policy FILE or URL")
+	runAuditPerfCmd.Flags().StringVar(&policyFileSHA256, "checksum", "", "policy file SHA256 checksum")
 	runAuditPerfCmd.Flags().StringVar(&outputType, "output", "sarif", "output type")
 }
 
@@ -56,7 +58,22 @@ func runAuditPerf(cmd *cobra.Command, args []string) {
 
 	perf := Performance{StartTime: time.Now()}
 
-	policyData, err = LoadPolicyFile(policyFile)
+	sourceType, processedInput, err := DeterminePolicySource(policyFile)
+	if err != nil {
+		log.Fatal().Err(err)
+	}
+
+	switch sourceType {
+	case LocalFile:
+		policyData, err = LoadPolicyFile(processedInput)
+	case RemoteURL:
+		policyData, err = LoadRemotePolicy(processedInput, policyFileSHA256)
+	default:
+		log.Fatal().Msg("unknown policy source type")
+	}
+
+	//policyData, err = LoadPolicyFile(policyFile)
+
 	if err != nil {
 		log.Fatal().Err(err).Str("file", policyFile).Msg("Error loading policy file")
 	}

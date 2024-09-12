@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"net/url"
 	"os"
 	"path/filepath"
 	"strconv"
@@ -410,4 +411,14 @@ func PathInfo(path string) (exists bool, isDir bool, err error) {
 
 func GetDirectory(path string) string {
 	return filepath.Dir(path) + "/"
+}
+
+// isURL checks if the input string is a valid URL
+func isURL(input string) bool {
+	// Check for common URL schemes
+	if strings.HasPrefix(input, "http://") || strings.HasPrefix(input, "https://") {
+		_, err := url.ParseRequestURI(input)
+		return err == nil
+	}
+	return false
 }
