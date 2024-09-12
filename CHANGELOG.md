@@ -6,9 +6,9 @@ All notable changes to this project will be documented in this file.
 
 ## EXPERIMENTAL FEATURE - feature/targetid
 
-**Commit**: [e95c0ed](https://github.com/xfhg/intercept/commit/e95c0ed)
+**Commit**: [b84f0f9](https://github.com/xfhg/intercept/commit/b84f0f9)
 
-**Branch** [feature/loadremote](https://github.com/xfhg/intercept/tree/feature/targetid)
+**Branch** [feature/targetid](https://github.com/xfhg/intercept/tree/feature/targetid)
 
 **Summary**: Fingerprint hosts for reporting --experimental
 
