@@ -1,12 +1,18 @@
-# Changelog
+# Intercept Changelog
 
 All notable changes to this project will be documented in this file.
 
 
-## [[Unreleased]] - feature/loadremote
-Commit: [55e24a0](https://github.com/xfhg/intercept/commit/55e24a0)
+## Unreleased - feature/loadremote
 
-Summary: Capability to load the main policy file from remote endpoint (and check their SHA256)
+**Commit**: [e95c0ed](https://github.com/xfhg/intercept/commit/e95c0ed)
+
+**Branch** [feature/loadremote](https://github.com/xfhg/intercept/tree/feature/loadremote)
+
+**Summary**: Capability to load the main policy file from remote endpoint (and check their SHA256)
+
+### Breaking 
+- None
 
 ### Added
 - Added this CHANGELOG
@@ -20,4 +26,5 @@ Summary: Capability to load the main policy file from remote endpoint (and check
 - Modified go build version to 1.23
 
 ### Removed
+- None
 
