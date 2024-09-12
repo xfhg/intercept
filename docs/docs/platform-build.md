@@ -9,7 +9,7 @@ git clone https://github.com/xfhg/intercept.git
 cd intercept
 ```
 
-::: info
+::: tip
 Ensure you have Go 1.22 or later and common build essentials installed.
 :::
 
@@ -55,7 +55,7 @@ snippet of policies/test_scan.yaml
 ```yaml{3,18}
 Policies:
   - id: "SCAN-001 Private Keys"
-    type: "scan"
+    type: "scan" // [!code focus]
     enforcement:
       - environment: "development"
         fatal: "true"
@@ -70,7 +70,7 @@ Policies:
         - "security"
         - "encryption"
       score: "9"
-    _regex:
+    _regex: // [!code focus]
       - \s*(-----BEGIN PRIVATE KEY-----)
       - \s*(-----BEGIN RSA PRIVATE KEY-----)
       - \s*(-----BEGIN DSA PRIVATE KEY-----)
@@ -114,8 +114,8 @@ audit # the main audit command
 ### 8. INTERCEPT Results
 
 ```sh{2}
-_my_first_run/
-├─ intercept_2lshLG.sarif.json      # The sarif report from our audit run
+_my_first_run/ # // [!code focus]
+├─ intercept_2lshLG.sarif.json      # The sarif report from our audit run // [!code focus]
 ├─ _debug/
 │  ├─ ..json
 │  ├─ ..sarif       # this is a debug folder for internal workflow output validation
@@ -148,11 +148,11 @@ A comprehensive SARIF Report is generated for every audit run (identified by a r
       },
       "results": [
         {
-          "ruleId": "SCAN-001-PRIVATE-KEYS",
-          "level": "error",
-          "message": {
-            "text": "Policy violation: Detect private keys Matched text: \n-----BEGIN PGP PRIVATE KEY BLOCK-----"
-          },
+          "ruleId": "SCAN-001-PRIVATE-KEYS", // [!code focus]
+          "level": "error", // [!code focus]
+          "message": { // [!code focus]
+            "text": "Policy violation: Detect private keys Matched text: \n-----BEGIN PGP PRIVATE KEY BLOCK-----" // [!code focus]
+          }, // [!code focus]
           "locations": [
             {
               "physicalLocation": {
@@ -205,7 +205,7 @@ This is the minimum intercept report generated that includes 1 policy and 1 audi
 
 ### 9. Explore the remainding policy files to understand and build more complex workflows.
 
-::: info
+::: tip
 <-- More info for each policy type
 
 POST the sarif reports using the WEBHOOKS workflow
