@@ -5,10 +5,12 @@ export default defineConfig({
   title: "INTERCEPT",
   description: "Policy as Code Engine",
   lastUpdated: true,
+  appearance: "dark",
   head: [
     ['link', { rel: 'icon', type: 'image/svg+xml', href: '/intercept-icon.svg' }],
   ],
   themeConfig: {
+    
     search: {
       provider: 'local'
     },
