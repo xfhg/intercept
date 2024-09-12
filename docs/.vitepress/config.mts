@@ -15,57 +15,64 @@ export default defineConfig({
     // https://vitepress.dev/reference/default-theme-config
     nav: [
       { text: 'Code', link: 'https://github.com/xfhg/intercept' },
-      { text: 'Documentation', link: '/docs/tbd' },
-      { text: 'Features', link: '/docs/tbd' },
+      { text: 'Documentation', link: '/docs/architecture' },
+      { text: 'Basics', link: '/docs/basics' },
       { text: 'Latest Release', link: 'https://github.com/xfhg/intercept/releases' }
     ],
     // head: [['link', { rel: 'icon', href: '/intercept-icon.svg' }]],
     logo: '/intercept-icon.svg',
     sidebar: [
       {
+        text: 'Architecture',
+        items: [
+          { text: 'Workflow', link: '/docs/architecture' },
+          { text: 'Basic Concepts', link: '/docs/basics' },
+          { text: 'Features', link: '/docs/features' },
+          
+        ]
+      },
+      {
         text: 'Getting Started',
         items: [
-          { text: 'Architecture', link: '/docs/architecture' },
           { text: 'Platform Build', link: '/docs/platform-build' },
           { text: 'Docker QuickStart', link: '/docs/docker-quickstart' },
           { text: 'Sandbox Playground', link: '/docs/sandbox' },
         ]
       },
-      
       {
         text: 'Policy Features',
         items: [
-          { text: 'Schema', link: '/docs/policy-schema' },
-          { text: 'Enforcement Levels', link: '/docs/enforcement' },
-          { text: 'Patching', link: '/docs/patching' },
-          { text: 'Monitoring', link: '/docs/monitoring' },
+          { text: 'Schema', link: '/docs/tbd' },
+          { text: 'Enforcement Levels', link: '/docs/tbd' },
+          { text: 'Patching', link: '/docs/tbd' },
+          { text: 'Monitoring', link: '/docs/tbd' },
         ]
       },
 
       {
         text: 'Policy Types',
         items: [
-          { text: 'SCAN ', link: '/docs/policy-scan-regex' },
-          { text: 'ASSURE ', link: '/docs/policy-assure-regex' },
-          { text: 'ASSURE - REGO ', link: '/docs/policy-assure-rego' },
-          { text: 'ASSURE - TYPE ', link: '/docs/policy-assure-filetype' },
-          { text: 'ASSURE - API ', link: '/docs/policy-assure-api' },
-          { text: 'RUNTIME ', link: '/docs/policy-runtime' },
+          { text: 'SCAN ', link: '/docs/tbd' },
+          { text: 'ASSURE ', link: '/docs/tbd' },
+          { text: 'ASSURE - REGO ', link: '/docs/tbd' },
+          { text: 'ASSURE - TYPE ', link: '/docs/tbd' },
+          { text: 'ASSURE - API ', link: '/docs/tbd' },
+          { text: 'RUNTIME ', link: '/docs/tbd' },
         ]
       },
       {
         text: 'INTERCEPT AUDIT',
         items: [
-          { text: 'Compliance Reporting', link: '/docs/compliance-report' },
-          { text: 'Feature Flags', link: '/docs/feature-flags' },
+          { text: 'Compliance Reporting', link: '/docs/tbd' },
+          { text: 'Feature Flags', link: '/docs/tbd' },
         ]
       },
       {
         text: 'INTERCEPT OBSERVE',
         items: [
-          { text: 'Setup', link: '/docs/intercept-observe' },
-          { text: 'Runtime Daemon', link: '/docs/runtime-observe' },
-          { text: 'Integration Webhooks', link: '/docs/hooks' }
+          { text: 'Setup', link: '/docs/tbd' },
+          { text: 'Runtime Daemon', link: '/docs/tbd' },
+          { text: 'Integration Webhooks', link: '/docs/tbd' }
         ]
       },
       {
@@ -80,7 +87,7 @@ export default defineConfig({
       { icon: 'github', link: 'https://github.com/xfhg/intercept' }
     ],
     footer: {
-      message: 'Released under the <a href="https://github.com/xfhg/intercept/blob/master/LICENSE">EUPL-1.2 License</a>',
+      message: 'Released under the <a href="https://github.com/xfhg/intercept/blob/master/LICENSE.md">EUPL-1.2 License</a>',
       copyright: 'Copyright © 2018-202X - <a href="https://github.com/xfhg">Flávio HG</a>'
     }
   },

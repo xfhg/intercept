@@ -15,7 +15,7 @@ hero:
       link: /docs/architecture
     - theme: alt
       text: Policy Documentation
-      link: /docs/architecture
+      link: /docs/basics
 
 features:
   - title: ELEGANT
@@ -40,6 +40,6 @@ features:
 
 ```sh
 git clone https://github.com/xfhg/intercept.git
-docker pull ghcr.io/xfhg/intercept:latest
+docker pull ghcr.io/xfhg/intercept:latest-$OS-$ARCH
 ```
 
