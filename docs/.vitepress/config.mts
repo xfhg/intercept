@@ -42,24 +42,21 @@ export default defineConfig({
         ]
       },
       {
-        text: 'Policy Features',
-        items: [
-          { text: 'Schema', link: '/docs/tbd' },
-          { text: 'Enforcement Levels', link: '/docs/tbd' },
-          { text: 'Patching', link: '/docs/tbd' },
-          { text: 'Monitoring', link: '/docs/tbd' },
-        ]
-      },
-
-      {
         text: 'Policy Types',
         items: [
-          { text: 'SCAN ', link: '/docs/tbd' },
-          { text: 'ASSURE ', link: '/docs/tbd' },
-          { text: 'ASSURE - REGO ', link: '/docs/tbd' },
-          { text: 'ASSURE - TYPE ', link: '/docs/tbd' },
-          { text: 'ASSURE - API ', link: '/docs/tbd' },
-          { text: 'RUNTIME ', link: '/docs/tbd' },
+          { text: 'SCAN - REGEX', link: '/docs/policy-scan-regex' },
+          { text: 'ASSURE - REGEX', link: '/docs/policy-assure-regex' },
+          { text: 'ASSURE - FILETYPE ', link: '/docs/policy-assure-filetype' },
+          { text: 'ASSURE - API ', link: '/docs/policy-assure-api' },
+          { text: 'ASSURE - REGO ', link: '/docs/policy-assure-rego' },
+          { text: 'RUNTIME ', link: '/docs/policy-runtime' },
+        ]
+      },
+      {
+        text: 'Policy Features',
+        items: [
+          { text: 'Schema', link: '/docs/policy-schema' },
+          { text: 'Enforcement Levels', link: '/docs/enforcement' },
         ]
       },
       {

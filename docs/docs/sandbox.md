@@ -14,7 +14,7 @@ Gitpod offers a convenient way to explore Intercept in a cloud environment
 Once in the Gitpod environment, you can build Intercept and start experimenting:
 
 ```
-make build 
+make build && cp release/intercept playground/intercept
 ```
 
 ### 3. Explore the playground folder
@@ -58,5 +58,6 @@ These tools provide an excellent way to ensure your schemas and policies are cor
 Try some example policies before building your own
 
 ```sh 
+cd playground
 ./intercept audit --policy policies/test_scan.yaml --target targets -vvv -o _my_first_run
 ```
