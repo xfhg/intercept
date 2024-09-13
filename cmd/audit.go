@@ -21,7 +21,6 @@ var (
 	targetDir        string
 	tagsAny          string
 	tagsAll          string
-	environment      string
 	envDetection     bool
 	debugOutput      bool
 	rgPath           string

@@ -242,6 +242,7 @@ func loadFilteredPolicies() []Policy {
 func ofilterPolicies(policies []Policy) []Policy {
 	if observeEnvironment == "" && observeEnvDetection {
 		observeEnvironment = DetectEnvironment()
+		environment = observeEnvironment
 	}
 
 	filtered := policies

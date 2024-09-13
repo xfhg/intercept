@@ -20,6 +20,8 @@ var (
 	silentMode       bool
 	nologMode        bool
 
+	environment string
+
 	hostData        string
 	hostFingerprint string
 
