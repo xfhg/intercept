@@ -46,6 +46,7 @@ require (
 require (
 	cuelang.org/go v0.10.0
 	github.com/adhocore/gronx v1.19.0
+	github.com/charlievieth/fastwalk v1.0.8
 	github.com/cockroachdb/apd/v3 v3.2.1 // indirect
 	github.com/fsnotify/fsnotify v1.7.0
 	github.com/go-resty/resty/v2 v2.14.0
