@@ -1,50 +1,61 @@
-
-Version: "1.0"
-
 Policies:
-
-  - id: "INI-001"
+  - id: "ASSURE-INI-001"
     type: "ini"
-    filepattern: "\\.ini$"
+    filepattern: "example\\.(ini)$"
     enforcement:
-      - environment: "all"
+      - environment: "production"
+        fatal: "true"
+        exceptions: "false"
+        confidence: "high"
+      - environment: "development"
         fatal: "false"
-        exceptions: "development"
-      - environment: "dev"
-        fatal: "false"
-        exceptions: "development"
+        exceptions: "false"
         confidence: "high"
     metadata:
-      name: "INI Schema Compliance"
-      description: "Enforce schema compliance on INI configuration files"
-      msg_solution: "Ensure all required fields are present and comply with the schema."
-      msg_error: "INI file does not comply with the required schema."
+      name: "Mandatory Security Configurations"
+      description: "Ensure critical security settings are properly configured"
+      msg_solution: "Review and update the security configurations as per the company's security policy."
+      msg_error: "One or more mandatory security configurations are missing or incorrectly set."
       tags:
-        - "config"
-        - "ini"
-        - "schema"
+        - "security"
+        - "compliance"
+      score: "9"
+    _schema:
+      structure: |
+        {
+          security: {
+            tls_version: "TLSv1.3"
+            minimum_password_length: >=12
+            multi_factor_authentication: bool & true
+            session_timeout: <=600
+          }
+        }
+
+  - id: "ASSURE-INI-002"
+    type: "ini"
+    filepattern: "logging\\.(ini)$"
+    enforcement:
+      - environment: "all"
+        fatal: "true"
+        exceptions: "false"
+        confidence: "high"
+    metadata:
+      name: "Logging Best Practices"
+      description: "Verify adherence to logging best practices and compliance requirements"
+      msg_solution: "Adjust logging configurations to meet security and compliance standards."
+      msg_error: "Logging configuration does not meet required standards."
+      tags:
+        - "logging"
+        - "compliance"
+        - "security"
       score: "8"
     _schema:
       structure: |
         {
-          version: string
-          date:    string & =~"^\\d{4}/\\d{2}/\\d{2}$"
-
-          database: {
-            host: string
-            port: int & >=0 & <=65535
-            name: string
-            user: string
-          }
-
-          server: {
-            port:  int & >=0 & <=65535
-            debug: bool
-          }
-
           logging: {
-            level: "trace" | "debug" | "info" | "warn" | "error" | "fatal"
-            file:  string
+            log_level: "info" | "warn" | "error"
+            log_format: "json"
+            log_retention_period: >=30 & <=365
+            pii_masking: bool & true
           }
         }
-

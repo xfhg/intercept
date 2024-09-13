@@ -13,7 +13,7 @@ func ProcessAssureType(policy Policy, rgPath string, targetDir string, filePaths
 	if policy.Type == "assure" {
 		err := executeAssure(policy, rgPath, targetDir, filePaths)
 		if err != nil {
-			log.Error().Err(err).Msg("error assuring for policy %s")
+			log.Error().Err(err).Msgf("error assuring for policy %s", policy.ID)
 			return fmt.Errorf("error assuring for policy %s: %w", policy.ID, err)
 		}
 	}

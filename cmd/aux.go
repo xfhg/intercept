@@ -334,7 +334,7 @@ func createOutputDirectories(isObserve bool) error {
 	for _, dir := range dirs {
 		if outputDir != "" {
 			dir = filepath.Join(outputDir, dir)
-			log.Debug().Msgf("Creating directory: %s", dir)
+			// log.Debug().Msgf("Creating directory: %s", dir)
 
 		}
 		if err := os.MkdirAll(dir, 0755); err != nil {
@@ -350,7 +350,7 @@ func cleanupOutputDirectories() error {
 	if outputDir != "" {
 		for i, dir := range dirsToClean {
 			dirsToClean[i] = filepath.Join(outputDir, dir)
-			log.Debug().Msgf("Cleaning up directories: %v", dirsToClean)
+			// log.Debug().Msgf("Cleaning up directories: %v", dirsToClean)
 		}
 	}
 	var wg sync.WaitGroup
@@ -367,7 +367,7 @@ func cleanupOutputDirectories() error {
 				return
 			}
 
-			log.Debug().Msgf("Cleaned up directory: %s ", d)
+			// log.Debug().Msgf("Cleaned up directory: %s ", d)
 		}(dir)
 	}
 

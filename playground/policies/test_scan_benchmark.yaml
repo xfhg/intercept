@@ -1,0 +1,1943 @@
+Policies:
+
+  - id: "SCAN-000 Private Keys"
+    type: "scan"
+    enforcement:
+      - environment: "all"
+        fatal: "true"
+        exceptions: "false"
+        confidence: "high"
+    metadata:
+      name: "Detect private keys"
+      description: "Scan for potential private key leaks in the codebase"
+      msg_solution: "Remove the private key and use secure key management practices."
+      msg_error: "Private key detected in the codebase."
+      tags:
+        - "security"
+        - "encryption"
+      score: "9"
+    _regex:
+      - \s*(-----BEGIN PRIVATE KEY-----)
+      - \s*(-----BEGIN RSA PRIVATE KEY-----)
+      - \s*(-----BEGIN DSA PRIVATE KEY-----)
+      - \s*(-----BEGIN EC PRIVATE KEY-----)
+      - \s*(-----BEGIN OPENSSH PRIVATE KEY-----)
+      - \s*(-----BEGIN PGP PRIVATE KEY BLOCK-----)
+
+  - id: "SCAN-001 ADMIN_PASSWORD"
+    type: "scan"
+    enforcement:
+      - environment: "all"
+        fatal: "true"
+        exceptions: "false"
+        confidence: "high"
+    metadata:
+      name: "Detect Admin Password"
+      description: "Scan for potential admin password leaks in the codebase"
+      msg_solution: "Remove the admin password and use secure password management practices."
+      msg_error: "Admin password detected in the codebase."
+      tags:
+        - "security"
+        - "admin"
+        - "password"
+      score: "9"
+    _regex:
+      - '(admin).+(secret|token|key|password).+'
+
+  - id: "SCAN-002 AWS API Gateway"
+    type: "scan"
+    enforcement:
+      - environment: "all"
+        fatal: "true"
+        exceptions: "false"
+        confidence: "high"
+    metadata:
+      name: "Detect AWS API Gateway"
+      description: "Scan for potential AWS API Gateway leaks in the codebase"
+      msg_solution: "Remove the AWS API Gateway and use secure configuration management."
+      msg_error: "AWS API Gateway detected in the codebase."
+      tags:
+        - "security"
+        - "aws"
+        - "api"
+      score: "9"
+    _regex:
+      - '[0-9a-z]+.execute-api.[0-9a-z.-_]+.amazonaws.com'
+
+  - id: "SCAN-003 AWS API Key"
+    type: "scan"
+    enforcement:
+      - environment: "all"
+        fatal: "true"
+        exceptions: "false"
+        confidence: "high"
+    metadata:
+      name: "Detect AWS API Key"
+      description: "Scan for potential AWS API Key leaks in the codebase"
+      msg_solution: "Remove the AWS API Key and use secure key management practices."
+      msg_error: "AWS API Key detected in the codebase."
+      tags:
+        - "security"
+        - "aws"
+        - "api"
+      score: "9"
+    _regex:
+      - 'AKIA[0-9A-Z]{16}'
+
+  - id: "SCAN-004 AWS ARN"
+    type: "scan"
+    enforcement:
+      - environment: "all"
+        fatal: "true"
+        exceptions: "false"
+        confidence: "high"
+    metadata:
+      name: "Detect AWS ARN"
+      description: "Scan for potential AWS ARN leaks in the codebase"
+      msg_solution: "Remove the AWS ARN and use secure configuration management."
+      msg_error: "AWS ARN detected in the codebase."
+      tags:
+        - "security"
+        - "aws"
+        - "arn"
+      score: "9"
+    _regex:
+      - 'arn:aws:[a-z0-9-]+:[a-z]{2}-[a-z]+-[0-9]+:[0-9]+:.+'
+
+  - id: "SCAN-005 AWS Access Key ID Value"
+    type: "scan"
+    enforcement:
+      - environment: "all"
+        fatal: "true"
+        exceptions: "false"
+        confidence: "high"
+    metadata:
+      name: "Detect AWS Access Key ID Value"
+      description: "Scan for potential AWS Access Key ID Value leaks in the codebase"
+      msg_solution: "Remove the AWS Access Key ID Value and use secure key management practices."
+      msg_error: "AWS Access Key ID Value detected in the codebase."
+      tags:
+        - "security"
+        - "aws"
+        - "access_key"
+      score: "9"
+    _regex:
+      - '(A3T[A-Z0-9]|AKIA|AGPA|AROA|AIPA|ANPA|ANVA|ASIA)[A-Z0-9]{16}'
+
+  - id: "SCAN-006 AWS AppSync GraphQL Key"
+    type: "scan"
+    enforcement:
+      - environment: "all"
+        fatal: "true"
+        exceptions: "false"
+        confidence: "high"
+    metadata:
+      name: "Detect AWS AppSync GraphQL Key"
+      description: "Scan for potential AWS AppSync GraphQL Key leaks in the codebase"
+      msg_solution: "Remove the AWS AppSync GraphQL Key and use secure key management practices."
+      msg_error: "AWS AppSync GraphQL Key detected in the codebase."
+      tags:
+        - "security"
+        - "aws"
+        - "appsync"
+      score: "9"
+    _regex:
+      - 'da2-[a-z0-9]{26}'
+
+  - id: "SCAN-007 AWS CloudFront"
+    type: "scan"
+    enforcement:
+      - environment: "all"
+        fatal: "true"
+        exceptions: "false"
+        confidence: "low"
+    metadata:
+      name: "Detect AWS CloudFront"
+      description: "Scan for potential AWS CloudFront leaks in the codebase"
+      msg_solution: "Remove the AWS CloudFront and use secure configuration management."
+      msg_error: "AWS CloudFront detected in the codebase."
+      tags:
+        - "security"
+        - "aws"
+        - "cloudfront"
+      score: "6"
+    _regex:
+      - '[0-9a-z.-_]+.cloudfront.net'
+
+  - id: "SCAN-008 AWS Cognito Pool ID"
+    type: "scan"
+    enforcement:
+      - environment: "all"
+        fatal: "true"
+        exceptions: "false"
+        confidence: "low"
+    metadata:
+      name: "Detect AWS Cognito Pool ID"
+      description: "Scan for potential AWS Cognito Pool ID leaks in the codebase"
+      msg_solution: "Remove the AWS Cognito Pool ID and use secure configuration management."
+      msg_error: "AWS Cognito Pool ID detected in the codebase."
+      tags:
+        - "security"
+        - "aws"
+        - "cognito"
+      score: "6"
+    _regex:
+      - ':[0-9A-Za-z]{8}-[0-9A-Za-z]{4}-[0-9A-Za-z]{4}-[0-9A-Za-z]{4}-[0-9A-Za-z]{12}'
+
+  - id: "SCAN-009 AWS EC2 External"
+    type: "scan"
+    enforcement:
+      - environment: "all"
+        fatal: "true"
+        exceptions: "false"
+        confidence: "low"
+    metadata:
+      name: "Detect AWS EC2 External"
+      description: "Scan for potential AWS EC2 External leaks in the codebase"
+      msg_solution: "Remove the AWS EC2 External and use secure configuration management."
+      msg_error: "AWS EC2 External detected in the codebase."
+      tags:
+        - "security"
+        - "aws"
+        - "ec2"
+      score: "6"
+    _regex:
+      - 'ec2-[0-9a-z.-_]+.compute(-1)?.amazonaws.com'
+
+  - id: "SCAN-010 AWS EC2 Internal"
+    type: "scan"
+    enforcement:
+      - environment: "all"
+        fatal: "true"
+        exceptions: "false"
+        confidence: "low"
+    metadata:
+      name: "Detect AWS EC2 Internal"
+      description: "Scan for potential AWS EC2 Internal leaks in the codebase"
+      msg_solution: "Remove the AWS EC2 Internal and use secure configuration management."
+      msg_error: "AWS EC2 Internal detected in the codebase."
+      tags:
+        - "security"
+        - "aws"
+        - "ec2"
+      score: "6"
+    _regex:
+      - '[0-9a-z.-_]+.compute(-1)?.internal'
+
+  - id: "SCAN-011 AWS ELB"
+    type: "scan"
+    enforcement:
+      - environment: "all"
+        fatal: "true"
+        exceptions: "false"
+        confidence: "low"
+    metadata:
+      name: "Detect AWS ELB"
+      description: "Scan for potential AWS ELB leaks in the codebase"
+      msg_solution: "Remove the AWS ELB and use secure configuration management."
+      msg_error: "AWS ELB detected in the codebase."
+      tags:
+        - "security"
+        - "aws"
+        - "elb"
+      score: "6"
+    _regex:
+      - '[0-9a-z.-_]+.elb.amazonaws.com'
+
+  - id: "SCAN-012 AWS ElasticCache"
+    type: "scan"
+    enforcement:
+      - environment: "all"
+        fatal: "true"
+        exceptions: "false"
+        confidence: "low"
+    metadata:
+      name: "Detect AWS ElasticCache"
+      description: "Scan for potential AWS ElasticCache leaks in the codebase"
+      msg_solution: "Remove the AWS ElasticCache and use secure configuration management."
+      msg_error: "AWS ElasticCache detected in the codebase."
+      tags:
+        - "security"
+        - "aws"
+        - "elasticache"
+      score: "6"
+    _regex:
+      - '[0-9a-z.-_]+.cache.amazonaws.com'
+
+  - id: "SCAN-013 AWS MWS ID"
+    type: "scan"
+    enforcement:
+      - environment: "all"
+        fatal: "true"
+        exceptions: "false"
+        confidence: "low"
+    metadata:
+      name: "Detect AWS MWS ID"
+      description: "Scan for potential AWS MWS ID leaks in the codebase"
+      msg_solution: "Remove the AWS MWS ID and use secure configuration management."
+      msg_error: "AWS MWS ID detected in the codebase."
+      tags:
+        - "security"
+        - "aws"
+        - "mws"
+      score: "6"
+    _regex:
+      - 'mzn\.mws\.[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}'
+
+  - id: "SCAN-014 AWS MWS key"
+    type: "scan"
+    enforcement:
+      - environment: "all"
+        fatal: "true"
+        exceptions: "false"
+        confidence: "high"
+    metadata:
+      name: "Detect AWS MWS key"
+      description: "Scan for potential AWS MWS key leaks in the codebase"
+      msg_solution: "Remove the AWS MWS key and use secure key management practices."
+      msg_error: "AWS MWS key detected in the codebase."
+      tags:
+        - "security"
+        - "aws"
+        - "mws"
+      score: "9"
+    _regex:
+      - 'amzn\.mws\.[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}'
+
+  - id: "SCAN-015 AWS RDS"
+    type: "scan"
+    enforcement:
+      - environment: "all"
+        fatal: "true"
+        exceptions: "false"
+        confidence: "high"
+    metadata:
+      name: "Detect AWS RDS"
+      description: "Scan for potential AWS RDS leaks in the codebase"
+      msg_solution: "Remove the AWS RDS and use secure configuration management."
+      msg_error: "AWS RDS detected in the codebase."
+      tags:
+        - "security"
+        - "aws"
+        - "rds"
+      score: "9"
+    _regex:
+      - '[0-9a-z.-_]+.rds.amazonaws.com'
+  - id: "SCAN-016 Lendflow"
+    type: "scan"
+    enforcement:
+      - environment: "all"
+        fatal: "true"
+        exceptions: "false"
+        confidence: "high"
+    metadata:
+      name: "Detect Lendflow"
+      description: "Scan for potential Lendflow leaks in the codebase"
+      msg_solution: "Remove the Lendflow token and use secure token management practices."
+      msg_error: "Lendflow token detected in the codebase."
+      tags:
+        - "security"
+        - "lendflow"
+      score: "9"
+    _regex:
+      - '(?:lendflow).{0,40}\b([a-zA-Z0-9]{36}\.[a-zA-Z0-9]{235}\.[a-zA-Z0-9]{32}\-[a-zA-Z0-9]{47}\-[a-zA-Z0-9_]{162}\-[a-zA-Z0-9]{42}\-[a-zA-Z0-9_]{40}\-[a-zA-Z0-9_]{66}\-[a-zA-Z0-9_]{59}\-[a-zA-Z0-9]{7}\-[a-zA-Z0-9_]{220})\b'
+
+  - id: "SCAN-017 Lessannoyingcrm"
+    type: "scan"
+    enforcement:
+      - environment: "all"
+        fatal: "true"
+        exceptions: "false"
+        confidence: "high"
+    metadata:
+      name: "Detect Lessannoyingcrm"
+      description: "Scan for potential Lessannoyingcrm leaks in the codebase"
+      msg_solution: "Remove the Lessannoyingcrm token and use secure token management practices."
+      msg_error: "Lessannoyingcrm token detected in the codebase."
+      tags:
+        - "security"
+        - "lessannoyingcrm"
+      score: "9"
+    _regex:
+      - '(?:less).{0,40}\b([a-zA-Z0-9-]{57})\b'
+
+  - id: "SCAN-018 Lexigram"
+    type: "scan"
+    enforcement:
+      - environment: "all"
+        fatal: "true"
+        exceptions: "false"
+        confidence: "high"
+    metadata:
+      name: "Detect Lexigram"
+      description: "Scan for potential Lexigram leaks in the codebase"
+      msg_solution: "Remove the Lexigram token and use secure token management practices."
+      msg_error: "Lexigram token detected in the codebase."
+      tags:
+        - "security"
+        - "lexigram"
+      score: "9"
+    _regex:
+      - '(?:lexigram).{0,40}\b([a-zA-Z0-9\S]{301})\b'
+
+  - id: "SCAN-019 Linearapi"
+    type: "scan"
+    enforcement:
+      - environment: "all"
+        fatal: "true"
+        exceptions: "false"
+        confidence: "high"
+    metadata:
+      name: "Detect Linearapi"
+      description: "Scan for potential Linearapi leaks in the codebase"
+      msg_solution: "Remove the Linearapi token and use secure token management practices."
+      msg_error: "Linearapi token detected in the codebase."
+      tags:
+        - "security"
+        - "linearapi"
+      score: "9"
+    _regex:
+      - '\b(lin_api_[0-9A-Za-z]{40})\b'
+
+  - id: "SCAN-020 Loginradius"
+    type: "scan"
+    enforcement:
+      - environment: "all"
+        fatal: "true"
+        exceptions: "false"
+        confidence: "high"
+    metadata:
+      name: "Detect Loginradius"
+      description: "Scan for potential Loginradius leaks in the codebase"
+      msg_solution: "Remove the Loginradius token and use secure token management practices."
+      msg_error: "Loginradius token detected in the codebase."
+      tags:
+        - "security"
+        - "loginradius"
+      score: "9"
+    _regex:
+      - '(?:loginradius).{0,40}\b([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})\b'
+
+  - id: "SCAN-021 Lokalisetoken"
+    type: "scan"
+    enforcement:
+      - environment: "all"
+        fatal: "true"
+        exceptions: "false"
+        confidence: "high"
+    metadata:
+      name: "Detect Lokalisetoken"
+      description: "Scan for potential Lokalisetoken leaks in the codebase"
+      msg_solution: "Remove the Lokalisetoken and use secure token management practices."
+      msg_error: "Lokalisetoken detected in the codebase."
+      tags:
+        - "security"
+        - "lokalise"
+      score: "9"
+    _regex:
+      - '(?:lokalise).{0,40}\b([a-z0-9]{40})\b'
+
+  - id: "SCAN-022 Loyverse"
+    type: "scan"
+    enforcement:
+      - environment: "all"
+        fatal: "true"
+        exceptions: "false"
+        confidence: "high"
+    metadata:
+      name: "Detect Loyverse"
+      description: "Scan for potential Loyverse leaks in the codebase"
+      msg_solution: "Remove the Loyverse token and use secure token management practices."
+      msg_error: "Loyverse token detected in the codebase."
+      tags:
+        - "security"
+        - "loyverse"
+      score: "9"
+    _regex:
+      - '(?:loyverse).{0,40}\b([0-9-a-z]{32})\b'
+
+  - id: "SCAN-023 Luno - 1"
+    type: "scan"
+    enforcement:
+      - environment: "all"
+        fatal: "true"
+        exceptions: "false"
+        confidence: "high"
+    metadata:
+      name: "Detect Luno - 1"
+      description: "Scan for potential Luno - 1 leaks in the codebase"
+      msg_solution: "Remove the Luno token and use secure token management practices."
+      msg_error: "Luno token detected in the codebase."
+      tags:
+        - "security"
+        - "luno"
+      score: "9"
+    _regex:
+      - '(?:luno).{0,40}\b([a-z0-9]{13})\b'
+
+  - id: "SCAN-024 Luno - 2"
+    type: "scan"
+    enforcement:
+      - environment: "all"
+        fatal: "true"
+        exceptions: "false"
+        confidence: "high"
+    metadata:
+      name: "Detect Luno - 2"
+      description: "Scan for potential Luno - 2 leaks in the codebase"
+      msg_solution: "Remove the Luno token and use secure token management practices."
+      msg_error: "Luno token detected in the codebase."
+      tags:
+        - "security"
+        - "luno"
+      score: "9"
+    _regex:
+      - '(?:luno).{0,40}\b([a-z0-9]{13})\b'
+
+  - id: "SCAN-025 artifactory"
+    type: "scan"
+    enforcement:
+      - environment: "all"
+        fatal: "true"
+        exceptions: "false"
+        confidence: "low"
+    metadata:
+      name: "Detect artifactory"
+      description: "Scan for potential artifactory leaks in the codebase"
+      msg_solution: "Remove the artifactory token and use secure token management practices."
+      msg_error: "artifactory token detected in the codebase."
+      tags:
+        - "security"
+        - "artifactory"
+      score: "6"
+    _regex:
+      - '(artifactory.{0,50}("|''|")?[a-zA-Z0-9=]{112}("|''|")?)'
+
+  - id: "SCAN-026 artifactory_key"
+    type: "scan"
+    enforcement:
+      - environment: "all"
+        fatal: "true"
+        exceptions: "false"
+        confidence: "low"
+    metadata:
+      name: "Detect artifactory_key"
+      description: "Scan for potential artifactory_key leaks in the codebase"
+      msg_solution: "Remove the artifactory_key and use secure key management practices."
+      msg_error: "artifactory_key detected in the codebase."
+      tags:
+        - "security"
+        - "artifactory"
+      score: "6"
+    _regex:
+      - 'artifactory[_-]?key(=| =|:| :)'
+
+  - id: "SCAN-027 artifacts_aws_access_key_id"
+    type: "scan"
+    enforcement:
+      - environment: "all"
+        fatal: "true"
+        exceptions: "false"
+        confidence: "low"
+    metadata:
+      name: "Detect artifacts_aws_access_key_id"
+      description: "Scan for potential artifacts_aws_access_key_id leaks in the codebase"
+      msg_solution: "Remove the artifacts_aws_access_key_id and use secure key management practices."
+      msg_error: "artifacts_aws_access_key_id detected in the codebase."
+      tags:
+        - "security"
+        - "aws"
+        - "access_key"
+      score: "6"
+    _regex:
+      - 'artifacts[_-]?aws[_-]?access[_-]?key[_-]?id(=| =|:| :)'
+
+  - id: "SCAN-028 artifacts_aws_secret_access_key"
+    type: "scan"
+    enforcement:
+      - environment: "all"
+        fatal: "true"
+        exceptions: "false"
+        confidence: "low"
+    metadata:
+      name: "Detect artifacts_aws_secret_access_key"
+      description: "Scan for potential artifacts_aws_secret_access_key leaks in the codebase"
+      msg_solution: "Remove the artifacts_aws_secret_access_key and use secure key management practices."
+      msg_error: "artifacts_aws_secret_access_key detected in the codebase."
+      tags:
+        - "security"
+        - "aws"
+        - "secret_access_key"
+      score: "6"
+    _regex:
+      - 'artifacts[_-]?aws[_-]?secret[_-]?access[_-]?key(=| =|:| :)'
+
+  - id: "SCAN-029 artifacts_bucket"
+    type: "scan"
+    enforcement:
+      - environment: "all"
+        fatal: "true"
+        exceptions: "false"
+        confidence: "low"
+    metadata:
+      name: "Detect artifacts_bucket"
+      description: "Scan for potential artifacts_bucket leaks in the codebase"
+      msg_solution: "Remove the artifacts_bucket and use secure configuration management."
+      msg_error: "artifacts_bucket detected in the codebase."
+      tags:
+        - "security"
+        - "aws"
+        - "bucket"
+      score: "6"
+    _regex:
+      - 'artifacts[_-]?bucket(=| =|:| :)'
+
+  - id: "SCAN-030 artifacts_host"
+    type: "scan"
+    enforcement:
+      - environment: "all"
+        fatal: "true"
+        exceptions: "false"
+        confidence: "low"
+    metadata:
+      name: "Detect artifacts_host"
+      description: "Scan for potential artifacts_host leaks in the codebase"
+      msg_solution: "Remove the artifacts_host and use secure configuration management."
+      msg_error: "artifacts_host detected in the codebase."
+      tags:
+        - "security"
+        - "aws"
+        - "host"
+      score: "6"
+    _regex:
+      - 'artifacts[_-]?host(=| =|:| :)'
+
+  - id: "SCAN-031 author_email_addr"
+    type: "scan"
+    enforcement:
+      - environment: "all"
+        fatal: "true"
+        exceptions: "false"
+        confidence: "low"
+    metadata:
+      name: "Detect author_email_addr"
+      description: "Scan for potential author_email_addr leaks in the codebase"
+      msg_solution: "Remove the author_email_addr and use secure configuration management."
+      msg_error: "author_email_addr detected in the codebase."
+      tags:
+        - "security"
+        - "email"
+      score: "6"
+    _regex:
+      - 'author[_-]?email[_-]?addr(=| =|:| :)'
+
+  - id: "SCAN-032 author_npm_api_key"
+    type: "scan"
+    enforcement:
+      - environment: "all"
+        fatal: "true"
+        exceptions: "false"
+        confidence: "low"
+    metadata:
+      name: "Detect author_npm_api_key"
+      description: "Scan for potential author_npm_api_key leaks in the codebase"
+      msg_solution: "Remove the author_npm_api_key and use secure key management practices."
+      msg_error: "author_npm_api_key detected in the codebase."
+      tags:
+        - "security"
+        - "npm"
+        - "api_key"
+      score: "6"
+    _regex:
+      - 'author[_-]?npm[_-]?api[_-]?key(=| =|:| :)'
+  - id: "SCAN-033 Checkvist - 2"
+    type: "scan"
+    enforcement:
+      - environment: "all"
+        fatal: "true"
+        exceptions: "false"
+        confidence: "high"
+    metadata:
+      name: "Detect Checkvist - 2"
+      description: "Scan for potential Checkvist - 2 leaks in the codebase"
+      msg_solution: "Remove the Checkvist - 2 token and use secure token management practices."
+      msg_error: "Checkvist - 2 token detected in the codebase."
+      tags:
+        - "security"
+        - "checkvist"
+      score: "9"
+    _regex:
+      - '(?:checkvist).{0,40}\b([0-9a-zA-Z]{14})\b'
+
+  - id: "SCAN-034 Cicero"
+    type: "scan"
+    enforcement:
+      - environment: "all"
+        fatal: "true"
+        exceptions: "false"
+        confidence: "high"
+    metadata:
+      name: "Detect Cicero"
+      description: "Scan for potential Cicero leaks in the codebase"
+      msg_solution: "Remove the Cicero token and use secure token management practices."
+      msg_error: "Cicero token detected in the codebase."
+      tags:
+        - "security"
+        - "cicero"
+      score: "9"
+    _regex:
+      - '(?:cicero).{0,40}\b([0-9a-z]{40})\b'
+
+  - id: "SCAN-035 Circleci"
+    type: "scan"
+    enforcement:
+      - environment: "all"
+        fatal: "true"
+        exceptions: "false"
+        confidence: "high"
+    metadata:
+      name: "Detect Circleci"
+      description: "Scan for potential Circleci leaks in the codebase"
+      msg_solution: "Remove the Circleci token and use secure token management practices."
+      msg_error: "Circleci token detected in the codebase."
+      tags:
+        - "security"
+        - "circleci"
+      score: "9"
+    _regex:
+      - '(?:circle).{0,40}([a-fA-F0-9]{40})'
+
+  - id: "SCAN-036 Clearbit"
+    type: "scan"
+    enforcement:
+      - environment: "all"
+        fatal: "true"
+        exceptions: "false"
+        confidence: "high"
+    metadata:
+      name: "Detect Clearbit"
+      description: "Scan for potential Clearbit leaks in the codebase"
+      msg_solution: "Remove the Clearbit token and use secure token management practices."
+      msg_error: "Clearbit token detected in the codebase."
+      tags:
+        - "security"
+        - "clearbit"
+      score: "9"
+    _regex:
+      - '(?:clearbit).{0,40}\b([a-zA-Z0-9]{40})\b'
+
+  - id: "SCAN-037 Clockify"
+    type: "scan"
+    enforcement:
+      - environment: "all"
+        fatal: "true"
+        exceptions: "false"
+        confidence: "high"
+    metadata:
+      name: "Detect Clockify"
+      description: "Scan for potential Clockify leaks in the codebase"
+      msg_solution: "Remove the Clockify token and use secure token management practices."
+      msg_error: "Clockify token detected in the codebase."
+      tags:
+        - "security"
+        - "clockify"
+      score: "9"
+    _regex:
+      - '(?:clockify).{0,40}\b([a-zA-Z0-9]{48})\b'
+
+  - id: "SCAN-038 Clockworksms - 1"
+    type: "scan"
+    enforcement:
+      - environment: "all"
+        fatal: "true"
+        exceptions: "false"
+        confidence: "high"
+    metadata:
+      name: "Detect Clockworksms - 1"
+      description: "Scan for potential Clockworksms - 1 leaks in the codebase"
+      msg_solution: "Remove the Clockworksms - 1 token and use secure token management practices."
+      msg_error: "Clockworksms - 1 token detected in the codebase."
+      tags:
+        - "security"
+        - "clockworksms"
+      score: "9"
+    _regex:
+      - '(?:clockwork|textanywhere).{0,40}\b([0-9a-zA-Z]{24})\b'
+
+  - id: "SCAN-039 Clockworksms - 2"
+    type: "scan"
+    enforcement:
+      - environment: "all"
+        fatal: "true"
+        exceptions: "false"
+        confidence: "high"
+    metadata:
+      name: "Detect Clockworksms - 2"
+      description: "Scan for potential Clockworksms - 2 leaks in the codebase"
+      msg_solution: "Remove the Clockworksms - 2 token and use secure token management practices."
+      msg_error: "Clockworksms - 2 token detected in the codebase."
+      tags:
+        - "security"
+        - "clockworksms"
+      score: "9"
+    _regex:
+      - '(?:clockwork|textanywhere).{0,40}\b([0-9]{5})\b'
+
+  - id: "SCAN-040 Closecrm"
+    type: "scan"
+    enforcement:
+      - environment: "all"
+        fatal: "true"
+        exceptions: "false"
+        confidence: "high"
+    metadata:
+      name: "Detect Closecrm"
+      description: "Scan for potential Closecrm leaks in the codebase"
+      msg_solution: "Remove the Closecrm token and use secure token management practices."
+      msg_error: "Closecrm token detected in the codebase."
+      tags:
+        - "security"
+        - "closecrm"
+      score: "9"
+    _regex:
+      - '\b(api_[a-z0-9A-Z.]{45})\b'
+
+  - id: "SCAN-041 Cloudelements - 1"
+    type: "scan"
+    enforcement:
+      - environment: "all"
+        fatal: "true"
+        exceptions: "false"
+        confidence: "high"
+    metadata:
+      name: "Detect Cloudelements - 1"
+      description: "Scan for potential Cloudelements - 1 leaks in the codebase"
+      msg_solution: "Remove the Cloudelements - 1 token and use secure token management practices."
+      msg_error: "Cloudelements - 1 token detected in the codebase."
+      tags:
+        - "security"
+        - "cloudelements"
+      score: "9"
+    _regex:
+      - '(?:cloudelements).{0,40}\b([a-zA-Z0-9]{40})\b'
+
+  - id: "SCAN-042 Flowflu - 1"
+    type: "scan"
+    enforcement:
+      - environment: "all"
+        fatal: "true"
+        exceptions: "false"
+        confidence: "high"
+    metadata:
+      name: "Detect Flowflu - 1"
+      description: "Scan for potential Flowflu - 1 leaks in the codebase"
+      msg_solution: "Remove the Flowflu - 1 token and use secure token management practices."
+      msg_error: "Flowflu - 1 token detected in the codebase."
+      tags:
+        - "security"
+        - "flowflu"
+      score: "9"
+    _regex:
+      - '(?:flowflu|account).{0,40}\b([a-zA-Z0-9]{4,30})\b'
+
+  - id: "SCAN-043 Flowflu - 2"
+    type: "scan"
+    enforcement:
+      - environment: "all"
+        fatal: "true"
+        exceptions: "false"
+        confidence: "high"
+    metadata:
+      name: "Detect Flowflu - 2"
+      description: "Scan for potential Flowflu - 2 leaks in the codebase"
+      msg_solution: "Remove the Flowflu - 2 token and use secure token management practices."
+      msg_error: "Flowflu - 2 token detected in the codebase."
+      tags:
+        - "security"
+        - "flowflu"
+      score: "9"
+    _regex:
+      - '(?:flowflu).{0,40}\b([a-zA-Z0-9]{51})\b'
+
+  - id: "SCAN-044 Flutterwave"
+    type: "scan"
+    enforcement:
+      - environment: "all"
+        fatal: "true"
+        exceptions: "false"
+        confidence: "high"
+    metadata:
+      name: "Detect Flutterwave"
+      description: "Scan for potential Flutterwave leaks in the codebase"
+      msg_solution: "Remove the Flutterwave token and use secure token management practices."
+      msg_error: "Flutterwave token detected in the codebase."
+      tags:
+        - "security"
+        - "flutterwave"
+      score: "9"
+    _regex:
+      - '\b(FLWSECK-[0-9a-z]{32}-X)\b'
+
+  - id: "SCAN-045 Fmfw - 1"
+    type: "scan"
+    enforcement:
+      - environment: "all"
+        fatal: "true"
+        exceptions: "false"
+        confidence: "high"
+    metadata:
+      name: "Detect Fmfw - 1"
+      description: "Scan for potential Fmfw - 1 leaks in the codebase"
+      msg_solution: "Remove the Fmfw - 1 token and use secure token management practices."
+      msg_error: "Fmfw - 1 token detected in the codebase."
+      tags:
+        - "security"
+        - "fmfw"
+      score: "9"
+    _regex:
+      - '(?:fmfw).{0,40}\b([a-zA-Z0-9-]{32})\b'
+
+  - id: "SCAN-046 Fmfw - 2"
+    type: "scan"
+    enforcement:
+      - environment: "all"
+        fatal: "true"
+        exceptions: "false"
+        confidence: "high"
+    metadata:
+      name: "Detect Fmfw - 2"
+      description: "Scan for potential Fmfw - 2 leaks in the codebase"
+      msg_solution: "Remove the Fmfw - 2 token and use secure token management practices."
+      msg_error: "Fmfw - 2 token detected in the codebase."
+      tags:
+        - "security"
+        - "fmfw"
+      score: "9"
+    _regex:
+      - '(?:fmfw).{0,40}\b([a-zA-Z0-9-]{32})\b'
+
+  - id: "SCAN-047 Freshdesk - 1"
+    type: "scan"
+    enforcement:
+      - environment: "all"
+        fatal: "true"
+        exceptions: "false"
+        confidence: "high"
+    metadata:
+      name: "Detect Freshdesk - 1"
+      description: "Scan for potential Freshdesk - 1 leaks in the codebase"
+      msg_solution: "Remove the Freshdesk - 1 token and use secure token management practices."
+      msg_error: "Freshdesk - 1 token detected in the codebase."
+      tags:
+        - "security"
+        - "freshdesk"
+      score: "9"
+    _regex:
+      - '(?:freshdesk).{0,40}\b([0-9A-Za-z]{20})\b'
+
+  - id: "SCAN-048 Freshdesk - 2"
+    type: "scan"
+    enforcement:
+      - environment: "all"
+        fatal: "true"
+        exceptions: "false"
+        confidence: "high"
+    metadata:
+      name: "Detect Freshdesk - 2"
+      description: "Scan for potential Freshdesk - 2 leaks in the codebase"
+      msg_solution: "Remove the Freshdesk - 2 token and use secure token management practices."
+      msg_error: "Freshdesk - 2 token detected in the codebase."
+      tags:
+        - "security"
+        - "freshdesk"
+      score: "9"
+    _regex:
+      - '\b([0-9a-z-]{1,}.freshdesk.com)\b'
+
+  - id: "SCAN-049 Front"
+    type: "scan"
+    enforcement:
+      - environment: "all"
+        fatal: "true"
+        exceptions: "false"
+        confidence: "high"
+    metadata:
+      name: "Detect Front"
+      description: "Scan for potential Front leaks in the codebase"
+      msg_solution: "Remove the Front token and use secure token management practices."
+      msg_error: "Front token detected in the codebase."
+      tags:
+        - "security"
+        - "front"
+      score: "9"
+    _regex:
+      - '(?:front).{0,40}\b([0-9a-zA-Z]{36}.[0-9a-zA-Z\.\-\_]{188,244})\b'
+
+  - id: "SCAN-050 Fulcrum"
+    type: "scan"
+    enforcement:
+      - environment: "all"
+        fatal: "true"
+        exceptions: "false"
+        confidence: "high"
+    metadata:
+      name: "Detect Fulcrum"
+      description: "Scan for potential Fulcrum leaks in the codebase"
+      msg_solution: "Remove the Fulcrum token and use secure token management practices."
+      msg_error: "Fulcrum token detected in the codebase."
+      tags:
+        - "security"
+        - "fulcrum"
+      score: "9"
+    _regex:
+      - '(?:fulcrum).{0,40}\b([a-z0-9]{80})\b'
+
+  - id: "SCAN-051 Fullstory"
+    type: "scan"
+    enforcement:
+      - environment: "all"
+        fatal: "true"
+        exceptions: "false"
+        confidence: "high"
+    metadata:
+      name: "Detect Fullstory"
+      description: "Scan for potential Fullstory leaks in the codebase"
+      msg_solution: "Remove the Fullstory token and use secure token management practices."
+      msg_error: "Fullstory token detected in the codebase."
+      tags:
+        - "security"
+        - "fullstory"
+      score: "9"
+    _regex:
+      - '(?:fullstory).{0,40}\b([a-zA-Z-0-9/+]{88})\b'
+
+  - id: "SCAN-052 Axonaut"
+    type: "scan"
+    enforcement:
+      - environment: "all"
+        fatal: "true"
+        exceptions: "false"
+        confidence: "high"
+    metadata:
+      name: "Detect Axonaut"
+      description: "Scan for potential Axonaut leaks in the codebase"
+      msg_solution: "Remove the Axonaut token and use secure token management practices."
+      msg_error: "Axonaut token detected in the codebase."
+      tags:
+        - "security"
+        - "axonaut"
+      score: "9"
+    _regex:
+      - '(?:axonaut).{0,40}\b([a-z0-9]{32})\b'
+
+  - id: "SCAN-053 Aylien - 1"
+    type: "scan"
+    enforcement:
+      - environment: "all"
+        fatal: "true"
+        exceptions: "false"
+        confidence: "high"
+    metadata:
+      name: "Detect Aylien - 1"
+      description: "Scan for potential Aylien - 1 leaks in the codebase"
+      msg_solution: "Remove the Aylien - 1 token and use secure token management practices."
+      msg_error: "Aylien - 1 token detected in the codebase."
+      tags:
+        - "security"
+        - "aylien"
+      score: "9"
+    _regex:
+      - '(?:aylien).{0,40}\b([a-z0-9]{32})\b'
+
+  - id: "SCAN-054 Aylien - 2"
+    type: "scan"
+    enforcement:
+      - environment: "all"
+        fatal: "true"
+        exceptions: "false"
+        confidence: "high"
+    metadata:
+      name: "Detect Aylien - 2"
+      description: "Scan for potential Aylien - 2 leaks in the codebase"
+      msg_solution: "Remove the Aylien - 2 token and use secure token management practices."
+      msg_error: "Aylien - 2 token detected in the codebase."
+      tags:
+        - "security"
+        - "aylien"
+      score: "9"
+    _regex:
+      - '(?:aylien).{0,40}\b([a-z0-9]{8})\b'
+
+  - id: "SCAN-055 Billomat - 2"
+    type: "scan"
+    enforcement:
+      - environment: "all"
+        fatal: "true"
+        exceptions: "false"
+        confidence: "high"
+    metadata:
+      name: "Detect Billomat - 2"
+      description: "Scan for potential Billomat - 2 leaks in the codebase"
+      msg_solution: "Remove the Billomat - 2 token and use secure token management practices."
+      msg_error: "Billomat - 2 token detected in the codebase."
+      tags:
+        - "security"
+        - "billomat"
+      score: "9"
+    _regex:
+      - '(?:billomat).{0,40}\b([0-9a-z]{32})\b'
+
+  - id: "SCAN-056 Bitbar"
+    type: "scan"
+    enforcement:
+      - environment: "all"
+        fatal: "true"
+        exceptions: "false"
+        confidence: "high"
+    metadata:
+      name: "Detect Bitbar"
+      description: "Scan for potential Bitbar leaks in the codebase"
+      msg_solution: "Remove the Bitbar token and use secure token management practices."
+      msg_error: "Bitbar token detected in the codebase."
+      tags:
+        - "security"
+        - "bitbar"
+      score: "9"
+    _regex:
+      - '(?:bitbar).{0,40}\b([0-9a-z]{32})\b'
+
+  - id: "SCAN-057 Bitcoinaverage"
+    type: "scan"
+    enforcement:
+      - environment: "all"
+        fatal: "true"
+        exceptions: "false"
+        confidence: "high"
+    metadata:
+      name: "Detect Bitcoinaverage"
+      description: "Scan for potential Bitcoinaverage leaks in the codebase"
+      msg_solution: "Remove the Bitcoinaverage token and use secure token management practices."
+      msg_error: "Bitcoinaverage token detected in the codebase."
+      tags:
+        - "security"
+        - "bitcoinaverage"
+      score: "9"
+    _regex:
+      - '(?:bitcoinaverage).{0,40}\b([a-zA-Z0-9]{43})\b'
+
+  - id: "SCAN-058 Bitfinex"
+    type: "scan"
+    enforcement:
+      - environment: "all"
+        fatal: "true"
+        exceptions: "false"
+        confidence: "high"
+    metadata:
+      name: "Detect Bitfinex"
+      description: "Scan for potential Bitfinex leaks in the codebase"
+      msg_solution: "Remove the Bitfinex token and use secure token management practices."
+      msg_error: "Bitfinex token detected in the codebase."
+      tags:
+        - "security"
+        - "bitfinex"
+      score: "9"
+    _regex:
+      - '(?:bitfinex).{0,40}\b([a-zA-Z0-9]{43})\b'
+
+  - id: "SCAN-059 Coinbase"
+    type: "scan"
+    enforcement:
+      - environment: "all"
+        fatal: "true"
+        exceptions: "false"
+        confidence: "high"
+    metadata:
+      name: "Detect Coinbase"
+      description: "Scan for potential Coinbase leaks in the codebase"
+      msg_solution: "Remove the Coinbase token and use secure token management practices."
+      msg_error: "Coinbase token detected in the codebase."
+      tags:
+        - "security"
+        - "coinbase"
+      score: "9"
+    _regex:
+      - '(:coinbase).{0,40}\b([a-zA-Z-0-9]{64})\b'
+
+  - id: "SCAN-060 Coinlayer"
+    type: "scan"
+    enforcement:
+      - environment: "all"
+        fatal: "true"
+        exceptions: "false"
+        confidence: "high"
+    metadata:
+      name: "Detect Coinlayer"
+      description: "Scan for potential Coinlayer leaks in the codebase"
+      msg_solution: "Remove the Coinlayer token and use secure token management practices."
+      msg_error: "Coinlayer token detected in the codebase."
+      tags:
+        - "security"
+        - "coinlayer"
+      score: "9"
+    _regex:
+      - '(?:coinlayer).{0,40}\b([a-z0-9]{32})\b'
+
+  - id: "SCAN-061 Coinlib"
+    type: "scan"
+    enforcement:
+      - environment: "all"
+        fatal: "true"
+        exceptions: "false"
+        confidence: "high"
+    metadata:
+      name: "Detect Coinlib"
+      description: "Scan for potential Coinlib leaks in the codebase"
+      msg_solution: "Remove the Coinlib token and use secure token management practices."
+      msg_error: "Coinlib token detected in the codebase."
+      tags:
+        - "security"
+        - "coinlib"
+      score: "9"
+    _regex:
+      - '(?:coinlib).{0,40}\b([a-z0-9]{16})\b'
+
+  - id: "SCAN-062 Column"
+    type: "scan"
+    enforcement:
+      - environment: "all"
+        fatal: "true"
+        exceptions: "false"
+        confidence: "high"
+    metadata:
+      name: "Detect Column"
+      description: "Scan for potential Column leaks in the codebase"
+      msg_solution: "Remove the Column token and use secure token management practices."
+      msg_error: "Column token detected in the codebase."
+      tags:
+        - "security"
+        - "column"
+      score: "9"
+    _regex:
+      - '(?:column).{0,40}\b([a-z0-9]{32})\b'
+
+  - id: "SCAN-063 Convier"
+    type: "scan"
+    enforcement:
+      - environment: "all"
+        fatal: "true"
+        exceptions: "false"
+        confidence: "high"
+    metadata:
+      name: "Detect Convier"
+      description: "Scan for potential Convier leaks in the codebase"
+      msg_solution: "Remove the Convier token and use secure token management practices."
+      msg_error: "Convier token detected in the codebase."
+      tags:
+        - "security"
+        - "convier"
+      score: "9"
+    _regex:
+      - '(?:convier).{0,40}\b([0-9]{2}\|[a-zA-Z0-9]{40})\b'
+
+  - id: "SCAN-64 zoom_api_key"
+    type: "scan"
+    enforcement:
+      - environment: "all"
+        fatal: "true"
+        exceptions: "false"
+        confidence: "low"
+    metadata:
+      name: "Detect zoom_api_key"
+      description: "Scan for potential zoom_api_key leaks in the codebase"
+      msg_solution: "Remove the zoom_api_key and use secure key management practices."
+      msg_error: "zoom_api_key detected in the codebase."
+      tags:
+        - "security"
+        - "zoom"
+      score: "6"
+    _regex:
+      - 'zoom[_-]?api[_-]?key(=| =|:| :)'
+
+  - id: "SCAN-65 zoom_api_secret"
+    type: "scan"
+    enforcement:
+      - environment: "all"
+        fatal: "true"
+        exceptions: "false"
+        confidence: "low"
+    metadata:
+      name: "Detect zoom_api_secret"
+      description: "Scan for potential zoom_api_secret leaks in the codebase"
+      msg_solution: "Remove the zoom_api_secret and use secure key management practices."
+      msg_error: "zoom_api_secret detected in the codebase."
+      tags:
+        - "security"
+        - "zoom"
+      score: "6"
+    _regex:
+      - 'zoom[_-]?api[_-]?secret(=| =|:| :)'
+
+  - id: "SCAN-066 Countrylayer"
+    type: "scan"
+    enforcement:
+      - environment: "all"
+        fatal: "true"
+        exceptions: "false"
+        confidence: "high"
+    metadata:
+      name: "Detect Countrylayer"
+      description: "Scan for potential Countrylayer leaks in the codebase"
+      msg_solution: "Remove the Countrylayer token and use secure token management practices."
+      msg_error: "Countrylayer token detected in the codebase."
+      tags:
+        - "security"
+        - "countrylayer"
+      score: "9"
+    _regex:
+      - '(?:countrylayer).{0,40}\b([a-z0-9]{32})\b'
+
+  - id: "SCAN-067 Courier"
+    type: "scan"
+    enforcement:
+      - environment: "all"
+        fatal: "true"
+        exceptions: "false"
+        confidence: "high"
+    metadata:
+      name: "Detect Courier"
+      description: "Scan for potential Courier leaks in the codebase"
+      msg_solution: "Remove the Courier token and use secure token management practices."
+      msg_error: "Courier token detected in the codebase."
+      tags:
+        - "security"
+        - "courier"
+      score: "9"
+    _regex:
+      - '(?:courier).{0,40}\b([a-z0-9]{32})\b'
+
+  - id: "SCAN-068 Datadogtoken - 1"
+    type: "scan"
+    enforcement:
+      - environment: "all"
+        fatal: "true"
+        exceptions: "false"
+        confidence: "high"
+    metadata:
+      name: "Detect Datadogtoken - 1"
+      description: "Scan for potential Datadogtoken - 1 leaks in the codebase"
+      msg_solution: "Remove the Datadogtoken - 1 token and use secure token management practices."
+      msg_error: "Datadogtoken - 1 token detected in the codebase."
+      tags:
+        - "security"
+        - "datadog"
+      score: "9"
+    _regex:
+      - '(?:datadog).{0,40}\b([a-zA-Z-0-9]{32})\b'
+
+  - id: "SCAN-069 Datadogtoken - 2"
+    type: "scan"
+    enforcement:
+      - environment: "all"
+        fatal: "true"
+        exceptions: "false"
+        confidence: "high"
+    metadata:
+      name: "Detect Datadogtoken - 2"
+      description: "Scan for potential Datadogtoken - 2 leaks in the codebase"
+      msg_solution: "Remove the Datadogtoken - 2 token and use secure token management practices."
+      msg_error: "Datadogtoken - 2 token detected in the codebase."
+      tags:
+        - "security"
+        - "datadog"
+      score: "9"
+    _regex:
+      - '(?:datadog).{0,40}\b([a-zA-Z-0-9]{40})\b'
+
+  - id: "SCAN-070 Datafire"
+    type: "scan"
+    enforcement:
+      - environment: "all"
+        fatal: "true"
+        exceptions: "false"
+        confidence: "high"
+    metadata:
+      name: "Detect Datafire"
+      description: "Scan for potential Datafire leaks in the codebase"
+      msg_solution: "Remove the Datafire token and use secure token management practices."
+      msg_error: "Datafire token detected in the codebase."
+      tags:
+        - "security"
+        - "datafire"
+      score: "9"
+    _regex:
+      - '(?:datafire).{0,40}\b([a-z0-9\S]{175,190})\b'
+
+  - id: "SCAN-071 Datagov"
+    type: "scan"
+    enforcement:
+      - environment: "all"
+        fatal: "true"
+        exceptions: "false"
+        confidence: "high"
+    metadata:
+      name: "Detect Datagov"
+      description: "Scan for potential Datagov leaks in the codebase"
+      msg_solution: "Remove the Datagov token and use secure token management practices."
+      msg_error: "Datagov token detected in the codebase."
+      tags:
+        - "security"
+        - "datagov"
+      score: "9"
+    _regex:
+      - '(?:data.gov).{0,40}\b([a-zA-Z0-9]{40})\b'
+
+  - id: "SCAN-072 Debounce"
+    type: "scan"
+    enforcement:
+      - environment: "all"
+        fatal: "true"
+        exceptions: "false"
+        confidence: "high"
+    metadata:
+      name: "Detect Debounce"
+      description: "Scan for potential Debounce leaks in the codebase"
+      msg_solution: "Remove the Debounce token and use secure token management practices."
+      msg_error: "Debounce token detected in the codebase."
+      tags:
+        - "security"
+        - "debounce"
+      score: "9"
+    _regex:
+      - '(?:debounce).{0,40}\b([a-zA-Z0-9]{32})\b'
+
+  - id: "SCAN-073 Diffbot"
+    type: "scan"
+    enforcement:
+      - environment: "all"
+        fatal: "true"
+        exceptions: "false"
+        confidence: "high"
+    metadata:
+      name: "Detect Diffbot"
+      description: "Scan for potential Diffbot leaks in the codebase"
+      msg_solution: "Remove the Diffbot token and use secure token management practices."
+      msg_error: "Diffbot token detected in the codebase."
+      tags:
+        - "security"
+        - "diffbot"
+      score: "9"
+    _regex:
+      - '(?:diffbot).{0,40}\b([a-z0-9]{32})\b'
+
+  - id: "SCAN-074 Digitaloceantoken"
+    type: "scan"
+    enforcement:
+      - environment: "all"
+        fatal: "true"
+        exceptions: "false"
+        confidence: "high"
+    metadata:
+      name: "Detect Digitaloceantoken"
+      description: "Scan for potential Digitaloceantoken leaks in the codebase"
+      msg_solution: "Remove the Digitaloceantoken and use secure token management practices."
+      msg_error: "Digitaloceantoken detected in the codebase."
+      tags:
+        - "security"
+        - "digitalocean"
+      score: "9"
+    _regex:
+      - '(?:digitalocean).{0,40}\b([A-Za-z0-9_-]{64})\b'
+
+  - id: "SCAN-075 Discord Webhook"
+    type: "scan"
+    enforcement:
+      - environment: "all"
+        fatal: "true"
+        exceptions: "false"
+        confidence: "high"
+    metadata:
+      name: "Detect Discord Webhook"
+      description: "Scan for potential Discord Webhook leaks in the codebase"
+      msg_solution: "Remove the Discord Webhook and use secure token management practices."
+      msg_error: "Discord Webhook detected in the codebase."
+      tags:
+        - "security"
+        - "discord"
+      score: "9"
+    _regex:
+      - 'https://discordapp\.com/api/webhooks/[0-9]+/[A-Za-z0-9\-]+'
+
+  - id: "SCAN-076 Discordbottoken - 1"
+    type: "scan"
+    enforcement:
+      - environment: "all"
+        fatal: "true"
+        exceptions: "false"
+        confidence: "high"
+    metadata:
+      name: "Detect Discordbottoken - 1"
+      description: "Scan for potential Discordbottoken - 1 leaks in the codebase"
+      msg_solution: "Remove the Discordbottoken - 1 token and use secure token management practices."
+      msg_error: "Discordbottoken - 1 token detected in the codebase."
+      tags:
+        - "security"
+        - "discord"
+      score: "9"
+    _regex:
+      - '(?:discord).{0,40}\b([A-Za-z0-9_-]{24}\.[A-Za-z0-9_-]{6}\.[A-Za-z0-9_-]{27})\b'
+
+  - id: "SCAN-077 Discordbottoken - 2"
+    type: "scan"
+    enforcement:
+      - environment: "all"
+        fatal: "true" 
+        exceptions: "false"
+        confidence: "high"
+    metadata:
+      name: "Detect Discordbottoken - 2"
+      description: "Scan for potential Discordbottoken - 2 leaks in the codebase"
+      msg_solution: "Remove the Discordbottoken - 2 token and use secure token management practices."
+      msg_error: "Discordbottoken - 2 token detected in the codebase."
+      tags:
+        - "security"
+        - "discord"
+      score: "9"
+    _regex:
+      - '(?:discord).{0,40}\b([A-Za-z0-9_-]{59})\b'
+  - id: "SCAN-078 Disqus"
+    type: "scan"
+    enforcement:
+      - environment: "all"
+        fatal: "true"
+        exceptions: "false"
+        confidence: "high"
+    metadata:
+      name: "Detect Disqus"
+      description: "Scan for potential Disqus leaks in the codebase"
+      msg_solution: "Remove the Disqus token and use secure token management practices."
+      msg_error: "Disqus token detected in the codebase."
+      tags:
+        - "security"
+        - "disqus"
+      score: "9"
+    _regex:
+      - '(?:disqus).{0,40}\b([a-zA-Z0-9]{40})\b'
+
+  - id: "SCAN-079 Dropbox"
+    type: "scan"
+    enforcement:
+      - environment: "all"
+        fatal: "true"
+        exceptions: "false"
+        confidence: "high"
+    metadata:
+      name: "Detect Dropbox"
+      description: "Scan for potential Dropbox leaks in the codebase"
+      msg_solution: "Remove the Dropbox token and use secure token management practices."
+      msg_error: "Dropbox token detected in the codebase."
+      tags:
+        - "security"
+        - "dropbox"
+      score: "9"
+    _regex:
+      - '(?:dropbox).{0,40}\b([a-zA-Z0-9_-]{15})\b'
+
+  - id: "SCAN-080 Drip"
+    type: "scan"
+    enforcement:
+      - environment: "all"
+        fatal: "true"
+        exceptions: "false"
+        confidence: "high"
+    metadata:
+      name: "Detect Drip"
+      description: "Scan for potential Drip leaks in the codebase"
+      msg_solution: "Remove the Drip token and use secure token management practices."
+      msg_error: "Drip token detected in the codebase."
+      tags:
+        - "security"
+        - "drip"
+      score: "9"
+    _regex:
+      - '(?:drip).{0,40}\b([a-zA-Z0-9]{40})\b'
+
+  - id: "SCAN-081 Duda"
+    type: "scan"
+    enforcement:
+      - environment: "all"
+        fatal: "true"
+        exceptions: "false"
+        confidence: "high"
+    metadata:
+      name: "Detect Duda"
+      description: "Scan for potential Duda leaks in the codebase"
+      msg_solution: "Remove the Duda token and use secure token management practices."
+      msg_error: "Duda token detected in the codebase."
+      tags:
+        - "security"
+        - "duda"
+      score: "9"
+    _regex:
+      - '(?:duda).{0,40}\b([a-zA-Z0-9]{40})\b'
+
+  - id: "SCAN-082 Dwolla"
+    type: "scan"
+    enforcement:
+      - environment: "all"
+        fatal: "true"
+        exceptions: "false"
+        confidence: "high"
+    metadata:
+      name: "Detect Dwolla"
+      description: "Scan for potential Dwolla leaks in the codebase"
+      msg_solution: "Remove the Dwolla token and use secure token management practices."
+      msg_error: "Dwolla token detected in the codebase."
+      tags:
+        - "security"
+        - "dwolla"
+      score: "9"
+    _regex:
+      - '(?:dwolla).{0,40}\b([a-zA-Z0-9]{40})\b'
+
+  - id: "SCAN-083 EasyPost"
+    type: "scan"
+    enforcement:
+      - environment: "all"
+        fatal: "true"
+        exceptions: "false"
+        confidence: "high"
+    metadata:
+      name: "Detect EasyPost"
+      description: "Scan for potential EasyPost leaks in the codebase"
+      msg_solution: "Remove the EasyPost token and use secure token management practices."
+      msg_error: "EasyPost token detected in the codebase."
+      tags:
+        - "security"
+        - "easypost"
+      score: "9"
+    _regex:
+      - '(?:easypost).{0,40}\b([a-zA-Z0-9]{40})\b'
+
+  - id: "SCAN-084 Ecwid"
+    type: "scan"
+    enforcement:
+      - environment: "all"
+        fatal: "true"
+        exceptions: "false"
+        confidence: "high"
+    metadata:
+      name: "Detect Ecwid"
+      description: "Scan for potential Ecwid leaks in the codebase"
+      msg_solution: "Remove the Ecwid token and use secure token management practices."
+      msg_error: "Ecwid token detected in the codebase."
+      tags:
+        - "security"
+        - "ecwid"
+      score: "9"
+    _regex:
+      - '(?:ecwid).{0,40}\b([a-zA-Z0-9]{40})\b'
+
+  - id: "SCAN-085 Edamam"
+    type: "scan"
+    enforcement:
+      - environment: "all"
+        fatal: "true"
+        exceptions: "false"
+        confidence: "high"
+    metadata:
+      name: "Detect Edamam"
+      description: "Scan for potential Edamam leaks in the codebase"
+      msg_solution: "Remove the Edamam token and use secure token management practices."
+      msg_error: "Edamam token detected in the codebase."
+      tags:
+        - "security"
+        - "edamam"
+      score: "9"
+    _regex:
+      - '(?:edamam).{0,40}\b([a-zA-Z0-9]{40})\b'
+
+  - id: "SCAN-086 Elasticsearch"
+    type: "scan"
+    enforcement:
+      - environment: "all"
+        fatal: "true"
+        exceptions: "false"
+        confidence: "high"
+    metadata:
+      name: "Detect Elasticsearch"
+      description: "Scan for potential Elasticsearch leaks in the codebase"
+      msg_solution: "Remove the Elasticsearch token and use secure token management practices."
+      msg_error: "Elasticsearch token detected in the codebase."
+      tags:
+        - "security"
+        - "elasticsearch"
+      score: "9"
+    _regex:
+      - '(?:elasticsearch).{0,40}\b([a-zA-Z0-9]{40})\b'
+
+  - id: "SCAN-087 Envato"
+    type: "scan"
+    enforcement:
+      - environment: "all"
+        fatal: "true"
+        exceptions: "false"
+        confidence: "high"
+    metadata:
+      name: "Detect Envato"
+      description: "Scan for potential Envato leaks in the codebase"
+      msg_solution: "Remove the Envato token and use secure token management practices."
+      msg_error: "Envato token detected in the codebase."
+      tags:
+        - "security"
+        - "envato"
+      score: "9"
+    _regex:
+      - '(?:envato).{0,40}\b([a-zA-Z0-9]{40})\b'
+
+  - id: "SCAN-088 Eventbrite"
+    type: "scan"
+    enforcement:
+      - environment: "all"
+        fatal: "true"
+        exceptions: "false"
+        confidence: "high"
+    metadata:
+      name: "Detect Eventbrite"
+      description: "Scan for potential Eventbrite leaks in the codebase"
+      msg_solution: "Remove the Eventbrite token and use secure token management practices."
+      msg_error: "Eventbrite token detected in the codebase."
+      tags:
+        - "security"
+        - "eventbrite"
+      score: "9"
+    _regex:
+      - '(?:eventbrite).{0,40}\b([a-zA-Z0-9]{40})\b'
+
+  - id: "SCAN-089 Facebook"
+    type: "scan"
+    enforcement:
+      - environment: "all"
+        fatal: "true"
+        exceptions: "false"
+        confidence: "high"
+    metadata:
+      name: "Detect Facebook"
+      description: "Scan for potential Facebook leaks in the codebase"
+      msg_solution: "Remove the Facebook token and use secure token management practices."
+      msg_error: "Facebook token detected in the codebase."
+      tags:
+        - "security"
+        - "facebook"
+      score: "9"
+    _regex:
+      - '(?:facebook).{0,40}\b([a-zA-Z0-9]{40})\b'
+
+  - id: "SCAN-090 Fastly"
+    type: "scan"
+    enforcement:
+      - environment: "all"
+        fatal: "true"
+        exceptions: "false"
+        confidence: "high"
+    metadata:
+      name: "Detect Fastly"
+      description: "Scan for potential Fastly leaks in the codebase"
+      msg_solution: "Remove the Fastly token and use secure token management practices."
+      msg_error: "Fastly token detected in the codebase."
+      tags:
+        - "security"
+        - "fastly"
+      score: "9"
+    _regex:
+      - '(?:fastly).{0,40}\b([a-zA-Z0-9]{40})\b'
+
+  - id: "SCAN-091 Firebase"
+    type: "scan"
+    enforcement:
+      - environment: "all"
+        fatal: "true"
+        exceptions: "false"
+        confidence: "high"
+    metadata:
+      name: "Detect Firebase"
+      description: "Scan for potential Firebase leaks in the codebase"
+      msg_solution: "Remove the Firebase token and use secure token management practices."
+      msg_error: "Firebase token detected in the codebase."
+      tags:
+        - "security"
+        - "firebase"
+      score: "9"
+    _regex:
+      - '(?:firebase).{0,40}\b([a-zA-Z0-9]{40})\b'
+
+  - id: "SCAN-092 Flickr"
+    type: "scan"
+    enforcement:
+      - environment: "all"
+        fatal: "true"
+        exceptions: "false"
+        confidence: "high"
+    metadata:
+      name: "Detect Flickr"
+      description: "Scan for potential Flickr leaks in the codebase"
+      msg_solution: "Remove the Flickr token and use secure token management practices."
+      msg_error: "Flickr token detected in the codebase."
+      tags:
+        - "security"
+        - "flickr"
+      score: "9"
+    _regex:
+      - '(?:flickr).{0,40}\b([a-zA-Z0-9]{40})\b'
+
+  - id: "SCAN-093 Flowdock"
+    type: "scan"
+    enforcement:
+      - environment: "all"
+        fatal: "true"
+        exceptions: "false"
+        confidence: "high"
+    metadata:
+      name: "Detect Flowdock"
+      description: "Scan for potential Flowdock leaks in the codebase"
+      msg_solution: "Remove the Flowdock token and use secure token management practices."
+      msg_error: "Flowdock token detected in the codebase."
+      tags:
+        - "security"
+        - "flowdock"
+      score: "9"
+    _regex:
+      - '(?:flowdock).{0,40}\b([a-zA-Z0-9]{40})\b'
+
+  - id: "SCAN-094 Foursquare"
+    type: "scan"
+    enforcement:
+      - environment: "all"
+        fatal: "true"
+        exceptions: "false"
+        confidence: "high"
+    metadata:
+      name: "Detect Foursquare"
+      description: "Scan for potential Foursquare leaks in the codebase"
+      msg_solution: "Remove the Foursquare token and use secure token management practices."
+      msg_error: "Foursquare token detected in the codebase."
+      tags:
+        - "security"
+        - "foursquare"
+      score: "9"
+    _regex:
+      - '(?:foursquare).{0,40}\b([0-9A-Z]{48})\b'
+
+  - id: "SCAN-095 Frameio"
+    type: "scan"
+    enforcement:
+      - environment: "all"
+        fatal: "true"
+        exceptions: "false"
+        confidence: "high"
+    metadata:
+      name: "Detect Frameio"
+      description: "Scan for potential Frameio leaks in the codebase"
+      msg_solution: "Remove the Frameio token and use secure token management practices."
+      msg_error: "Frameio token detected in the codebase."
+      tags:
+        - "security"
+        - "frameio"
+      score: "9"
+    _regex:
+      - '\b(fio-u-[0-9a-zA-Z_-]{64})\b'
+
+  - id: "SCAN-096 Freshbooks - 1"
+    type: "scan"
+    enforcement:
+      - environment: "all"
+        fatal: "true"
+        exceptions: "false"
+        confidence: "high"
+    metadata:
+      name: "Detect Freshbooks - 1"
+      description: "Scan for potential Freshbooks - 1 leaks in the codebase"
+      msg_solution: "Remove the Freshbooks - 1 token and use secure token management practices."
+      msg_error: "Freshbooks - 1 token detected in the codebase."
+      tags:
+        - "security"
+        - "freshbooks"
+      score: "9"
+    _regex:
+      - '(?:freshbooks).{0,40}\b([0-9a-z]{64})\b'
+
+  - id: "SCAN-097 Freshbooks - 2"
+    type: "scan"
+    enforcement:
+      - environment: "all"
+        fatal: "true"
+        exceptions: "false"
+        confidence: "high"
+    metadata:
+      name: "Detect Freshbooks - 2"
+      description: "Scan for potential Freshbooks - 2 leaks in the codebase"
+      msg_solution: "Remove the Freshbooks - 2 token and use secure token management practices."
+      msg_error: "Freshbooks - 2 token detected in the codebase."
+      tags:
+        - "security"
+        - "freshbooks"
+      score: "9"
+    _regex:
+      - '(?:freshbooks).{0,40}\b(https://www.[0-9A-Za-z_-]{1,}.com)\b'
+
+  - id: "SCAN-098 Freshdesk - 1"
+    type: "scan"
+    enforcement:
+      - environment: "all"
+        fatal: "true"
+        exceptions: "false"
+        confidence: "high"
+    metadata:
+      name: "Detect Freshdesk - 1"
+      description: "Scan for potential Freshdesk - 1 leaks in the codebase"
+      msg_solution: "Remove the Freshdesk - 1 token and use secure token management practices."
+      msg_error: "Freshdesk - 1 token detected in the codebase."
+      tags:
+        - "security"
+        - "freshdesk"
+      score: "9"
+    _regex:
+      - '(?:freshdesk).{0,40}\b([0-9A-Za-z]{20})\b'
+
+  - id: "SCAN-099 Freshdesk - 2"
+    type: "scan"
+    enforcement:
+      - environment: "all"
+        fatal: "true"
+        exceptions: "false"
+        confidence: "high"
+    metadata:
+      name: "Detect Freshdesk - 2"
+      description: "Scan for potential Freshdesk - 2 leaks in the codebase"
+      msg_solution: "Remove the Freshdesk - 2 token and use secure token management practices."
+      msg_error: "Freshdesk - 2 token detected in the codebase."
+      tags:
+        - "security"
+        - "freshdesk"
+      score: "9"
+    _regex:
+      - '\b([0-9a-z-]{1,}.freshdesk.com)\b'
+
+  - id: "SCAN-100 Front"
+    type: "scan"
+    enforcement:
+      - environment: "all"
+        fatal: "true"
+        exceptions: "false"
+        confidence: "high"
+    metadata:
+      name: "Detect Front"
+      description: "Scan for potential Front leaks in the codebase"
+      msg_solution: "Remove the Front token and use secure token management practices."
+      msg_error: "Front token detected in the codebase."
+      tags:
+        - "security"
+        - "front"
+      score: "9"
+    _regex:
+      - '(?:front).{0,40}\b([0-9a-zA-Z]{36}.[0-9a-zA-Z\.\-\_]{188,244})\b'
+

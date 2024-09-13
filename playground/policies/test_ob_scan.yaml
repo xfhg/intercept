@@ -3,7 +3,7 @@ Config:
   Flags:
     policy_schedule: "*/15 * * * * *"
     report_schedule:  "*/50 * * * * *"
-    # target: "targets/"
+    target: "targets/"
     ignore:
       - "targets/scan/"
 
