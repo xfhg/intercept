@@ -53,7 +53,7 @@ jobs:
           name: ${{ steps.get_version.outputs.VERSION }}
           body: >
             Release ${{ steps.get_version.outputs.VERSION }}
-          gzip: "false"
+          gzip: "true"
           files: >
             release/intercept-darwin-amd64
             release/intercept-darwin-amd64.sha256
