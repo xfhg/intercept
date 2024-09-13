@@ -8,6 +8,8 @@ import (
 	"path/filepath"
 	"strings"
 	"time"
+
+	"github.com/charlievieth/fastwalk"
 )
 
 // SARIFLevel represents the severity level in SARIF format
@@ -127,9 +129,14 @@ type ArtifactLocation struct {
 }
 
 type Region struct {
-	StartLine   int `json:"startLine"`
-	StartColumn int `json:"startColumn"`
-	EndColumn   int `json:"endColumn"`
+	StartLine   int     `json:"startLine"`
+	StartColumn int     `json:"startColumn"`
+	EndColumn   int     `json:"endColumn"`
+	Snippet     Snippet `json:"snippet"`
+}
+
+type Snippet struct {
+	Text string `json:"text"`
 }
 
 type Invocation struct {
@@ -204,7 +211,8 @@ func GenerateSARIFReport(inputFile string, policy Policy) (SARIFReport, error) {
 				},
 			},
 			Properties: map[string]string{
-				"result-type": "detail", "observe-run-id": policy.RunID,
+				"result-type":      "detail",
+				"observe-run-id":   policy.RunID,
 				"result-timestamp": timestamp,
 				"name":             policy.Metadata.Name,
 				"description":      policy.Metadata.Description,
@@ -234,6 +242,9 @@ func GenerateSARIFReport(inputFile string, policy Policy) (SARIFReport, error) {
 									StartLine:   rgOutput.Data.LineNumber,
 									StartColumn: strings.Index(rgOutput.Data.Lines.Text, matchText) + 1,
 									EndColumn:   strings.Index(rgOutput.Data.Lines.Text, matchText) + len(matchText) + 1,
+									Snippet: Snippet{
+										Text: matchText,
+									},
 								},
 							},
 						},
@@ -634,7 +645,7 @@ func cleanupSARIFFolder() error {
 		sarifDir = filepath.Join(outputDir, sarifDir)
 	}
 
-	err := filepath.WalkDir(sarifDir, func(path string, d fs.DirEntry, err error) error {
+	err := fastwalk.Walk(nil, sarifDir, func(path string, d fs.DirEntry, err error) error {
 		if err != nil {
 			return err // Error accessing the path
 		}
