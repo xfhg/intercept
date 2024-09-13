@@ -44,17 +44,20 @@ export default defineConfig({
       {
         text: 'Policy Types',
         items: [
+
           { text: 'SCAN - REGEX', link: '/docs/policy-scan-regex' },
           { text: 'ASSURE - REGEX', link: '/docs/policy-assure-regex' },
           { text: 'ASSURE - FILETYPE ', link: '/docs/policy-assure-filetype' },
           { text: 'ASSURE - API ', link: '/docs/policy-assure-api' },
           { text: 'ASSURE - REGO ', link: '/docs/policy-assure-rego' },
           { text: 'RUNTIME ', link: '/docs/policy-runtime' },
+
         ]
       },
       {
         text: 'Policy Features',
         items: [
+
           { text: 'Schema', link: '/docs/policy-schema' },
           { text: 'Enforcement Levels', link: '/docs/enforcement' },
         ]
