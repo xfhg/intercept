@@ -8,6 +8,8 @@ import (
 	"path/filepath"
 	"strings"
 	"time"
+
+	"github.com/charlievieth/fastwalk"
 )
 
 // SARIFLevel represents the severity level in SARIF format
@@ -127,9 +129,14 @@ type ArtifactLocation struct {
 }
 
 type Region struct {
-	StartLine   int `json:"startLine"`
-	StartColumn int `json:"startColumn"`
-	EndColumn   int `json:"endColumn"`
+	StartLine   int     `json:"startLine"`
+	StartColumn int     `json:"startColumn"`
+	EndColumn   int     `json:"endColumn"`
+	Snippet     Snippet `json:"snippet"`
+}
+
+type Snippet struct {
+	Text string `json:"text"`
 }
 
 type Invocation struct {
@@ -204,7 +211,8 @@ func GenerateSARIFReport(inputFile string, policy Policy) (SARIFReport, error) {
 				},
 			},
 			Properties: map[string]string{
-				"result-type": "detail", "observe-run-id": policy.RunID,
+				"result-type":      "detail",
+				"observe-run-id":   policy.RunID,
 				"result-timestamp": timestamp,
 				"name":             policy.Metadata.Name,
 				"description":      policy.Metadata.Description,
@@ -234,6 +242,9 @@ func GenerateSARIFReport(inputFile string, policy Policy) (SARIFReport, error) {
 									StartLine:   rgOutput.Data.LineNumber,
 									StartColumn: strings.Index(rgOutput.Data.Lines.Text, matchText) + 1,
 									EndColumn:   strings.Index(rgOutput.Data.Lines.Text, matchText) + len(matchText) + 1,
+									Snippet: Snippet{
+										Text: matchText,
+									},
 								},
 							},
 						},
@@ -545,13 +556,15 @@ func MergeSARIFReports(commandLine string, perf Performance, isScheduled bool) (
 						ExecutionSuccessful: true,
 						CommandLine:         commandLine,
 						Properties: map[string]string{
-							"run_id":            intercept_run_id,
-							"start_time":        perf.StartTime.Format(time.RFC3339),
-							"end_time":          perf.EndTime.Format(time.RFC3339),
-							"execution_time_ms": fmt.Sprintf("%d", perf.Delta.Milliseconds()),
+							"run-id":            intercept_run_id,
+							"start-time":        perf.StartTime.Format(time.RFC3339),
+							"end-time":          perf.EndTime.Format(time.RFC3339),
+							"execution-time-ms": fmt.Sprintf("%d", perf.Delta.Milliseconds()),
 							"environment":       environment,
 							"debug":             fmt.Sprintf("%v", debugOutput),
 							"report-timestamp":  timestamp,
+							"host-data":         hostData,
+							"host-fingerprint":  hostFingerprint,
 						},
 					},
 				},
@@ -634,7 +647,7 @@ func cleanupSARIFFolder() error {
 		sarifDir = filepath.Join(outputDir, sarifDir)
 	}
 
-	err := filepath.WalkDir(sarifDir, func(path string, d fs.DirEntry, err error) error {
+	err := fastwalk.Walk(nil, sarifDir, func(path string, d fs.DirEntry, err error) error {
 		if err != nil {
 			return err // Error accessing the path
 		}

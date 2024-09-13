@@ -3,10 +3,13 @@ package cmd
 import (
 	"encoding/json"
 	"fmt"
+	"io/fs"
 	"os"
 	"path/filepath"
 	"regexp"
 	"strings"
+
+	"github.com/charlievieth/fastwalk"
 )
 
 type FileInfo struct {
@@ -21,12 +24,12 @@ func CalculateFileHashes(targetDir string) ([]FileInfo, error) {
 
 	ignorePaths := policyData.Config.Flags.Ignore
 
-	err := filepath.Walk(targetDir, func(path string, info os.FileInfo, err error) error {
+	err := fastwalk.Walk(nil, targetDir, func(path string, d fs.DirEntry, err error) error {
 		if err != nil {
 			return err
 		}
 
-		if !info.IsDir() && !isIgnored(ignorePaths, path) {
+		if !d.IsDir() && !isIgnored(ignorePaths, path) {
 
 			hash, err := calculateSHA256(path)
 			if err != nil {

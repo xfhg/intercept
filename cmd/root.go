@@ -20,6 +20,9 @@ var (
 	silentMode       bool
 	nologMode        bool
 
+	hostData        string
+	hostFingerprint string
+
 	buildVersion   string
 	buildSignature string
 
@@ -94,8 +97,30 @@ func setupLogging() {
 	log = zerolog.New(output).With().Timestamp().Logger()
 
 	if experimentalMode {
+
+		// ----------------------------------------------
+		// ---------------------------------------------- EXPERIMENTAL log caller debug
+		// ----------------------------------------------
+
 		log = zerolog.New(output).With().Timestamp().Logger().With().Caller().Logger()
 		// log = zerolog.New(output).With().Timestamp().Logger().With().Str("id", intercept_run_id).Logger()
+
+		// ----------------------------------------------
+		// ---------------------------------------------- EXPERIMENTAL feature/targetid
+		// ----------------------------------------------
+
+		hostInfo, err := GetHostInfo()
+		if err != nil {
+			log.Error().Msgf("Error gathering host info: %v\n", err)
+		}
+
+		hostData, hostFingerprint, err := FingerprintHost(hostInfo)
+		if err != nil {
+			log.Error().Msgf("Error generating fingerprint: %v\n", err)
+		}
+		log.Info().Msgf("Host Data: %s", hostData)
+		log.Info().Msgf("Host Fingerprint: %s", hostFingerprint)
+
 	}
 	if silentMode {
 

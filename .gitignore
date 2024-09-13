@@ -32,7 +32,6 @@ Desktop.ini
 
 .vscode/
 
-
 # Temp
 
 playground/_output
@@ -51,3 +50,4 @@ docs/.vitepress/dist/
 docs/.vitepress/cache/
 
 local/
+dist/

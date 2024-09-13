@@ -26,6 +26,12 @@ type Config struct {
 		ReportSchedule string   `yaml:"report_schedule"`
 	} `yaml:"Flags"`
 	Metadata struct {
+		HostOS          string `yaml:"host_os,omitempty"`
+		HostMAC         string `yaml:"host_mac,omitempty"`
+		HostARCH        string `yaml:"host_arch,omitempty"`
+		HostNAME        string `yaml:"host_name,omitempty"`
+		HostFingerprint string `yaml:"host_fingerprint,omitempty"`
+		HostInfo        string `yaml:"host_info,omitempty"`
 		MsgExitClean    string `yaml:"MsgExitClean"`
 		MsgExitWarning  string `yaml:"MsgExitWarning"`
 		MsgExitCritical string `yaml:"MsgExitCritical"`
@@ -146,14 +152,15 @@ func LoadPolicyFile(filename string) (*PolicyFile, error) {
 // LoadRemotePolicy loads a policy file from a remote HTTPS endpoint
 func LoadRemotePolicy(url string, expectedChecksum string) (*PolicyFile, error) {
 	// Create a temporary directory to store the downloaded file
-	tempDir, err := os.MkdirTemp(outputDir, "_remote")
+	remoteDir := filepath.Join(outputDir, "_remote")
+	err := os.MkdirAll(remoteDir, 0755)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create temporary directory: %w", err)
 	}
-	defer os.RemoveAll(tempDir) // Clean up the temporary directory when done
+	defer os.RemoveAll(remoteDir) // Clean up the temporary directory when done
 
 	// Generate a temporary file name
-	tempFile := filepath.Join(tempDir, "remote_policy.yaml")
+	tempFile := filepath.Join(remoteDir, "remote_policy.yaml")
 
 	// Create a resty client
 	client := resty.New()
