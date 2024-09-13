@@ -1,0 +1,37 @@
+
+Config: 
+  Flags:
+    policy_schedule: "*/15 * * * * *"
+    report_schedule:  "*/50 * * * * *"
+    # target: "targets/"
+    ignore:
+      - "targets/scan/"
+
+Policies:
+  - id: "SCAN-001 Private Keys"
+    type: "scan"
+    enforcement:
+      - environment: "production"
+        fatal: "true"
+        exceptions: "false"
+        confidence: "high"
+      - environment: "development"
+        fatal: "true"
+        exceptions: "false"
+        confidence: "high"
+    metadata:
+      name: "Detect private keys"
+      description: "Generic long description for (metadata) policy"
+      msg_solution: "Generic solution message to production issue."
+      msg_error: "Generic error message for production issue"
+      tags:
+        - "security"
+        - "encryption"
+      score: "9"
+    _regex:
+      - \s*(-----BEGIN PRIVATE KEY-----)
+      - \s*(-----BEGIN RSA PRIVATE KEY-----)
+      - \s*(-----BEGIN DSA PRIVATE KEY-----)
+      - \s*(-----BEGIN EC PRIVATE KEY-----)
+      - \s*(-----BEGIN OPENSSH PRIVATE KEY-----)
+      - \s*(-----BEGIN PGP PRIVATE KEY BLOCK-----)

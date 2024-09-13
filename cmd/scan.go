@@ -62,6 +62,10 @@ func executeScan(policy Policy, rgPath string, targetDir string, filesToScan []s
 		"-f", searchPatternFile,
 	}
 
+	if targetDir == "" {
+		return fmt.Errorf("no target directory defined")
+	}
+
 	// Append the same file targets as the previous command
 	if len(filesToScan) > 0 {
 		codePatternScanJSON = append(codePatternScanJSON, filesToScan...)

@@ -60,6 +60,10 @@ func executeAssure(policy Policy, rgPath string, targetDir string, filesToAssure
 		"-f", searchPatternFile,
 	}
 
+	if targetDir == "" {
+		return fmt.Errorf("no target directory defined")
+	}
+
 	// Append the file targets
 	if len(filesToAssure) > 0 {
 		codePatternAssureJSON = append(codePatternAssureJSON, filesToAssure...)
