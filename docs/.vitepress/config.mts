@@ -8,6 +8,12 @@ export default defineConfig({
   appearance: "dark",
   head: [
     ['link', { rel: 'icon', type: 'image/svg+xml', href: '/intercept-icon.svg' }],
+    ['script',
+      {
+        "data-domain": "intercept.cc",
+        async: "true",
+        src: 'https://eye.netsec.vip/js/script.js',
+      },]
   ],
   themeConfig: {
     
