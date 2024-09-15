@@ -86,6 +86,7 @@ export default defineConfig({
     ],
 
     socialLinks: [
+      { icon: 'mastodon', link: 'https://netsec.vip/@intercept' },
       { icon: 'github', link: 'https://github.com/xfhg/intercept' }
     ],
     footer: {
