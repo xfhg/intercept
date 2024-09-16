@@ -47,7 +47,7 @@ docker pull ghcr.io/xfhg/intercept:latest-$OS-$ARCH
 <h4 align="center" class="details">Trusted by the coolest teams at</h4>
 <p align="center"> 
 
- <a href="https://github.com/xfhg/intercept/">
+ <a href="https://intercept.cc">
     <img alt="GitHub stars" width=200 src="/scb.png">
   </a>
 </p>

@@ -93,7 +93,9 @@ export default defineConfig({
 
     socialLinks: [
       { icon: 'mastodon', link: 'https://netsec.vip/@intercept' },
-      { icon: 'github', link: 'https://github.com/xfhg/intercept' }
+      { icon: 'x', link: 'https://matrix.to/#/#intercept:x.netsec.vip' },
+      { icon: 'github', link: 'https://github.com/xfhg/intercept' },
+      
     ],
     footer: {
       message: 'Released under the <a href="https://github.com/xfhg/intercept/blob/master/LICENSE.md">EUPL-1.2 License</a>',
