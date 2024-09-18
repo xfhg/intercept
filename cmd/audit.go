@@ -95,6 +95,7 @@ func runAuditPerf(cmd *cobra.Command, args []string) {
 	}
 
 	config := GetConfig()
+
 	policies_provided := GetPolicies()
 	policies_filtered := filterPolicies(policies_provided, config.Flags.Tags)
 
@@ -214,6 +215,7 @@ func processPolicy(policy Policy, allFileInfos []FileInfo, rgPath string) {
 
 		normalizedID := NormalizeFilename(policy.ID)
 		outputPath := fmt.Sprintf("scanned_files_%s.json", normalizedID)
+
 		err := WriteHashesToJSON(filesToProcess, outputPath)
 		if err != nil {
 			log.Debug().Msgf("Error writing hashes to JSON for policy %s: %v ", policy.ID, err)

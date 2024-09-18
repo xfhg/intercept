@@ -11,20 +11,27 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
+type PolicyFile struct {
+	Config    Config   `yaml:"Config"`
+	Version   string   `yaml:"Version"`
+	Namespace string   `yaml:"Namespace"`
+	Policies  []Policy `yaml:"Policies"`
+}
+
 type Config struct {
 	System struct {
-		RGVersion        string `yaml:"RGVersion"`
-		GossVersion      string `yaml:"GossVersion"`
-		InterceptVersion string `yaml:"InterceptVersion"`
-	} `yaml:"System"`
+		RGVersion        string `yaml:"RGVersion,omitempty"`
+		GossVersion      string `yaml:"GossVersion,omitempty"`
+		InterceptVersion string `yaml:"InterceptVersion,omitempty"`
+	} `yaml:"System,omitempty"`
 	Flags struct {
-		OutputType     string   `yaml:"output_type"`
-		Target         string   `yaml:"target"`
-		Ignore         []string `yaml:"ignore"`
-		Tags           []string `yaml:"tags"`
-		PolicySchedule string   `yaml:"policy_schedule"`
-		ReportSchedule string   `yaml:"report_schedule"`
-	} `yaml:"Flags"`
+		OutputType     string   `yaml:"output_type,omitempty"`
+		Target         string   `yaml:"target,omitempty"`
+		Ignore         []string `yaml:"ignore,omitempty"`
+		Tags           []string `yaml:"tags,omitempty"`
+		PolicySchedule string   `yaml:"policy_schedule,omitempty"`
+		ReportSchedule string   `yaml:"report_schedule,omitempty"`
+	} `yaml:"Flags,omitempty"`
 	Metadata struct {
 		HostOS          string `yaml:"host_os,omitempty"`
 		HostMAC         string `yaml:"host_mac,omitempty"`
@@ -32,10 +39,10 @@ type Config struct {
 		HostNAME        string `yaml:"host_name,omitempty"`
 		HostFingerprint string `yaml:"host_fingerprint,omitempty"`
 		HostInfo        string `yaml:"host_info,omitempty"`
-		MsgExitClean    string `yaml:"MsgExitClean"`
-		MsgExitWarning  string `yaml:"MsgExitWarning"`
-		MsgExitCritical string `yaml:"MsgExitCritical"`
-	} `yaml:"Metadata"`
+		MsgExitClean    string `yaml:"MsgExitClean,omitempty"`
+		MsgExitWarning  string `yaml:"MsgExitWarning,omitempty"`
+		MsgExitCritical string `yaml:"MsgExitCritical,omitempty"`
+	} `yaml:"Metadata,omitempty"`
 	Hooks []HookConfig `yaml:"Hooks"`
 }
 
@@ -111,13 +118,6 @@ type Runtime struct {
 	Observe string `yaml:"observe"`
 }
 
-type PolicyFile struct {
-	Config    Config   `yaml:"Config"`
-	Version   string   `yaml:"Version"`
-	Namespace string   `yaml:"Namespace"`
-	Policies  []Policy `yaml:"Policies"`
-}
-
 type PolicySourceType int
 
 const (
@@ -136,6 +136,8 @@ func LoadPolicyFile(filename string) (*PolicyFile, error) {
 	if err != nil {
 		return nil, err
 	}
+
+	log.Debug().Interface("raw config", policyFile.Config).Msg("Raw Config data")
 
 	// Generate intercept_id for each policy, add its own ID as a tag for easy filtering with tags flag
 	for i := range policyFile.Policies {
