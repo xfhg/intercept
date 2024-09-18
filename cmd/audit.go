@@ -95,6 +95,7 @@ func runAuditPerf(cmd *cobra.Command, args []string) {
 	}
 
 	config := GetConfig()
+
 	policies_provided := GetPolicies()
 	policies_filtered := filterPolicies(policies_provided, config.Flags.Tags)
 

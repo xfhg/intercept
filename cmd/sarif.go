@@ -253,42 +253,48 @@ func GenerateSARIFReport(inputFile string, policy Policy) (SARIFReport, error) {
 		// Process ripgrep output and add results to SARIF report
 		for _, rgOutput := range rgOutputs {
 			if rgOutput.Type == "match" {
-				matchText := rgOutput.Data.Submatches[0].Match.Text
+
 				sarifLevel := calculateSARIFLevel(policy, environment)
 				levelProperty := sarifLevelToString(sarifLevel)
-				result := Result{
-					RuleID: policy.ID,
-					Level:  sarifLevel,
-					Message: Message{
-						Text: fmt.Sprintf("Policy violation: %s Matched text: %s", policy.Metadata.Name, matchText),
-					},
-					Locations: []Location{
-						{
-							PhysicalLocation: PhysicalLocation{
-								ArtifactLocation: ArtifactLocation{URI: rgOutput.Data.Path.Text},
-								Region: Region{
-									StartLine:   rgOutput.Data.LineNumber,
-									StartColumn: strings.Index(rgOutput.Data.Lines.Text, matchText) + 1,
-									EndColumn:   strings.Index(rgOutput.Data.Lines.Text, matchText) + len(matchText) + 1,
-									Snippet: Snippet{
-										Text: matchText,
+				for _, submatch := range rgOutput.Data.Submatches {
+					matchText := submatch.Match.Text
+					startColumn := strings.Index(rgOutput.Data.Lines.Text, matchText) + 1
+					endColumn := startColumn + len(matchText)
+
+					result := Result{
+						RuleID: policy.ID,
+						Level:  sarifLevel,
+						Message: Message{
+							Text: fmt.Sprintf("Policy violation: %s Matched text: %s", policy.Metadata.Name, matchText),
+						},
+						Locations: []Location{
+							{
+								PhysicalLocation: PhysicalLocation{
+									ArtifactLocation: ArtifactLocation{URI: rgOutput.Data.Path.Text},
+									Region: Region{
+										StartLine:   rgOutput.Data.LineNumber,
+										StartColumn: startColumn,
+										EndColumn:   endColumn,
+										Snippet: Snippet{
+											Text: matchText,
+										},
 									},
 								},
 							},
 						},
-					},
-					Properties: map[string]string{
-						"result-type":      "detail",
-						"observe-run-id":   policy.RunID,
-						"result-timestamp": timestamp,
-						"name":             policy.Metadata.Name,
-						"description":      policy.Metadata.Description,
-						"msg-error":        policy.Metadata.MsgError,
-						"msg-solution":     policy.Metadata.MsgSolution,
-						levelProperty:      "true",
-					},
+						Properties: map[string]string{
+							"result-type":      "detail",
+							"observe-run-id":   policy.RunID,
+							"result-timestamp": timestamp,
+							"name":             policy.Metadata.Name,
+							"description":      policy.Metadata.Description,
+							"msg-error":        policy.Metadata.MsgError,
+							"msg-solution":     policy.Metadata.MsgSolution,
+							levelProperty:      "true",
+						},
+					}
+					results = append(results, result)
 				}
-				results = append(results, result)
 			}
 		}
 	}
