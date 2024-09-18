@@ -1,5 +1,5 @@
 
-# Features
+# Policy as Code
 
 <br><br>
 
@@ -8,8 +8,6 @@ This document is a work in progress. Please check back for updates.
 :::
 
 <br><br><br><br>
-
-# Policy as Code with INTERCEPT
 
 Policy as Code is the core principle of Intercept, allowing organizations to define, implement, and enforce policies using code. Instead of relying on static documents or spreadsheets, Intercept enables you to write policies as executable code, integrating them seamlessly into your infrastructure, software development lifecycle, and operational workflows.
 

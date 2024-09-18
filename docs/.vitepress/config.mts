@@ -35,16 +35,17 @@ export default defineConfig({
         items: [
           { text: 'Workflow', link: '/docs/architecture' },
           { text: 'Basic Concepts', link: '/docs/basics' },
-          { text: 'Features', link: '/docs/features' },
+
           
         ]
       },
       {
         text: 'Getting Started',
         items: [
+          { text: 'Sandbox', link: '/docs/sandbox' },
           { text: 'Platform Build', link: '/docs/platform-build' },
           { text: 'Docker QuickStart', link: '/docs/docker-quickstart' },
-          { text: 'Sandbox Playground', link: '/docs/sandbox' },
+          
         ]
       },
       {
@@ -87,6 +88,7 @@ export default defineConfig({
         text: 'Use Cases',
         items: [
           { text: 'Overview', link: '/docs/use-cases' },
+          { text: 'Features', link: '/docs/features' },
         ]
       }
     ],
