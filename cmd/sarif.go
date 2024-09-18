@@ -62,6 +62,34 @@ func sarifLevelToString(level SARIFLevel) string {
 	}
 }
 
+func selectEnforcementRule(policy Policy, environment string) Enforcement {
+	for _, rule := range policy.Enforcement {
+		if rule.Environment == environment || rule.Environment == "all" {
+			return rule
+		}
+	}
+	// If no matching rule is found, return a default rule or the first rule
+	if len(policy.Enforcement) > 0 {
+		return policy.Enforcement[0]
+	}
+	// If there are no rules at all, return a default rule
+	return Enforcement{
+		Environment: "all",
+		Fatal:       "false",
+		Exceptions:  "false",
+		Confidence:  "low",
+	}
+}
+
+func calculateSARIFLevel(policy Policy, environment string) SARIFLevel {
+	selectedRule := selectEnforcementRule(policy, environment)
+	return PolicyToSARIFLevel(
+		selectedRule.Fatal == "true",
+		selectedRule.Exceptions == "true",
+		selectedRule.Confidence,
+	)
+}
+
 // RipgrepOutput represents the structure of the ripgrep JSON output
 type RipgrepOutput struct {
 	Type string `json:"type"`
@@ -786,32 +814,4 @@ func GenerateAPISARIFReport(policy Policy, endpoint string, matchFound bool, iss
 	}
 
 	return sarifReport, nil
-}
-
-func selectEnforcementRule(policy Policy, environment string) Enforcement {
-	for _, rule := range policy.Enforcement {
-		if rule.Environment == environment || rule.Environment == "all" {
-			return rule
-		}
-	}
-	// If no matching rule is found, return a default rule or the first rule
-	if len(policy.Enforcement) > 0 {
-		return policy.Enforcement[0]
-	}
-	// If there are no rules at all, return a default rule
-	return Enforcement{
-		Environment: "all",
-		Fatal:       "false",
-		Exceptions:  "false",
-		Confidence:  "low",
-	}
-}
-
-func calculateSARIFLevel(policy Policy, environment string) SARIFLevel {
-	selectedRule := selectEnforcementRule(policy, environment)
-	return PolicyToSARIFLevel(
-		selectedRule.Fatal == "true",
-		selectedRule.Exceptions == "true",
-		selectedRule.Confidence,
-	)
 }

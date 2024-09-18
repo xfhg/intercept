@@ -116,7 +116,7 @@ func setupLogging() {
 			log.Error().Msgf("Error gathering host info: %v\n", err)
 		}
 
-		hostData, hostFingerprint, err := FingerprintHost(hostInfo)
+		hostData, hostFingerprint, err = FingerprintHost(hostInfo)
 		if err != nil {
 			log.Error().Msgf("Error generating fingerprint: %v\n", err)
 		}
