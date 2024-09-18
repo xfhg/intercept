@@ -22,9 +22,9 @@ export default defineConfig({
     },
     // https://vitepress.dev/reference/default-theme-config
     nav: [
-      { text: 'Code', link: 'https://github.com/xfhg/intercept' },
-      { text: 'Documentation', link: '/docs/architecture' },
       { text: 'Basics', link: '/docs/basics' },
+      { text: 'Sandbox', link: 'docs/sandbox' },
+      { text: 'Documentation', link: '/docs/architecture' },
       { text: 'Latest Release', link: 'https://github.com/xfhg/intercept/releases' }
     ],
     // head: [['link', { rel: 'icon', href: '/intercept-icon.svg' }]],

@@ -43,6 +43,8 @@ git clone https://github.com/xfhg/intercept.git
 docker pull ghcr.io/xfhg/intercept:latest-$OS-$ARCH
 ```
 
+#### Check our [sandbox](docs/sandbox) after mastering the [basic concepts](docs/basics)
+
 <br><br><br><br><br><br><br>
 <h4 align="center" class="details">Trusted by the coolest teams at</h4>
 <p align="center"> 

@@ -42,7 +42,9 @@ docker run \
     -o _my_first_run
 ```
 
-::: warning
+::: warning SANDBOX
 This document is a work in progress, hang tight.
+
+Follow the examples in the SANDBOX
 :::
 
