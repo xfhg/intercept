@@ -1,9 +1,8 @@
 # Sandbox Playground
 
 ::: tip START HERE
-Free to play, no hassle intercept sandbox :
+For a hassle-free experience with INTERCEPT, utilize our sandbox environment to analyze an insecure nginx.conf in under 20 milliseconds.
 
-Check an insecure nginx.conf in less than 20 miliseconds
 :::
 
 
@@ -11,13 +10,13 @@ Check an insecure nginx.conf in less than 20 miliseconds
 
 ## 1. Our friends at Gitpod will host you 
 
-Gitpod offers a convenient way to explore Intercept in a cloud environment
+Gitpod offers a convenient way to explore INTERCEPT in a cloud environment
 
 [![Open in Gitpod](https://gitpod.io/button/open-in-gitpod.svg)](https://gitpod.io/#https://github.com/xfhg/intercept)
 
 ## 2. Build & Experiment :
 
-Once in the Gitpod environment, you can build Intercept and start experimenting:
+Once in the Gitpod environment, you can build INTERCEPT and start experimenting:
 
 ```
 make build && cp release/intercept playground/intercept
@@ -75,7 +74,7 @@ cd playground
 ## 5. Check the compliance report
 
 ```
-find it inside the output folders (_gitpod_nginx and _playground_nginx)
+Locate it inside the respective output folders (_gitpod_nginx and _playground_nginx)
 ```
 
 ```json
@@ -96,7 +95,7 @@ find it inside the output folders (_gitpod_nginx and _playground_nginx)
 ```
 
 ::: info
-Great, let's automate it and send the report to the CIO
+Alright, let's automate it and send the report to the CIO
 :::
 
 ## 🛰️ INTERCEPT OBSERVE
@@ -107,7 +106,10 @@ Running adhoc scans (audits) is just useful in your pre-deployment CI/CD, so let
 
 
 ```sh
-./intercept observe --policy policies/nginx_observe.yaml  -vvvv -o _nginx_observe
+./intercept observe \
+  --policy policies/nginx_observe.yaml \
+  -vvvv \
+  -o _nginx_observe
 ```
 
 ::: tip
@@ -115,7 +117,7 @@ open **playground/policies/nginx_observe.yaml** policy , we cut the policies sho
 
 For the observe command we define the **target** through the policy file and we can also set an optional global **policy_schedule** that applies to all policies that don't have their own schedule defined (SCAN-001).
 
-The **report_schedule** is essential to generate a merged report of all the policies.
+The **report_schedule** is essential to generate a merged report of all the policies. (known as the **Compliance Report**)
 :::
 
 
@@ -170,33 +172,34 @@ Policies:
       - "access_log\\s+off;"
 ```
 
-
-
 ```sh
  INF Added policy to Scheduler policy=SCAN-001-SERVER-TOKENS schedule="*/30 * * * * *"
  INF Added policy to Scheduler policy=SCAN-007-ACCESS-LOGS-DISABLED schedule="*/30 * * * * *"
  INF Added policy to Scheduler policy=SCAN-008-AUTOINDEX-ENABLED schedule="*/30 * * * * *"
 ```
 
-::: tip
-after 50seconds a SARIF report with all the results from all the policies is generated and a minute later you can CTRL-C and a final report will be generated on the output folder.
-
-each scheduled report will have all the results of it's defined interval delta. The final report has the delta from the previous report to the time of quitting OBSERVE.
+::: info SCHEDULE SETUP
+As configured every 30s an AUDIT is triggered and the results are saved in individual policy reports. Every 50s a Compliance Report is generated that contains all the individual results captured on the last 50s (delta). Individual result files are cleaned up upon creation of each compliance report.
 :::
 
-## 6. Setup a path monitor to run audits on file changes
+
+::: tip REPORT STRUCTURE
+Individual reports are generated based on the specified policy schedules. Compliance Reports are generated from all the interval delta policy results. A final report is created upon termination of the observe command. The final report contains only the delta between the last compliance report and the quit cleanup.
+:::
+
+## 7. Setup a path monitor to run audits on file changes
 
 ::: warning WIP
-TBC
+Content TBC
 :::
 
-## 7. Setup integration webhooks to receive AUDIT results and compliance reports
+## 8. Setup integration webhooks to receive AUDIT results and compliance reports
 
 ::: warning WIP
-TBC
+Content TBC
 :::
 
-## 8. EXTRA Validate CUE Lang Schemas and REGO Policies
+## 9. EXTRA Validate CUE Lang Schemas and REGO Policies
 
 To validate your CUE Lang Schemas or REGO policies, you can use these online tools:
 
