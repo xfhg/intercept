@@ -94,8 +94,11 @@ export default defineConfig({
     ],
 
     socialLinks: [
+      { icon: {
+        svg: '<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 3H3v18h1m16 0h1V3h-1M7 9v6m5 0v-3.5a2.5 2.5 0 1 0-5 0v.5m10 3v-3.5a2.5 2.5 0 1 0-5 0v.5"/></svg>'
+      }, link: 'https://matrix.to/#/#intercept:x.netsec.vip' },
       { icon: 'mastodon', link: 'https://netsec.vip/@intercept' },
-      { icon: 'x', link: 'https://matrix.to/#/#intercept:x.netsec.vip' },
+      
       { icon: 'github', link: 'https://github.com/xfhg/intercept' },
       
     ],
