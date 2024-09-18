@@ -57,7 +57,7 @@ func WriteHashesToJSON(fileInfos []FileInfo, outputPath string) error {
 		return nil
 	}
 
-	outputPath = filepath.Join("_debug", outputPath)
+	outputPath = filepath.Join(outputDir, "_debug", outputPath)
 
 	jsonData, err := json.MarshalIndent(fileInfos, "", "  ")
 	if err != nil {
@@ -91,6 +91,62 @@ func FilterFilesByPattern(fileInfos []FileInfo, pattern string) ([]FileInfo, err
 	return filteredFiles, nil
 }
 
+// func isIgnored(ignorePaths []string, path string) bool {
+// 	absPath, err := filepath.Abs(path)
+// 	if err != nil {
+// 		// If the path cannot be converted to an absolute path, assume it's not ignored
+// 		return false
+// 	}
+
+// 	// Convert all ignorePaths to absolute paths
+// 	for _, ignore := range ignorePaths {
+// 		absIgnore, err := filepath.Abs(ignore)
+// 		if err != nil {
+// 			continue // If an ignore path can't be converted, skip it
+// 		}
+
+// 		// Check if the absPath is a subpath of any absIgnore
+// 		if strings.HasPrefix(absPath, absIgnore) {
+// 			return true
+// 		}
+// 	}
+
+// 	return false
+// }
+
+// func isIgnored(ignorePaths []string, path string) bool {
+// 	absPath, err := filepath.Abs(path)
+// 	if err != nil {
+// 		// If the path cannot be converted to an absolute path, assume it's not ignored
+// 		return false
+// 	}
+
+// 	// Convert all ignorePaths to absolute paths and handle extensions
+// 	for _, ignore := range ignorePaths {
+// 		// Check if the ignore pattern is an extension (e.g., *.md)
+// 		if strings.HasPrefix(ignore, "*.") {
+// 			// Extract the extension and compare it case-insensitively
+// 			ext := strings.ToLower(ignore[1:]) // ".md" for "*.md"
+// 			if strings.EqualFold(filepath.Ext(absPath), ext) {
+// 				return true
+// 			}
+// 		} else {
+// 			// Convert ignore to absolute path and compare paths
+// 			absIgnore, err := filepath.Abs(ignore)
+// 			if err != nil {
+// 				continue // If an ignore path can't be converted, skip it
+// 			}
+
+// 			// Check if the absPath is a subpath of any absIgnore
+// 			if strings.HasPrefix(absPath, absIgnore) {
+// 				return true
+// 			}
+// 		}
+// 	}
+
+// 	return false
+// }
+
 func isIgnored(ignorePaths []string, path string) bool {
 	absPath, err := filepath.Abs(path)
 	if err != nil {
@@ -98,16 +154,42 @@ func isIgnored(ignorePaths []string, path string) bool {
 		return false
 	}
 
-	// Convert all ignorePaths to absolute paths
+	// Loop over each ignore pattern in ignorePaths
 	for _, ignore := range ignorePaths {
-		absIgnore, err := filepath.Abs(ignore)
-		if err != nil {
-			continue // If an ignore path can't be converted, skip it
-		}
+		// Handle file extension patterns like *.md
+		if strings.HasPrefix(ignore, "*.") {
+			ext := strings.ToLower(ignore[1:]) // ".md" for "*.md"
+			if strings.EqualFold(filepath.Ext(absPath), ext) {
+				return true
+			}
+		} else if strings.HasSuffix(ignore, "/") {
+			// Handle folder ignore patterns (like folder/) at any level
+			absIgnore, err := filepath.Abs(ignore)
+			if err != nil {
+				continue // Skip if the ignore path cannot be resolved
+			}
 
-		// Check if the absPath is a subpath of any absIgnore
-		if strings.HasPrefix(absPath, absIgnore) {
-			return true
+			// Check if we're ignoring this folder globally
+			if strings.Contains(absPath, absIgnore) {
+				return true
+			}
+		} else if strings.HasPrefix(ignore, "/") && strings.HasSuffix(ignore, "/") {
+			// Handle root-level folder ignore (like /folder/)
+			rootIgnore := filepath.Clean(ignore) // Clean the path
+			if strings.HasPrefix(absPath, rootIgnore) {
+				return true
+			}
+		} else {
+			// Convert ignore to absolute path and compare paths
+			absIgnore, err := filepath.Abs(ignore)
+			if err != nil {
+				continue // Skip if the ignore path cannot be resolved
+			}
+
+			// Check if the absPath is a subpath of any absIgnore
+			if strings.HasPrefix(absPath, absIgnore) {
+				return true
+			}
 		}
 	}
 
