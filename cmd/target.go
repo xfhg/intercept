@@ -49,7 +49,7 @@ func CalculateFileHashes(targetDir string) ([]FileInfo, error) {
 	}
 
 	if len(fileInfos) == 0 {
-		return nil, fmt.Errorf("no target files found at  : %s", targetDir)
+		return nil, fmt.Errorf("no target files found at : %s", targetDir)
 	}
 
 	return fileInfos, nil

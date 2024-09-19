@@ -132,7 +132,7 @@ func runAuditPerf(cmd *cobra.Command, args []string) {
 		allFileInfos, err := CalculateFileHashes(targetDir)
 
 		if err != nil {
-			log.Debug().Err(err).Msg("Error calculating file hashes")
+			log.Err(err).Msg("Error verifying target")
 		} else {
 			processPoliciesInParallel(policies_filtered, allFileInfos, rgPath)
 		}
