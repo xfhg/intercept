@@ -23,7 +23,7 @@ func ProcessAssureType(policy Policy, rgPath string, targetDir string, filePaths
 
 func executeAssure(policy Policy, rgPath string, targetDir string, filesToAssure []string) error {
 	// Create a temporary file to store the search patterns
-	searchPatternFile, err := createSearchPatternFile(policy.Regex)
+	searchPatternFile, err := createSearchPatternFile(policy.Regex, NormalizeFilename(policy.ID))
 	if err != nil {
 		log.Error().Err(err).Msg("error creating search pattern file")
 		return fmt.Errorf("error creating search pattern file: %w", err)

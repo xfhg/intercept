@@ -168,7 +168,7 @@ func processWithRegex(policy Policy, data []byte, rgPath string) error {
 }
 func executeAssureForAPI(policy Policy, rgPath, filePath string) (bool, error) {
 	// Create a temporary file to store the search patterns
-	searchPatternFile, err := createSearchPatternFile(policy.Regex)
+	searchPatternFile, err := createSearchPatternFile(policy.Regex, NormalizeFilename(policy.ID))
 	if err != nil {
 		return false, fmt.Errorf("error creating search pattern file: %w", err)
 	}

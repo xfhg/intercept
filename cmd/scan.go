@@ -25,7 +25,7 @@ func ProcessScanType(policy Policy, rgPath string, targetDir string, filePaths [
 
 func executeScan(policy Policy, rgPath string, targetDir string, filesToScan []string) error {
 	// Create a temporary file to store the search patterns
-	searchPatternFile, err := createSearchPatternFile(policy.Regex)
+	searchPatternFile, err := createSearchPatternFile(policy.Regex, NormalizeFilename(policy.ID))
 	if err != nil {
 		log.Error().Err(err).Msg("error creating search pattern file")
 		return fmt.Errorf("error creating search pattern file: %w", err)
@@ -74,6 +74,9 @@ func executeScan(policy Policy, rgPath string, targetDir string, filesToScan []s
 	} else {
 		return fmt.Errorf("no files matched policy pattern")
 	}
+
+	// Print all the arguments for cmdJSON
+	// log.Debug().Msgf("RG command arguments: %v", codePatternScanJSON)
 
 	// Execute the ripgrep command for JSON output
 	cmdJSON := exec.Command(rgPath, codePatternScanJSON...)
@@ -134,26 +137,48 @@ func executeScan(policy Policy, rgPath string, targetDir string, filesToScan []s
 	return nil
 }
 
-func createSearchPatternFile(patterns []string) (string, error) {
+func createSearchPatternFile(patterns []string, policyId string) (string, error) {
 	searchPattern := []byte(strings.Join(patterns, "\n") + "\n")
 
-	// Create a temporary file
-	tmpfile, err := os.CreateTemp("", "policypatterns")
+	filename := filepath.Join("_debug", fmt.Sprintf("%s", policyId))
+	if outputDir != "" {
+		filename = filepath.Join(outputDir, filename)
+	}
+
+	tmpfile, err := os.Create(filename)
 	if err != nil {
-		return "", fmt.Errorf("error creating temporary file: %w", err)
+		return "", fmt.Errorf("error creating file in _debug directory: %w", err)
 	}
 
 	// Write the search patterns to the file
 	if _, err := tmpfile.Write(searchPattern); err != nil {
 		tmpfile.Close()
-		os.Remove(tmpfile.Name())
-		return "", fmt.Errorf("error writing to temporary file: %w", err)
+		os.Remove(filename)
+		return "", fmt.Errorf("error writing to file: %w", err)
 	}
 
 	if err := tmpfile.Close(); err != nil {
-		os.Remove(tmpfile.Name())
-		return "", fmt.Errorf("error closing temporary file: %w", err)
+		os.Remove(filename)
+		return "", fmt.Errorf("error closing file: %w", err)
 	}
+
+	// // Create a temporary file
+	// tmpfile, err := os.CreateTemp("", "policypatterns")
+	// if err != nil {
+	// 	return "", fmt.Errorf("error creating temporary file: %w", err)
+	// }
+
+	// // Write the search patterns to the file
+	// if _, err := tmpfile.Write(searchPattern); err != nil {
+	// 	tmpfile.Close()
+	// 	os.Remove(tmpfile.Name())
+	// 	return "", fmt.Errorf("error writing to temporary file: %w", err)
+	// }
+
+	// if err := tmpfile.Close(); err != nil {
+	// 	os.Remove(tmpfile.Name())
+	// 	return "", fmt.Errorf("error closing temporary file: %w", err)
+	// }
 
 	return tmpfile.Name(), nil
 }
