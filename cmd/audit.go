@@ -130,6 +130,7 @@ func runAuditPerf(cmd *cobra.Command, args []string) {
 		log.Debug().Msgf("Processing target directory: %s", targetDir)
 
 		allFileInfos, err := CalculateFileHashes(targetDir)
+
 		if err != nil {
 			log.Debug().Err(err).Msg("Error calculating file hashes")
 		} else {
