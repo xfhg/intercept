@@ -51,8 +51,8 @@ func validateContentAndCUE(content []byte, cueContent string, contentType string
 		}
 	}
 
-	log.Debug().Msgf("Missing fields: %s", missingFields)
-	log.Debug().Msgf("Extra fields: %s", extraFields)
+	log.Warn().Msgf("Missing fields: %s", missingFields)
+	log.Warn().Msgf("Extra fields: %s", extraFields)
 
 	return len(issues) == 0, issues
 }

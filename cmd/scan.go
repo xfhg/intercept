@@ -7,6 +7,7 @@ import (
 	"os/exec"
 	"path/filepath"
 	"strings"
+	"sync"
 )
 
 // ProcessScanType handles the scanning process for policies of type "scan"
@@ -25,7 +26,7 @@ func ProcessScanType(policy Policy, rgPath string, targetDir string, filePaths [
 
 func executeScan(policy Policy, rgPath string, targetDir string, filesToScan []string) error {
 	// Create a temporary file to store the search patterns
-	searchPatternFile, err := createSearchPatternFile(policy.Regex)
+	searchPatternFile, err := createSearchPatternFile(policy.Regex, NormalizeFilename(policy.ID))
 	if err != nil {
 		log.Error().Err(err).Msg("error creating search pattern file")
 		return fmt.Errorf("error creating search pattern file: %w", err)
@@ -51,6 +52,8 @@ func executeScan(policy Policy, rgPath string, targetDir string, filesToScan []s
 	writer := bufio.NewWriter(jsonoutfile)
 	defer writer.Flush()
 
+	processedIgnorePatterns := processIgnorePatterns(policyData.Config.Flags.Ignore)
+
 	codePatternScanJSON := []string{
 		"--pcre2",
 		"--no-heading",
@@ -61,38 +64,24 @@ func executeScan(policy Policy, rgPath string, targetDir string, filesToScan []s
 		"--json",
 		"-f", searchPatternFile,
 	}
+	codePatternScanJSON = append(codePatternScanJSON, processedIgnorePatterns...)
 
 	if targetDir == "" {
 		return fmt.Errorf("no target directory defined")
 	}
 
-	// Append the same file targets as the previous command
-	if len(filesToScan) > 0 {
-		codePatternScanJSON = append(codePatternScanJSON, filesToScan...)
-	} else if policy.FilePattern == "" {
-		codePatternScanJSON = append(codePatternScanJSON, targetDir)
+	// Parallel execution for large file sets
+	if policy.FilePattern == "" {
+		err = executeSingleScan(rgPath, codePatternScanJSON, nil, targetDir, policy, writer)
+	} else if len(filesToScan) > 25 {
+		err = executeParallelScans(rgPath, codePatternScanJSON, filesToScan, writer)
 	} else {
-		return fmt.Errorf("no files matched policy pattern")
+		err = executeSingleScan(rgPath, codePatternScanJSON, filesToScan, targetDir, policy, writer)
 	}
 
-	// Execute the ripgrep command for JSON output
-	cmdJSON := exec.Command(rgPath, codePatternScanJSON...)
-	cmdJSON.Stdout = writer
-	cmdJSON.Stderr = os.Stderr
-
-	log.Debug().Msgf("Creating JSON output for policy %s... ", policy.ID)
-	err = cmdJSON.Run()
 	if err != nil {
-		if exitError, ok := err.(*exec.ExitError); ok {
-			// Exit code 1 in ripgrep means "no matches found", which isn't an error for us
-			if exitError.ExitCode() != 1 {
-				log.Error().Err(err).Msg("error executing ripgrep for JSON output")
-				return fmt.Errorf("error executing ripgrep for JSON output: %w", err)
-			}
-		} else {
-			log.Error().Err(err).Msg("error executing ripgrep for JSON output")
-			return fmt.Errorf("error executing ripgrep for JSON output: %w", err)
-		}
+
+		log.Error().Err(err).Msg("error executing ripgrep batch")
 	}
 
 	// Patch the JSON output file
@@ -103,6 +92,7 @@ func executeScan(policy Policy, rgPath string, targetDir string, filesToScan []s
 	}
 
 	log.Debug().Msgf("JSON output for policy %s written to: %s ", policy.ID, jsonOutputFile)
+	log.Debug().Msgf("Scanned ~%d files for policy %s", len(filesToScan), policy.ID)
 
 	// Generate SARIF report
 	sarifReport, err := GenerateSARIFReport(jsonOutputFile, policy)
@@ -134,26 +124,124 @@ func executeScan(policy Policy, rgPath string, targetDir string, filesToScan []s
 	return nil
 }
 
-func createSearchPatternFile(patterns []string) (string, error) {
+func createSearchPatternFile(patterns []string, policyId string) (string, error) {
 	searchPattern := []byte(strings.Join(patterns, "\n") + "\n")
 
-	// Create a temporary file
-	tmpfile, err := os.CreateTemp("", "policypatterns")
+	filename := filepath.Join("_debug", policyId)
+	if outputDir != "" {
+		filename = filepath.Join(outputDir, filename)
+	}
+
+	tmpfile, err := os.Create(filename)
 	if err != nil {
-		return "", fmt.Errorf("error creating temporary file: %w", err)
+		return "", fmt.Errorf("error creating file in _debug directory: %w", err)
 	}
 
 	// Write the search patterns to the file
 	if _, err := tmpfile.Write(searchPattern); err != nil {
 		tmpfile.Close()
-		os.Remove(tmpfile.Name())
-		return "", fmt.Errorf("error writing to temporary file: %w", err)
+		os.Remove(filename)
+		return "", fmt.Errorf("error writing to file: %w", err)
 	}
 
 	if err := tmpfile.Close(); err != nil {
-		os.Remove(tmpfile.Name())
-		return "", fmt.Errorf("error closing temporary file: %w", err)
+		os.Remove(filename)
+		return "", fmt.Errorf("error closing file: %w", err)
 	}
 
 	return tmpfile.Name(), nil
+}
+
+func executeParallelScans(rgPath string, baseArgs []string, filesToScan []string, writer *bufio.Writer) error {
+	const batchSize = 25
+	var wg sync.WaitGroup
+	errChan := make(chan error, len(filesToScan)/batchSize+1)
+	var mu sync.Mutex
+
+	for i := 0; i < len(filesToScan); i += batchSize {
+		end := i + batchSize
+		if end > len(filesToScan) {
+			end = len(filesToScan)
+		}
+		batch := filesToScan[i:end]
+
+		// log.Debug().Msgf("RGM: %v", batch)
+
+		wg.Add(1)
+		go func(batch []string) {
+			defer wg.Done()
+			args := append(baseArgs, batch...)
+			cmd := exec.Command(rgPath, args...)
+			output, err := cmd.Output()
+
+			if err != nil {
+				if exitError, ok := err.(*exec.ExitError); ok && exitError.ExitCode() != 1 {
+					errChan <- fmt.Errorf("error executing ripgrep: %w", err)
+					return
+				}
+			}
+
+			mu.Lock()
+			_, writeErr := writer.Write(output)
+			if writeErr == nil {
+				writeErr = writer.Flush()
+			}
+			mu.Unlock()
+
+			if writeErr != nil {
+				errChan <- fmt.Errorf("error writing output: %w", writeErr)
+			}
+		}(batch)
+	}
+
+	wg.Wait()
+	close(errChan)
+
+	for err := range errChan {
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
+func executeSingleScan(rgPath string, baseArgs []string, filesToScan []string, targetDir string, policy Policy, writer *bufio.Writer) error {
+	if len(filesToScan) > 0 {
+		baseArgs = append(baseArgs, filesToScan...)
+	} else if policy.FilePattern == "" {
+		baseArgs = append(baseArgs, targetDir)
+	} else {
+		log.Error().Str("policy", policy.ID).Msgf("no files matched policy pattern on target : %s", targetDir)
+	}
+
+	// log.Debug().Msgf("RGS: %v", baseArgs)
+
+	cmdJSON := exec.Command(rgPath, baseArgs...)
+	cmdJSON.Stdout = writer
+	cmdJSON.Stderr = os.Stderr
+
+	log.Debug().Msgf("Creating JSON output for policy %s... ", policy.ID)
+	err := cmdJSON.Run()
+	if err != nil {
+		if exitError, ok := err.(*exec.ExitError); ok {
+			if exitError.ExitCode() == 2 {
+				log.Warn().Msgf("RG exited with code 2")
+				log.Debug().Msgf("RG Error Args: %v", baseArgs)
+				if len(exitError.Stderr) > 0 {
+					log.Debug().Msgf("RG exited with code 2 stderr: %s", string(exitError.Stderr))
+				}
+			}
+			if exitError.ExitCode() != 1 {
+				log.Error().Err(err).Msg("error executing ripgrep for JSON output")
+				return fmt.Errorf("error executing ripgrep for JSON output: %w", err)
+			}
+
+		} else {
+			log.Error().Err(err).Msg("error executing ripgrep for JSON output")
+			return fmt.Errorf("error executing ripgrep for JSON output: %w", err)
+		}
+	}
+
+	return nil
 }
