@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"bufio"
 	"crypto/sha256"
 	"encoding/hex"
 	"encoding/json"
@@ -22,29 +23,40 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
-// patchJSONOutputFile reads the ripgrep JSON output, patches it to create valid JSON, and writes it back to the file
 func patchJSONOutputFile(filePath string) error {
-	// Read the contents of the file
-	content, err := os.ReadFile(filePath)
+	// Open the file
+	file, err := os.Open(filePath)
 	if err != nil {
-		return fmt.Errorf("error reading JSON file: %v", err)
+		return fmt.Errorf("error opening JSON file: %v", err)
+	}
+	defer file.Close()
+
+	var validObjects []map[string]interface{}
+
+	// Read the file line by line
+	scanner := bufio.NewScanner(file)
+	for scanner.Scan() {
+		line := strings.TrimSpace(scanner.Text())
+		if line == "" {
+			continue
+		}
+
+		// Try to parse each line as a separate JSON object
+		var obj map[string]interface{}
+		if err := json.Unmarshal([]byte(line), &obj); err == nil {
+			validObjects = append(validObjects, obj)
+		} else {
+			// Log the error and skip this line
+			fmt.Printf("Skipping invalid JSON line: %s\n", line)
+		}
 	}
 
-	// Split the input into separate JSON objects
-	objects := strings.Split(string(content), "}\n{")
-
-	// Add the missing brackets to create a JSON array
-	jsonArray := "[" + strings.Join(objects, "},\n{") + "]"
-
-	// Parse the JSON array to validate it
-	var parsed []interface{}
-	err = json.Unmarshal([]byte(jsonArray), &parsed)
-	if err != nil {
-		return fmt.Errorf("error parsing JSON: %v", err)
+	if err := scanner.Err(); err != nil {
+		return fmt.Errorf("error reading file: %v", err)
 	}
 
-	// Re-marshal the parsed data to get a properly formatted JSON string
-	validJSON, err := json.MarshalIndent(parsed, "", "  ")
+	// Marshal the array of objects into a properly formatted JSON string
+	validJSON, err := json.MarshalIndent(validObjects, "", "  ")
 	if err != nil {
 		return fmt.Errorf("error marshaling JSON: %v", err)
 	}

@@ -130,8 +130,9 @@ func runAuditPerf(cmd *cobra.Command, args []string) {
 		log.Debug().Msgf("Processing target directory: %s", targetDir)
 
 		allFileInfos, err := CalculateFileHashes(targetDir)
+
 		if err != nil {
-			log.Debug().Err(err).Msg("Error calculating file hashes")
+			log.Err(err).Msg("Error verifying target")
 		} else {
 			processPoliciesInParallel(policies_filtered, allFileInfos, rgPath)
 		}
@@ -208,9 +209,11 @@ func processPolicy(policy Policy, allFileInfos []FileInfo, rgPath string) {
 
 	if policy.Type == "json" || policy.Type == "yaml" || policy.Type == "ini" || policy.Type == "scan" || policy.Type == "assure" {
 
-		log.Debug().Msgf(" Processing files for policy %s: ", policy.ID)
-		for _, file := range filesToProcess {
-			log.Debug().Msgf("  %s: %s ", file.Path, file.Hash)
+		log.Debug().Str("policy", policy.ID).Msgf(" Processing files for policy %s ", policy.ID)
+		if len(filesToProcess) < 15 {
+			for _, file := range filesToProcess {
+				log.Debug().Str("policy", policy.ID).Msgf("  %s: %s ", file.Path, file.Hash)
+			}
 		}
 
 		normalizedID := NormalizeFilename(policy.ID)
