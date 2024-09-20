@@ -151,3 +151,25 @@ func processIgnorePatterns(ignorePatterns []string) []string {
 	}
 	return processedPatterns
 }
+
+func detectOverlap(paths []string, targetPath string) (bool, string) {
+	// Normalize the target path
+	targetPath = filepath.Clean(targetPath)
+
+	for _, path := range paths {
+		// Normalize the current path
+		path = filepath.Clean(path)
+
+		// Check if the target path is the same as or a subdirectory of the current path
+		if targetPath == path || strings.HasPrefix(targetPath, path+string(filepath.Separator)) {
+			return true, path
+		}
+
+		// Check if the current path is a subdirectory of the target path
+		if strings.HasPrefix(path, targetPath+string(filepath.Separator)) {
+			return true, targetPath
+		}
+	}
+
+	return false, ""
+}

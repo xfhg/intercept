@@ -1,0 +1,30 @@
+
+
+Config: 
+  Flags:
+    policy_schedule: "*/35 * * * * *"
+    report_schedule: "*/50 * * * * *"
+    target: "_target/"
+ 
+
+Policies:
+  - id: "SCAN-001 Server Tokens"
+    type: "scan"
+    observe: "/workspace/intercept/playground/targets/scan/nginx.conf"
+    enforcement:
+      - environment: "all"
+        fatal: "true"
+        exceptions: "false"
+        confidence: "high"
+    metadata:
+      name: "Detect server_tokens on"
+      description: "Ensure that server_tokens is not enabled to avoid revealing version info."
+      msg_solution: "Set server_tokens to off in the nginx configuration."
+      msg_error: "server_tokens is enabled, exposing Nginx version."
+      tags:
+        - "security"
+        - "nginx"
+      score: "7"
+    _regex:
+      - "server_tokens\\s+on;"
+

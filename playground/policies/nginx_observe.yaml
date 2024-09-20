@@ -3,8 +3,8 @@
 Config: 
   Flags:
     policy_schedule: "*/30 * * * * *"
-    report_schedule: "*/30 * * * * *"
-    target: "targets/"
+    report_schedule: "*/50 * * * * *"
+    target: "targets/scan/"
  
 
 Policies:
@@ -51,7 +51,7 @@ Policies:
 
   - id: "SCAN-008 Autoindex Enabled"
     type: "scan"
-    filepattern: "nginx.conf"
+    # observe: "_target/modules/"
     enforcement:
       - environment: "all"
         fatal: "true"

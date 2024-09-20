@@ -72,15 +72,15 @@ export default defineConfig({
       {
         text: 'INTERCEPT AUDIT',
         items: [
-          { text: 'Compliance Reporting', link: '/docs/tbd' },
           { text: 'Feature Flags', link: '/docs/tbd' },
+          { text: 'Compliance Reporting', link: '/docs/tbd' },
         ]
       },
       {
         text: 'INTERCEPT OBSERVE',
         items: [
-          { text: 'Setup', link: '/docs/tbd' },
-          { text: 'Runtime Daemon', link: '/docs/tbd' },
+          { text: 'Feature Flags', link: '/docs/tbd' },
+          { text: 'Runtime Modes', link: '/docs/tbd' },
           { text: 'Integration Webhooks', link: '/docs/tbd' }
         ]
       },

@@ -123,6 +123,10 @@ func setupLogging() {
 		log.Info().Msgf("Host Data: %s", hostData)
 		log.Info().Msgf("Host Fingerprint: %s", hostFingerprint)
 
+		// ----------------------------------------------
+		// ---------------------------------------------- EXPERIMENTAL END
+		// ----------------------------------------------
+
 	}
 	if silentMode {
 

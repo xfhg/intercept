@@ -22,6 +22,8 @@ func processPolicyInWorker(e event.Event, policyType string) error {
 	targetDir, _ := e.Get("targetDir").(string)
 	filePaths, _ := e.Get("filePaths").([]string)
 
+	log.Debug().Str("policy", policy.ID).Msgf("Working [%s] [%s]", targetDir, filePaths)
+
 	switch policyType {
 	case "scan":
 		return ProcessScanType(policy, rgPath, targetDir, filePaths)

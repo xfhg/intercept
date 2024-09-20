@@ -59,6 +59,7 @@ type Policy struct {
 	Enforcement []Enforcement `yaml:"enforcement"`
 	Metadata    Metadata      `yaml:"metadata"`
 	FilePattern string        `yaml:"filepattern"`
+  Observe     string        `yaml:"observe"`
 	Schema      Schema        `yaml:"_schema"`
 	Rego        Rego          `yaml:"_rego"`
 	Regex       []string      `yaml:"_regex"`

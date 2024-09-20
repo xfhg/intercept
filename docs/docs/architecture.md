@@ -3,7 +3,7 @@
 
 <br><br>
 
-Intercept provides an industry-standard, policy-based approach to security and compliance. It offers comprehensive capabilities to scan, analyze, and patch various types of files, systems, services, hardenings, setups, and endpoints. Intercept can operate in ad-hoc, real-time, or event-triggered modes.
+INTERCEPT provides an industry-standard, policy-based approach to security and compliance. It offers comprehensive capabilities to scan, analyze, and patch various types of files, systems, services, hardenings, setups, and endpoints. Intercept can operate in ad-hoc, real-time, or event-triggered modes.
 
 ---
 
@@ -19,7 +19,9 @@ To accomplish a thorough scan of your codebase or system state, the INTERCEPT Po
 <br><br>
 
 
-
+::: tip
+Discover how INTERCEPT can transform your security operations and provide unparalleled visibility into your organization's compliance status. Check the SANDBOX for a 10 step approach.
+:::
 
 
 <br><br><br>
@@ -35,7 +37,7 @@ Scan policies enable thorough examination of non-binary files for regex patterns
 ### ASSURE Policies
 Functioning inversely to scan policies, assurance policies enforce the presence of defined patterns. They utilize regex, CUE Lang schemas, or a combination of both. These policies are ideal for validating configuration files, log streams, and audit logs against expected patterns or structures. Compliance is achieved when the target matches the specified patterns, schemas, or values.
 #### Configuration File Type Policies (JSON, YAML, TOML, INI)
-For monitored files with specific target types, Intercept can generate patches to bring non-compliant files back into compliance.
+For monitored files with specific target types,  can generate patches to bring non-compliant files back into compliance.
 #### Endpoint API Policies
 API policies apply assurance policy principles to API endpoints, ensuring they meet defined standards and expectations.
 ### RUNTIME Policies
@@ -45,12 +47,11 @@ Leveraging the Open Policy Agent (OPA) engine, Rego policies assess compliance i
 
 ## Multiplatform Single Binary
 
-Low footprint, works anywhere.
+Low footprint, works everywhere.
 
 ## Integration Webhooks
 
-Send your Compliance Reports immediatly to the right recipient
-
+Send your Compliance Reports immediatly to the right stakeholders
 
 
 ## Platform compatibility
