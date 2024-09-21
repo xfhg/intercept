@@ -1,13 +1,42 @@
 Config:
   Flags:
     ignore: 
-      - "*.yml"
-      - "ignorethisfolder/"
+      - "*.yaml"
+      - "submodules/"
       - "*.codes"
 Policies:
   - id: "SCAN-001 Private Keys"
     type: "scan"
     filepattern: "^.*\\.json$"
+    enforcement:
+      - environment: "production"
+        fatal: "true"
+        exceptions: "false"
+        confidence: "high"
+      - environment: "development"
+        fatal: "true"
+        exceptions: "false"
+        confidence: "high"
+    metadata:
+      name: "Detect private keys"
+      description: "Generic long description for (metadata) policy"
+      msg_solution: "Generic solution message to production issue."
+      msg_error: "Generic error message for production issue"
+      tags:
+        - "security"
+        - "encryption"
+      score: "9"
+    _regex:
+      - \s*(-----BEGIN PRIVATE KEY-----)
+      - \s*(-----BEGIN RSA PRIVATE KEY-----)
+      - \s*(-----BEGIN DSA PRIVATE KEY-----)
+      - \s*(-----BEGIN EC PRIVATE KEY-----)
+      - \s*(-----BEGIN OPENSSH PRIVATE KEY-----)
+      - \s*(-----BEGIN PGP PRIVATE KEY BLOCK-----)
+
+  - id: "SCAN-002 Private Keys"
+    type: "scan"
+    filepattern: "^.*\\.code$"
     enforcement:
       - environment: "production"
         fatal: "true"

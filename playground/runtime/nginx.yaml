@@ -1,0 +1,53 @@
+
+service:
+  nginx:
+    enabled: true
+    running: true
+
+# process:
+#   nginx:
+#     running: true
+#     count: 1
+
+# file:
+#   /etc/nginx/nginx.conf:
+#     exists: true
+#     mode: "644"
+#     owner: root
+#     group: root
+#   /var/log/nginx/access.log:
+#     exists: true
+#     mode: "644"
+#     owner: root
+#     group: adm
+#   /var/log/nginx/error.log:
+#     exists: true
+#     mode: "644"
+#     owner: root
+#     group: adm
+
+# command:
+#   nginx -t:
+#     exit-status: 0
+#     stdout:
+#       - "syntax is ok"
+#       - "test is successful"
+
+package:
+  nginx:
+    installed: true
+
+# http:
+#   http://localhost:
+#     status: 200
+#     timeout: 2000
+#     allow-insecure: true
+#     body:
+#       - "Welcome to nginx!"
+
+# port:
+#   tcp:80:
+#     listening: true
+#     ip:
+#       - 0.0.0.0
+#     protocol: tcp

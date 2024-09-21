@@ -1,0 +1,28 @@
+
+Config: 
+  Flags:
+    report_schedule:  "*/50 * * * * *"
+
+Policies:
+
+  - id: "RUNTIM-001-NGINX"
+    type: "runtime"
+    enforcement:
+      - environment: "all"
+        fatal: "false"
+        exceptions: "development"
+        confidence: "high"
+    metadata:
+      name: "RUNTIME System Compliance"
+      description: "Enforce system compliance at runtime"
+      msg_solution: ""
+      msg_error: ""
+      tags:
+        - "config"
+        - "runtime"
+        - "enforce"
+      score: "8"
+    _runtime:
+      config: runtime/nginx.yaml
+      observe: /workspace/intercept/playground/targets/scan/nginx.conf
+

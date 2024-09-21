@@ -1,4 +1,3 @@
-
 Policies:
   - id: "SCAN-001 Private Keys"
     type: "scan"
@@ -13,9 +12,9 @@ Policies:
         confidence: "high"
     metadata:
       name: "Detect private keys"
-      description: "Generic long description for (metadata) policy"
-      msg_solution: "Generic solution message to production issue."
-      msg_error: "Generic error message for production issue"
+      description: "Scan for potential private key leaks in the codebase"
+      msg_solution: "Remove the private key and use secure key management practices."
+      msg_error: "Private key detected in the codebase."
       tags:
         - "security"
         - "encryption"
@@ -27,3 +26,23 @@ Policies:
       - \s*(-----BEGIN EC PRIVATE KEY-----)
       - \s*(-----BEGIN OPENSSH PRIVATE KEY-----)
       - \s*(-----BEGIN PGP PRIVATE KEY BLOCK-----)
+
+  - id: "SCAN-002 API Keys"
+    type: "scan"
+    enforcement:
+      - environment: "all"
+        fatal: "true"
+        exceptions: "false"
+        confidence: "medium"
+    metadata:
+      name: "Detect API keys"
+      description: "Scan for potential API key leaks in the codebase"
+      msg_solution: "Remove the API key and use secure key management practices."
+      msg_error: "Potential API key detected in the codebase."
+      tags:
+        - "security"
+        - "api"
+      score: "8"
+    _regex:
+      - \b[A-Za-z0-9]{20,}\b
+      - api[_-]?key[_-]?=\s*['"]?\w+['"]?

@@ -36,7 +36,7 @@ playground/
 │  └─ ..yaml
 ├─ runtime/
 │  ├─ ..yaml
-│  ├─ ..yaml        example RUNTIME partial policies 
+│  ├─ ..yaml        example RUNTIME specific policies 
 │  └─ ..yaml
 └─ targets/
    ├─ ..json

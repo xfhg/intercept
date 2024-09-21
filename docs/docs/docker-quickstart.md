@@ -17,10 +17,8 @@ cd intercept
 Pull the latest image for your platform:
 
 ```sh
-
-docker pull ghcr.io/xfhg/intercept:latest
-
-# Or pull for a specific platform
+docker pull ghcr.io/xfhg/intercept:latest-$OS-$ARCH
+# Fill accodringly to your platform
 docker pull ghcr.io/xfhg/intercept:latest-linux-arm64
 
 ```
@@ -30,19 +28,23 @@ docker pull ghcr.io/xfhg/intercept:latest-linux-arm64
 Execute the following command:
 
 ```sh
+# assuming linux-amd64 platform
 docker run \
-    -v --rm \
-    -w $PWD \
-    -v $PWD:$PWD \ 
-    -e TERM=xterm-256color \ 
-    ghcr.io/xfhg/intercept intercept audit \
+  --rm \
+  -w "$PWD" \
+  -v "$PWD":"$PWD" \
+  -e TERM=xterm-256color \
+  ghcr.io/xfhg/intercept:latest-linux-amd64 \
+  intercept audit \
     --policy playground/policies/test_scan.yaml \
     --target playground/targets \
-    -vvv \
-    -o playground/_my_first_run
+    -vvvv \
+    -o _my_first_run
 ```
 
-::: warning
+::: warning SANDBOX
 This document is a work in progress, hang tight.
+
+Follow the examples in the SANDBOX
 :::
 

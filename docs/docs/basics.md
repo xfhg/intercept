@@ -1,9 +1,18 @@
 
 # 🧬 Basic Concepts
 
+
+As a forward-thinking CISO/CIO, you understand the critical importance of maintaining a strong security posture across your entire software lifecycle. INTERCEPT offers you:
+
+1. **Lightning-Fast SecConf Management**: Identify potential security risks in configuration files within milliseconds. And patch them immediatly.
+2. **Streamlined Compliance Workflow**: Implement a full-cycle compliance process with minimal setup time.
+3. **Proactive Risk Management**: Stay ahead of threats, leaks and drift by continuously monitoring and auditing your infrastructure.
+
+
+
 <br><br>
 
-The policy file (also known as the configuration file) is the primary component of the Intercept workflow. It configures the policy engine and provides all necessary policies, triggers, and hooks to generate a comprehensive compliance report and distribute it to the appropriate recipients.
+The policy file (also known as the configuration file) is the primary component of the INTERCEPT workflow. It configures the policy engine and provides all necessary policies, triggers, and hooks to generate a comprehensive compliance report and distribute it to the appropriate recipients.
 
 ---
 
@@ -20,7 +29,7 @@ A policy file is a YAML document comprising:
 
 ```yaml
 
-Config: # (optional) used to configure intercept
+Config: # (optional) used to configure INTERCEPT
 
 Version: # (optional) version of the policy schema
 
@@ -89,6 +98,7 @@ The policy file can contain all types of policy definitions or be segregated by 
 
   filepattern: # file name pattern filter to narrow down the target of the policy
   schedule: # (only for observe daemon) set the policy audit accodringly to a cron
+  observe: # (only for observe daemon) set up path monitoring to trigger this policy
 
   enforcement: # check the Enforcement section for the value matrix.
      - environment:
@@ -242,7 +252,7 @@ Use "intercept [command] --help" for more information about a command.
 
 ## The Compliance Report
 
-Intercept's AUDIT output is a SARIF-compliant report containing essential metadata for data-driven decision-making. The report includes:
+INTERCEPT's AUDIT output is a SARIF-compliant report containing essential metadata for data-driven decision-making. The report includes:
 
 - Individual Policy Attestation result details
 - Individual Policy Attestation result summaries

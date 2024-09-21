@@ -1,7 +1,7 @@
 
 Config: 
   Flags:
-    policy_schedule: "*/5 * * * * *"
+    policy_schedule: "*/15 * * * * *"
     report_schedule:  "*/50 * * * * *"
   Observe:
     max_report_size:
@@ -30,7 +30,7 @@ Policies:
       score: "8"
     _runtime:
       config: runtime/simple_https.yaml
-      schedule: "*/6 * * * * *"
+      schedule: "*/20 * * * * *"
 
   - id: "RUNTIM-002"
     type: "runtime"
