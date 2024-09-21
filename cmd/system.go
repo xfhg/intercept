@@ -1,12 +1,26 @@
 package cmd
 
 import (
+	"crypto/sha256"
+	"encoding/hex"
+	"fmt"
+	"net"
 	"os"
 	"os/exec"
 	"path/filepath"
+	"runtime"
+	"strings"
 
 	"github.com/spf13/cobra"
 )
+
+type HostInfo struct {
+	Hostname     string
+	OS           string
+	Architecture string
+	IPs          []string
+	MAC          string
+}
 
 var testEmbeddedCmd = &cobra.Command{
 	Use:   "sys",
@@ -69,4 +83,73 @@ var testEmbeddedCmd = &cobra.Command{
 
 func init() {
 	rootCmd.AddCommand(testEmbeddedCmd)
+}
+
+func GetHostInfo() (*HostInfo, error) {
+	hostInfo := &HostInfo{}
+
+	// Get hostname
+	hostname, err := os.Hostname()
+	if err != nil {
+		return nil, fmt.Errorf("failed to get hostname: %v", err)
+	}
+	hostInfo.Hostname = hostname
+
+	// Get OS and architecture
+	hostInfo.OS = runtime.GOOS
+	hostInfo.Architecture = runtime.GOARCH
+
+	// Get IPs and MAC addresses
+	interfaces, err := net.Interfaces()
+	if err != nil {
+		return nil, fmt.Errorf("failed to get network interfaces: %v", err)
+	}
+
+	for _, iface := range interfaces {
+		if iface.Flags&net.FlagUp == 0 {
+			continue // ignore interfaces that are down
+		}
+
+		addrs, err := iface.Addrs()
+		if err != nil {
+			return nil, fmt.Errorf("failed to get addresses for interface %v: %v", iface.Name, err)
+		}
+
+		for _, addr := range addrs {
+			ip, _, err := net.ParseCIDR(addr.String())
+			if err != nil {
+				return nil, fmt.Errorf("failed to parse IP address %v: %v", addr.String(), err)
+			}
+
+			if ip.IsLoopback() {
+				continue // ignore loopback addresses
+			}
+
+			hostInfo.IPs = append(hostInfo.IPs, ip.String())
+		}
+		// main MAC
+		if iface.Flags&net.FlagUp != 0 && iface.HardwareAddr.String() != "" {
+			hostInfo.MAC = iface.HardwareAddr.String()
+		}
+
+	}
+
+	return hostInfo, nil
+}
+
+// FingerprintHost generates a fingerprint for the host using its identifiable information
+func FingerprintHost(hostInfo *HostInfo) (string, string, error) {
+	data := strings.Join([]string{
+		hostInfo.MAC,
+		hostInfo.OS,
+		hostInfo.Architecture,
+		hostInfo.Hostname,
+	}, "|")
+	hash := sha256.New()
+	_, err := hash.Write([]byte(data))
+	if err != nil {
+		return "", "", fmt.Errorf("failed to generate hash: %v", err)
+	}
+	fingerprint := hex.EncodeToString(hash.Sum(nil))
+	return data, fingerprint, nil
 }
