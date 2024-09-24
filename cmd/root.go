@@ -60,7 +60,7 @@ func init() {
 	rootCmd.PersistentFlags().BoolVar(&experimentalMode, "experimental", false, "Enables unreleased experimental features")
 	rootCmd.PersistentFlags().BoolVar(&silentMode, "silent", false, "Enables log to file intercept.log")
 	rootCmd.PersistentFlags().BoolVar(&nologMode, "nolog", false, "Disables all loggging")
-	rootCmd.PersistentFlags().StringVar(&outputType, "output-type", "SARIF", "Output types (can be a list) : SARIF,LOG,OTL,REPORT")
+	rootCmd.PersistentFlags().StringVar(&outputType, "output-type", "SARIF", "Output types (can be a list) : SARIF,LOG,REPORT")
 
 	// running id
 	intercept_run_id = ksuid.New().String()
@@ -179,9 +179,6 @@ func setupLogging() {
 	}
 	if containsLogType(strings.Split(outputType, ","), "sarif") {
 		sLog = true
-	}
-	if containsLogType(strings.Split(outputType, ","), "otp") {
-		tLog = true
 	}
 	if containsLogType(strings.Split(outputType, ","), "report") {
 		rLog = true

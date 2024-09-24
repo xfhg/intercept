@@ -228,6 +228,10 @@ func generateRuntimeSARIFReport(policy Policy, gossResult GossResult) (SARIFRepo
 	}
 	sarifReport.Runs[0].Results = append(sarifReport.Runs[0].Results, summarySarifResult)
 
+	if lLog {
+		PostResultsToComplianceLog(sarifReport)
+	}
+
 	return sarifReport, nil
 }
 
