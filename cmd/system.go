@@ -22,11 +22,37 @@ type HostInfo struct {
 	MAC          string
 }
 
+var (
+	testOutputDir bool
+)
+
 var testEmbeddedCmd = &cobra.Command{
 	Use:   "sys",
 	Short: "Test intercept embedded core binaries",
 	Long:  `This command extracts and runs the embedded rg and goss binaries to verify they are working correctly.`,
 	Run: func(cmd *cobra.Command, args []string) {
+
+		if testOutputDir {
+			log.Debug().Msg("Checking OS Permissions:")
+			if outputDir != "" {
+				absPath, err := filepath.Abs(outputDir)
+				if err != nil {
+					log.Fatal().Err(err).Msg("Failed to get absolute path")
+				}
+				var paths []string
+				paths = append(paths, absPath)
+				hasPermissions, err := Permissions(paths)
+				if err != nil {
+					log.Error().Err(err).Msg("Permission check failed")
+				} else if hasPermissions {
+					log.Debug().Msg("You have sufficient permissions to create directories and write files on the target paths.")
+				} else {
+					log.Error().Msg("You do not have sufficient permissions on the target paths.")
+				}
+			} else {
+				log.Error().Msg("add your intended -o <output directory> for verification")
+			}
+		}
 
 		log.Debug().Msg("Core binaries:")
 		log.Debug().Msgf("rg path: %s", rgPath)
@@ -83,6 +109,8 @@ var testEmbeddedCmd = &cobra.Command{
 
 func init() {
 	rootCmd.AddCommand(testEmbeddedCmd)
+
+	testEmbeddedCmd.Flags().BoolVar(&testOutputDir, "permissions", false, "Check OS permissions with --output-dir or -o")
 }
 
 func GetHostInfo() (*HostInfo, error) {
@@ -152,4 +180,35 @@ func FingerprintHost(hostInfo *HostInfo) (string, string, string, error) {
 	}
 	fingerprint := hex.EncodeToString(hash.Sum(nil))
 	return data, fingerprint, strings.Join(hostInfo.IPs, " - "), nil
+}
+
+func Permissions(targetPaths []string) (bool, error) {
+	for _, path := range targetPaths {
+		info, err := os.Stat(path)
+		if os.IsNotExist(err) {
+			// Path does not exist, attempt to create the directory
+			err = os.MkdirAll(path, 0755)
+			if err != nil {
+				return false, fmt.Errorf("cannot create directory %s: %v", path, err)
+			}
+			// Directory created successfully, remove it
+			defer os.Remove(path)
+		} else if err != nil {
+			// Error accessing the path
+			return false, fmt.Errorf("error accessing path %s: %v", path, err)
+		} else {
+			if !info.IsDir() {
+				return false, fmt.Errorf("path %s exists but is not a directory", path)
+			}
+			// Attempt to create a temporary file in the directory
+			tmpFile, err := os.CreateTemp(path, "permtest_*")
+			if err != nil {
+				return false, fmt.Errorf("cannot create file in directory %s: %v", path, err)
+			}
+			// Close and remove the temporary file
+			tmpFile.Close()
+			os.Remove(tmpFile.Name())
+		}
+	}
+	return true, nil
 }
