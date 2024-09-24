@@ -188,7 +188,7 @@ func PostResultsToWebhooks(sarifReport SARIFReport) error {
 			// Split the Results
 			for _, result := range sarifReport.Runs[0].Results {
 
-				if result.Properties["result-type"] == "summary" {
+				if result.Properties.ResultType == "summary" {
 					summary = result
 				} else {
 					details = append(details, result)

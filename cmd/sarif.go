@@ -147,11 +147,11 @@ type Driver struct {
 }
 
 type Result struct {
-	RuleID     string            `json:"ruleId"`
-	Level      SARIFLevel        `json:"level"`
-	Message    Message           `json:"message"`
-	Locations  []Location        `json:"locations"`
-	Properties map[string]string `json:"properties,omitempty"`
+	RuleID     string           `json:"ruleId"`
+	Level      SARIFLevel       `json:"level"`
+	Message    Message          `json:"message"`
+	Locations  []Location       `json:"locations"`
+	Properties ResultProperties `json:"properties,omitempty"`
 }
 
 type Message struct {
@@ -182,10 +182,38 @@ type Snippet struct {
 	Text string `json:"text"`
 }
 
+type ResultProperties struct {
+	ResourceType    string `json:"resource-type"`
+	Property        string `json:"property"`
+	ResultType      string `json:"result-type"`
+	ObserveRunId    string `json:"observe-run-id"`
+	ResultTimestamp string `json:"result-timestamp"`
+	Environment     string `json:"environment"`
+	Name            string `json:"name"`
+	Description     string `json:"description"`
+	MsgError        string `json:"msg-error"`
+	MsgSolution     string `json:"msg-solution"`
+	SarifInt        int    `json:"sarif-int"`
+}
+
+type InvocationProperties struct {
+	RunId             string `json:"run-id"`
+	StartTime         string `json:"start-time"`
+	EndTime           string `json:"end-time"`
+	ExecutionTimeInMs string `json:"execution-time-ms"`
+	Environment       string `json:"environment"`
+	Debug             string `json:"debug"`
+	ReportTimestamp   string `json:"report-timestamp"`
+	HostData          string `json:"host-data"`
+	HostFingerprint   string `json:"host-fingerprint"`
+	ReportStatus      string `json:"report-status"`
+	ReportCompliant   bool   `json:"report-compliant"`
+}
+
 type Invocation struct {
-	ExecutionSuccessful bool              `json:"executionSuccessful"`
-	CommandLine         string            `json:"commandLine,omitempty"`
-	Properties          map[string]string `json:"properties,omitempty"`
+	ExecutionSuccessful bool                 `json:"executionSuccessful"`
+	CommandLine         string               `json:"commandLine,omitempty"`
+	Properties          InvocationProperties `json:"properties,omitempty"`
 }
 
 type Notification struct {
@@ -253,15 +281,16 @@ func GenerateSARIFReport(inputFile string, policy Policy) (SARIFReport, error) {
 					},
 				},
 			},
-			Properties: map[string]string{
-				"result-type":      "detail",
-				"observe-run-id":   policy.RunID,
-				"result-timestamp": timestamp,
-				"name":             policy.Metadata.Name,
-				"description":      policy.Metadata.Description,
-				"msg-error":        policy.Metadata.MsgError,
-				"msg-solution":     policy.Metadata.MsgSolution,
-				"note":             "true",
+			Properties: ResultProperties{
+				ResultType:      "detail",
+				ObserveRunId:    policy.RunID,
+				ResultTimestamp: timestamp,
+				Environment:     environment,
+				Name:            policy.Metadata.Name,
+				Description:     policy.Metadata.Description,
+				MsgError:        policy.Metadata.MsgError,
+				MsgSolution:     policy.Metadata.MsgSolution,
+				SarifInt:        sarifLevelToInt(SARIFNote),
 			},
 		})
 	} else {
@@ -270,7 +299,7 @@ func GenerateSARIFReport(inputFile string, policy Policy) (SARIFReport, error) {
 			if rgOutput.Type == "match" {
 
 				sarifLevel := calculateSARIFLevel(policy, environment)
-				levelProperty := sarifLevelToString(sarifLevel)
+
 				for _, submatch := range rgOutput.Data.Submatches {
 					matchText := submatch.Match.Text
 					startColumn := strings.Index(rgOutput.Data.Lines.Text, matchText) + 1
@@ -297,15 +326,16 @@ func GenerateSARIFReport(inputFile string, policy Policy) (SARIFReport, error) {
 								},
 							},
 						},
-						Properties: map[string]string{
-							"result-type":      "detail",
-							"observe-run-id":   policy.RunID,
-							"result-timestamp": timestamp,
-							"name":             policy.Metadata.Name,
-							"description":      policy.Metadata.Description,
-							"msg-error":        policy.Metadata.MsgError,
-							"msg-solution":     policy.Metadata.MsgSolution,
-							levelProperty:      "true",
+						Properties: ResultProperties{
+							ResultType:      "detail",
+							ObserveRunId:    policy.RunID,
+							ResultTimestamp: timestamp,
+							Environment:     environment,
+							Name:            policy.Metadata.Name,
+							Description:     policy.Metadata.Description,
+							MsgError:        policy.Metadata.MsgError,
+							MsgSolution:     policy.Metadata.MsgSolution,
+							SarifInt:        sarifLevelToInt(sarifLevel),
 						},
 					}
 
@@ -366,26 +396,26 @@ func GenerateAssureSARIFReport(inputFile string, policy Policy, status string) (
 
 	sarifLevel := calculateSARIFLevel(policy, environment)
 	timestamp := time.Now().Format(time.RFC3339)
-	levelProperty := sarifLevelToString(sarifLevel)
 
 	result := Result{}
 	if status == "FOUND" {
 		// For assure policies, we report based on the status
 		result = Result{
 			RuleID: policy.ID,
-			Level:  "note",
+			Level:  SARIFNote,
 			Message: Message{
 				Text: fmt.Sprintf("Assure policy %s: Pattern %s", policy.Metadata.Name, status),
 			},
-			Properties: map[string]string{
-				"result-type":      "detail",
-				"observe-run-id":   policy.RunID,
-				"result-timestamp": timestamp,
-				"name":             policy.Metadata.Name,
-				"description":      policy.Metadata.Description,
-				"msg-error":        policy.Metadata.MsgError,
-				"msg-solution":     policy.Metadata.MsgSolution,
-				"note":             "true",
+			Properties: ResultProperties{
+				ResultType:      "detail",
+				ObserveRunId:    policy.RunID,
+				ResultTimestamp: timestamp,
+				Environment:     environment,
+				Name:            policy.Metadata.Name,
+				Description:     policy.Metadata.Description,
+				MsgError:        policy.Metadata.MsgError,
+				MsgSolution:     policy.Metadata.MsgSolution,
+				SarifInt:        sarifLevelToInt(SARIFNote),
 			},
 		}
 	} else {
@@ -396,15 +426,16 @@ func GenerateAssureSARIFReport(inputFile string, policy Policy, status string) (
 			Message: Message{
 				Text: fmt.Sprintf("Assure policy %s: Pattern %s", policy.Metadata.Name, status),
 			},
-			Properties: map[string]string{
-				"result-type":      "detail",
-				"observe-run-id":   policy.RunID,
-				"result-timestamp": timestamp,
-				"name":             policy.Metadata.Name,
-				"description":      policy.Metadata.Description,
-				"msg-error":        policy.Metadata.MsgError,
-				"msg-solution":     policy.Metadata.MsgSolution,
-				levelProperty:      "true",
+			Properties: ResultProperties{
+				ResultType:      "detail",
+				ObserveRunId:    policy.RunID,
+				ResultTimestamp: timestamp,
+				Environment:     environment,
+				Name:            policy.Metadata.Name,
+				Description:     policy.Metadata.Description,
+				MsgError:        policy.Metadata.MsgError,
+				MsgSolution:     policy.Metadata.MsgSolution,
+				SarifInt:        sarifLevelToInt(sarifLevel),
 			},
 		}
 	}
@@ -470,8 +501,6 @@ func GenerateSchemaSARIFReport(policy Policy, filePath string, valid bool, issue
 
 	sarifLevel := calculateSARIFLevel(policy, environment)
 
-	levelProperty := sarifLevelToString(sarifLevel)
-
 	timestamp := time.Now().Format(time.RFC3339)
 
 	if !valid {
@@ -491,15 +520,16 @@ func GenerateSchemaSARIFReport(policy Policy, filePath string, valid bool, issue
 						},
 					},
 				},
-				Properties: map[string]string{
-					"result-type":      "detail",
-					"observe-run-id":   policy.RunID,
-					"result-timestamp": timestamp,
-					"name":             policy.Metadata.Name,
-					"description":      policy.Metadata.Description,
-					"msg-error":        policy.Metadata.MsgError,
-					"msg-solution":     policy.Metadata.MsgSolution,
-					levelProperty:      "true",
+				Properties: ResultProperties{
+					ResultType:      "detail",
+					ObserveRunId:    policy.RunID,
+					ResultTimestamp: timestamp,
+					Environment:     environment,
+					Name:            policy.Metadata.Name,
+					Description:     policy.Metadata.Description,
+					MsgError:        policy.Metadata.MsgError,
+					MsgSolution:     policy.Metadata.MsgSolution,
+					SarifInt:        sarifLevelToInt(sarifLevel),
 				},
 			}
 			sarifReport.Runs[0].Results = append(sarifReport.Runs[0].Results, result)
@@ -515,7 +545,6 @@ func GenerateSchemaSARIFReport(policy Policy, filePath string, valid bool, issue
 	}
 
 	detailSarif := map[bool]SARIFLevel{true: SARIFNote, false: sarifLevel}[valid]
-	levelProperty = sarifLevelToString(detailSarif)
 
 	summaryResult := Result{
 		RuleID: policy.ID,
@@ -532,15 +561,16 @@ func GenerateSchemaSARIFReport(policy Policy, filePath string, valid bool, issue
 				},
 			},
 		},
-		Properties: map[string]string{
-			"result-type":      "detail",
-			"observe-run-id":   policy.RunID,
-			"result-timestamp": timestamp,
-			"name":             policy.Metadata.Name,
-			"description":      policy.Metadata.Description,
-			"msg-error":        policy.Metadata.MsgError,
-			"msg-solution":     policy.Metadata.MsgSolution,
-			levelProperty:      "true",
+		Properties: ResultProperties{
+			ResultType:      "detail",
+			ObserveRunId:    policy.RunID,
+			ResultTimestamp: timestamp,
+			Environment:     environment,
+			Name:            policy.Metadata.Name,
+			Description:     policy.Metadata.Description,
+			MsgError:        policy.Metadata.MsgError,
+			MsgSolution:     policy.Metadata.MsgSolution,
+			SarifInt:        sarifLevelToInt(detailSarif),
 		},
 	}
 	sarifReport.Runs[0].Results = append(sarifReport.Runs[0].Results, summaryResult)
@@ -618,16 +648,16 @@ func MergeSARIFReports(commandLine string, perf Performance, isScheduled bool) (
 					{
 						ExecutionSuccessful: true,
 						CommandLine:         commandLine,
-						Properties: map[string]string{
-							"run-id":            intercept_run_id,
-							"start-time":        perf.StartTime.Format(time.RFC3339),
-							"end-time":          perf.EndTime.Format(time.RFC3339),
-							"execution-time-ms": fmt.Sprintf("%d", perf.Delta.Milliseconds()),
-							"environment":       environment,
-							"debug":             fmt.Sprintf("%v", debugOutput),
-							"report-timestamp":  timestamp,
-							"host-data":         hostData,
-							"host-fingerprint":  hostFingerprint,
+						Properties: InvocationProperties{
+							RunId:             intercept_run_id,
+							StartTime:         perf.StartTime.Format(time.RFC3339),
+							EndTime:           perf.EndTime.Format(time.RFC3339),
+							ExecutionTimeInMs: fmt.Sprintf("%d", perf.Delta.Milliseconds()),
+							Environment:       environment,
+							Debug:             fmt.Sprintf("%v", debugOutput),
+							ReportTimestamp:   timestamp,
+							HostData:          hostData,
+							HostFingerprint:   hostFingerprint,
 						},
 					},
 				},
@@ -664,11 +694,11 @@ func MergeSARIFReports(commandLine string, perf Performance, isScheduled bool) (
 
 	// Set the compliance status
 	if isCompliant {
-		mergedReport.Runs[0].Invocations[0].Properties["report-status"] = "compliant"
-		mergedReport.Runs[0].Invocations[0].Properties["report-compliant"] = "true"
+		mergedReport.Runs[0].Invocations[0].Properties.ReportStatus = "compliant"
+		mergedReport.Runs[0].Invocations[0].Properties.ReportCompliant = true
 	} else {
-		mergedReport.Runs[0].Invocations[0].Properties["report-status"] = "non-compliant"
-		mergedReport.Runs[0].Invocations[0].Properties["report-compliant"] = "false"
+		mergedReport.Runs[0].Invocations[0].Properties.ReportStatus = "non-compliant"
+		mergedReport.Runs[0].Invocations[0].Properties.ReportCompliant = false
 	}
 
 	if !isScheduled {
@@ -809,14 +839,16 @@ func GenerateAPISARIFReport(policy Policy, endpoint string, matchFound bool, iss
 				},
 			},
 		},
-		Properties: map[string]string{
-			"result-type":      "summary",
-			"observe-run-id":   policy.RunID,
-			"result-timestamp": timestamp,
-			"name":             policy.Metadata.Name,
-			"description":      policy.Metadata.Description,
-			"msg-error":        policy.Metadata.MsgError,
-			"msg-solution":     policy.Metadata.MsgSolution,
+		Properties: ResultProperties{
+			ResultType:      "summary",
+			ObserveRunId:    policy.RunID,
+			ResultTimestamp: timestamp,
+			Environment:     environment,
+			Name:            policy.Metadata.Name,
+			Description:     policy.Metadata.Description,
+			MsgError:        policy.Metadata.MsgError,
+			MsgSolution:     policy.Metadata.MsgSolution,
+			SarifInt:        sarifLevelToInt(resultLevel),
 		},
 	}
 
@@ -839,14 +871,16 @@ func GenerateAPISARIFReport(policy Policy, endpoint string, matchFound bool, iss
 					},
 				},
 			},
-			Properties: map[string]string{
-				"result-type":      "detail",
-				"observe-run-id":   policy.RunID,
-				"result-timestamp": timestamp,
-				"name":             policy.Metadata.Name,
-				"description":      policy.Metadata.Description,
-				"msg-error":        policy.Metadata.MsgError,
-				"msg-solution":     policy.Metadata.MsgSolution,
+			Properties: ResultProperties{
+				ResultType:      "detail",
+				ObserveRunId:    policy.RunID,
+				ResultTimestamp: timestamp,
+				Environment:     environment,
+				Name:            policy.Metadata.Name,
+				Description:     policy.Metadata.Description,
+				MsgError:        policy.Metadata.MsgError,
+				MsgSolution:     policy.Metadata.MsgSolution,
+				SarifInt:        sarifLevelToInt(sarifLevel),
 			},
 		}
 		sarifReport.Runs[0].Results = append(sarifReport.Runs[0].Results, issueResult)

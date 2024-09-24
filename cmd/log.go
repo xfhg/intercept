@@ -36,7 +36,7 @@ func PostResultsToComplianceLog(sarifReport SARIFReport) error {
 		resultLevel = sarifLevelToString(result.Level)
 		resultLevelInt = sarifLevelToInt(result.Level)
 
-		if result.Properties["result-type"] == "summary" {
+		if result.Properties.ResultType == "summary" {
 			resultBytes, _ := json.Marshal(result)
 			clog.Log().Str("policy-id", policyID).Str("result-level", resultLevel).Int("sarif-level", resultLevelInt).RawJSON("summary", resultBytes).Send()
 		} else {
@@ -61,10 +61,10 @@ func PostReportToComplianceLog(sarifReport SARIFReport) error {
 
 	payloadBytes, _ := json.Marshal(sarifReport)
 
-	clog.Log().Str("intercept-run-id", sarifReport.Runs[0].Invocations[0].Properties["run-id"]).Str("report-compliant", sarifReport.Runs[0].Invocations[0].Properties["report-compliant"]).Str("report-status", sarifReport.Runs[0].Invocations[0].Properties["report-status"]).Str("report-timestamp", sarifReport.Runs[0].Invocations[0].Properties["report-timestamp"]).Send()
+	clog.Log().Str("intercept-run-id", sarifReport.Runs[0].Invocations[0].Properties.RunId).Bool("report-compliant", sarifReport.Runs[0].Invocations[0].Properties.ReportCompliant).Str("report-status", sarifReport.Runs[0].Invocations[0].Properties.ReportStatus).Str("report-timestamp", sarifReport.Runs[0].Invocations[0].Properties.ReportTimestamp).Send()
 
 	if sLog {
-		clog.Log().Str("intercept-run-id", sarifReport.Runs[0].Invocations[0].Properties["run-id"]).Str("report-compliant", sarifReport.Runs[0].Invocations[0].Properties["report-compliant"]).RawJSON("report", payloadBytes).Send()
+		clog.Log().Str("intercept-run-id", sarifReport.Runs[0].Invocations[0].Properties.RunId).Bool("report-compliant", sarifReport.Runs[0].Invocations[0].Properties.ReportCompliant).RawJSON("report", payloadBytes).Send()
 	}
 
 	return nil
