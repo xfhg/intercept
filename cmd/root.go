@@ -67,8 +67,9 @@ func init() {
 
 	// Setup logging based on verbosity flag
 	rootCmd.PersistentPreRunE = func(cmd *cobra.Command, args []string) error {
+		setupOutputDir()
 		setupLogging()
-		return setupOutputDir()
+		return nil
 	}
 
 }
@@ -135,7 +136,7 @@ func setupLogging() {
 			logfilepath = filepath.Join(outputDir, logfilepath)
 		}
 
-		logFile, _ := lumberjack.NewRoller(
+		logFile, err := lumberjack.NewRoller(
 			logfilepath,
 			100*1024*1024, // 100 megabytes
 			&lumberjack.Options{
@@ -152,6 +153,9 @@ func setupLogging() {
 				// using gzip. The default is not to perform compression.
 				Compress: true,
 			})
+		if err != nil {
+			log.Fatal().Err(err).Msg("Failed to create log roller")
+		}
 
 		log = zerolog.New(logFile).With().Timestamp().Logger().With().Str("intercept_run_id", intercept_run_id).Logger()
 		if verbosity > 3 {
@@ -165,7 +169,8 @@ func setupLogging() {
 		if outputDir != "" {
 			compliancelogfilepath = filepath.Join(outputDir, compliancelogfilepath)
 		}
-		clogFile, _ := lumberjack.NewRoller(
+
+		clogFile, err := lumberjack.NewRoller(
 			compliancelogfilepath,
 			100*1024*1024, // 100 megabytes
 			&lumberjack.Options{
@@ -173,9 +178,14 @@ func setupLogging() {
 				MaxAge:     90 * time.Hour * 24,
 				Compress:   true,
 			})
+
+		if err != nil {
+			log.Fatal().Err(err).Msg("Failed to create log roller")
+		}
 		zerolog.TimeFieldFormat = time.RFC3339
 		clog = zerolog.New(clogFile).With().Timestamp().Str("host", hostData).Logger().With().Str("intercept_run_id", intercept_run_id).Logger()
 		clog.Log().Msg("Compliance Log Active")
+
 	}
 	if containsLogType(strings.Split(outputType, ","), "sarif") {
 		sLog = true
