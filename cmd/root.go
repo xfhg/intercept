@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"strings"
 	"time"
 
 	"github.com/natefinch/lumberjack/v3"
@@ -16,6 +17,7 @@ var (
 	intercept_run_id string
 	verbosity        int
 	outputDir        string
+	outputType       string
 	experimentalMode bool
 	silentMode       bool
 	nologMode        bool
@@ -24,6 +26,7 @@ var (
 
 	hostData        string
 	hostFingerprint string
+	hostIps         string
 
 	buildVersion   string
 	buildSignature string
@@ -33,7 +36,14 @@ var (
 		Short: "DevSecOps toolkit",
 		Long:  `Code Compliance`,
 	}
-	log zerolog.Logger
+
+	lLog bool
+	sLog bool
+	tLog bool
+	rLog bool
+
+	log  zerolog.Logger
+	clog zerolog.Logger
 )
 
 func Execute() {
@@ -50,6 +60,7 @@ func init() {
 	rootCmd.PersistentFlags().BoolVar(&experimentalMode, "experimental", false, "Enables unreleased experimental features")
 	rootCmd.PersistentFlags().BoolVar(&silentMode, "silent", false, "Enables log to file intercept.log")
 	rootCmd.PersistentFlags().BoolVar(&nologMode, "nolog", false, "Disables all loggging")
+	rootCmd.PersistentFlags().StringVar(&outputType, "output-type", "SARIF", "Output types (can be a list) : SARIF,LOG,OTL,REPORT")
 
 	// running id
 	intercept_run_id = ksuid.New().String()
@@ -62,6 +73,9 @@ func init() {
 
 }
 func setupLogging() {
+
+	zerolog.TimeFieldFormat = time.RFC3339
+
 	switch verbosity {
 	case 0:
 		zerolog.SetGlobalLevel(zerolog.FatalLevel)
@@ -96,38 +110,23 @@ func setupLogging() {
 		Out:        os.Stderr,
 		TimeFormat: time.RFC3339,
 	}
+
+	// setup hostinfo
+	hostInfo, err := GetHostInfo()
+	if err != nil {
+		log.Error().Msgf("Error gathering host info: %v\n", err)
+	}
+
+	hostData, hostFingerprint, hostIps, err = FingerprintHost(hostInfo)
+	if err != nil {
+		log.Error().Msgf("Error generating fingerprint: %v\n", err)
+	}
+
+	log.Info().Msgf("Host Data: %s", hostData)
+	log.Info().Msgf("Host Fingerprint: %s", hostFingerprint)
+
 	log = zerolog.New(output).With().Timestamp().Logger()
 
-	if experimentalMode {
-
-		// ----------------------------------------------
-		// ---------------------------------------------- EXPERIMENTAL log caller debug
-		// ----------------------------------------------
-
-		log = zerolog.New(output).With().Timestamp().Logger().With().Caller().Logger()
-		// log = zerolog.New(output).With().Timestamp().Logger().With().Str("id", intercept_run_id).Logger()
-
-		// ----------------------------------------------
-		// ---------------------------------------------- EXPERIMENTAL feature/targetid
-		// ----------------------------------------------
-
-		hostInfo, err := GetHostInfo()
-		if err != nil {
-			log.Error().Msgf("Error gathering host info: %v\n", err)
-		}
-
-		hostData, hostFingerprint, err = FingerprintHost(hostInfo)
-		if err != nil {
-			log.Error().Msgf("Error generating fingerprint: %v\n", err)
-		}
-		log.Info().Msgf("Host Data: %s", hostData)
-		log.Info().Msgf("Host Fingerprint: %s", hostFingerprint)
-
-		// ----------------------------------------------
-		// ---------------------------------------------- EXPERIMENTAL END
-		// ----------------------------------------------
-
-	}
 	if silentMode {
 
 		logfilepath := fmt.Sprintf("log_intercept_%s.log", intercept_run_id[:6])
@@ -154,20 +153,38 @@ func setupLogging() {
 				Compress: true,
 			})
 
-		if experimentalMode {
-
-			output := zerolog.ConsoleWriter{
-				Out:        logFile,
-				TimeFormat: time.RFC3339,
-				NoColor:    true,
-			}
-			log = zerolog.New(output).With().Timestamp().Logger().With().Str("intercept_run_id", intercept_run_id).Logger()
-
-		} else {
-			zerolog.TimeFieldFormat = zerolog.TimeFormatUnix
-			log = zerolog.New(logFile).With().Timestamp().Logger().With().Str("intercept_run_id", intercept_run_id).Logger()
+		log = zerolog.New(logFile).With().Timestamp().Logger().With().Str("intercept_run_id", intercept_run_id).Logger()
+		if verbosity > 3 {
+			log = zerolog.New(logFile).With().Timestamp().Logger().With().Str("intercept_run_id", intercept_run_id).Str("host", hostData).Logger()
 		}
+	}
 
+	if containsLogType(strings.Split(outputType, ","), "log") || containsLogType(strings.Split(outputType, ","), "report") {
+		lLog = true
+		compliancelogfilepath := fmt.Sprintf("c_log_intercept_%s.log", intercept_run_id[:6])
+		if outputDir != "" {
+			compliancelogfilepath = filepath.Join(outputDir, compliancelogfilepath)
+		}
+		clogFile, _ := lumberjack.NewRoller(
+			compliancelogfilepath,
+			100*1024*1024, // 100 megabytes
+			&lumberjack.Options{
+				MaxBackups: 5,
+				MaxAge:     90 * time.Hour * 24,
+				Compress:   true,
+			})
+		zerolog.TimeFieldFormat = time.RFC3339
+		clog = zerolog.New(clogFile).With().Timestamp().Str("host", hostData).Logger().With().Str("intercept_run_id", intercept_run_id).Logger()
+		clog.Log().Msg("Compliance Log Active")
+	}
+	if containsLogType(strings.Split(outputType, ","), "sarif") {
+		sLog = true
+	}
+	if containsLogType(strings.Split(outputType, ","), "otp") {
+		tLog = true
+	}
+	if containsLogType(strings.Split(outputType, ","), "report") {
+		rLog = true
 	}
 
 }

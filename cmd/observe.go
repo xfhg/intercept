@@ -105,6 +105,10 @@ func runObserve(cmd *cobra.Command, args []string) {
 		log.Fatal().Err(err).Msgf("failed to create directory %s", reportDir)
 	}
 
+	if outputType != "" {
+		policyData.Config.Flags.OutputType = strings.Split(outputType, ",")
+	}
+
 	config := GetConfig()
 
 	// Needed for scan/assure/schema policies

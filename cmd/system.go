@@ -138,7 +138,7 @@ func GetHostInfo() (*HostInfo, error) {
 }
 
 // FingerprintHost generates a fingerprint for the host using its identifiable information
-func FingerprintHost(hostInfo *HostInfo) (string, string, error) {
+func FingerprintHost(hostInfo *HostInfo) (string, string, string, error) {
 	data := strings.Join([]string{
 		hostInfo.MAC,
 		hostInfo.OS,
@@ -148,8 +148,8 @@ func FingerprintHost(hostInfo *HostInfo) (string, string, error) {
 	hash := sha256.New()
 	_, err := hash.Write([]byte(data))
 	if err != nil {
-		return "", "", fmt.Errorf("failed to generate hash: %v", err)
+		return "", "", "", fmt.Errorf("failed to generate hash: %v", err)
 	}
 	fingerprint := hex.EncodeToString(hash.Sum(nil))
-	return data, fingerprint, nil
+	return data, fingerprint, strings.Join(hostInfo.IPs, " - "), nil
 }

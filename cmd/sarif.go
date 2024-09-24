@@ -62,6 +62,21 @@ func sarifLevelToString(level SARIFLevel) string {
 	}
 }
 
+func sarifLevelToInt(level SARIFLevel) int {
+	switch level {
+	case SARIFNone:
+		return 0
+	case SARIFNote:
+		return 1
+	case SARIFWarning:
+		return 2
+	case SARIFError:
+		return 3
+	default:
+		return 99
+	}
+}
+
 func selectEnforcementRule(policy Policy, environment string) Enforcement {
 	for _, rule := range policy.Enforcement {
 		if rule.Environment == environment || rule.Environment == "all" {
@@ -206,7 +221,7 @@ func GenerateSARIFReport(inputFile string, policy Policy) (SARIFReport, error) {
 			{
 				Tool: Tool{
 					Driver: Driver{
-						Name:    "Intercept",
+						Name:    "INTERCEPT",
 						Version: buildVersion,
 					},
 				},
@@ -293,6 +308,7 @@ func GenerateSARIFReport(inputFile string, policy Policy) (SARIFReport, error) {
 							levelProperty:      "true",
 						},
 					}
+
 					results = append(results, result)
 				}
 			}
@@ -300,6 +316,11 @@ func GenerateSARIFReport(inputFile string, policy Policy) (SARIFReport, error) {
 	}
 
 	sarifReport.Runs[0].Results = results
+
+	if lLog {
+		PostResultsToComplianceLog(sarifReport)
+	}
+
 	return sarifReport, nil
 }
 
@@ -422,6 +443,10 @@ func GenerateAssureSARIFReport(inputFile string, policy Policy, status string) (
 
 	sarifReport.Runs[0].Results = append(sarifReport.Runs[0].Results, result)
 
+	if lLog {
+		PostResultsToComplianceLog(sarifReport)
+	}
+
 	return sarifReport, nil
 }
 
@@ -519,6 +544,10 @@ func GenerateSchemaSARIFReport(policy Policy, filePath string, valid bool, issue
 		},
 	}
 	sarifReport.Runs[0].Results = append(sarifReport.Runs[0].Results, summaryResult)
+
+	if lLog {
+		PostResultsToComplianceLog(sarifReport)
+	}
 
 	return sarifReport
 }
@@ -666,6 +695,10 @@ func MergeSARIFReports(commandLine string, perf Performance, isScheduled bool) (
 	}
 
 	log.Debug().Msgf("SARIF Report written to: %s ", mergeOutputPath)
+
+	if lLog {
+		PostReportToComplianceLog(mergedReport)
+	}
 
 	return mergedReport, nil
 }
@@ -817,6 +850,10 @@ func GenerateAPISARIFReport(policy Policy, endpoint string, matchFound bool, iss
 			},
 		}
 		sarifReport.Runs[0].Results = append(sarifReport.Runs[0].Results, issueResult)
+	}
+
+	if lLog {
+		PostResultsToComplianceLog(sarifReport)
 	}
 
 	return sarifReport, nil

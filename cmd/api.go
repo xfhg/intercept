@@ -78,7 +78,7 @@ func applyAuth(req *resty.Request, auth map[string]string) error {
 }
 
 func processWithCUE(policy Policy, data []byte) error {
-	valid, issues := validateContentAndCUE(data, policy.Schema.Structure, "json", policy.Schema.Strict)
+	valid, issues := validateContentAndCUE(data, policy.Schema.Structure, "json", policy.Schema.Strict, policy.ID)
 
 	// Generate SARIF report
 	sarifReport, err := GenerateAPISARIFReport(policy, policy.API.Endpoint, valid, issues)

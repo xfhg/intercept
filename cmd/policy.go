@@ -25,7 +25,7 @@ type Config struct {
 		InterceptVersion string `yaml:"InterceptVersion,omitempty"`
 	} `yaml:"System,omitempty"`
 	Flags struct {
-		OutputType     string   `yaml:"output_type,omitempty"`
+		OutputType     []string `yaml:"output_type,omitempty"`
 		Target         string   `yaml:"target,omitempty"`
 		Ignore         []string `yaml:"ignore,omitempty"`
 		Tags           []string `yaml:"tags,omitempty"`
