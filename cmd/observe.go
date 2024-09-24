@@ -31,6 +31,7 @@ var (
 	observeSchedule     string
 	observeReport       string
 	observeMode         string
+	observeIndex        string
 	reportMutex         sync.Mutex
 	reportDir           string = "_status"
 	allFileInfos        []FileInfo
@@ -56,6 +57,7 @@ func init() {
 	observeCmd.Flags().StringVar(&observeSchedule, "schedule", "", "Global Cron Schedule")
 	observeCmd.Flags().StringVar(&observeReport, "report", "", "Report Cron Schedule")
 	observeCmd.Flags().StringVar(&observeMode, "mode", "last", "Observe mode for path monitoring")
+	observeCmd.Flags().StringVar(&observeIndex, "index", "intercept", "Index name for bulk operations")
 
 }
 

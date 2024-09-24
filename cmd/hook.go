@@ -3,7 +3,9 @@
 package cmd
 
 import (
+	"bytes"
 	"crypto/tls"
+	"encoding/json"
 	"time"
 
 	"github.com/go-resty/resty/v2"
@@ -28,6 +30,8 @@ func PostReportToWebhooks(sarifReport SARIFReport) error {
 		log.Info().Str("hook_name", hook.Name).Str("endpoint", hook.Endpoint).Msg("Webhooking")
 
 		var payload WebhookPayload
+		var esbulkpayload string
+
 		if containsString(hook.EventTypes, "results") {
 
 			if len(sarifReport.Runs) == 0 {
@@ -40,7 +44,52 @@ func PostReportToWebhooks(sarifReport SARIFReport) error {
 				EventType: "results",
 				Data:      sarifReport.Runs[0].Results,
 			}
-		} else {
+
+			// ----------------------------------------------
+			// ---------------------------------------------- ES Bulk
+			// ---------------------------------------------- adds { "index": { "_index": "ng" } } between results
+
+			if containsString(hook.EventTypes, "bulk") {
+				// Create a buffer to hold the bulk payload
+				var bulkPayload bytes.Buffer
+
+				// Function to write an index action
+				writeIndexAction := func() error {
+					indexAction := map[string]interface{}{
+						"index": map[string]interface{}{
+							"_index": observeIndex,
+						},
+					}
+					indexActionBytes, err := json.Marshal(indexAction)
+					if err != nil {
+						return err
+					}
+					bulkPayload.Write(indexActionBytes)
+					bulkPayload.WriteByte('\n')
+					return nil
+				}
+
+				for _, result := range sarifReport.Runs[0].Results {
+					// Write the index action
+					if err := writeIndexAction(); err != nil {
+						log.Printf("Error marshalling index action: %v", err)
+						continue
+					}
+
+					// Write the result JSON
+					resultBytes, err := json.Marshal(result)
+					if err != nil {
+						log.Printf("Error marshalling result: %v", err)
+						continue
+					}
+					bulkPayload.Write(resultBytes)
+					bulkPayload.WriteByte('\n')
+				}
+
+				esbulkpayload = bulkPayload.String()
+			}
+
+		} else if containsString(hook.EventTypes, "report") {
 			// For "report" event type, send the full SARIF report
 			payload = WebhookPayload{
 				EventType: "report",
@@ -58,6 +107,10 @@ func PostReportToWebhooks(sarifReport SARIFReport) error {
 		req := client.R()
 		req.SetHeaders(hook.Headers)
 		req.SetBody(payload)
+
+		if containsString(hook.EventTypes, "bulk") {
+			req.SetBody(esbulkpayload)
+		}
 
 		// Apply authentication
 		if err := applyAuth(req, hook.Auth); err != nil {
@@ -102,6 +155,8 @@ func PostResultsToWebhooks(sarifReport SARIFReport) error {
 		log.Info().Str("hook_name", hook.Name).Str("endpoint", hook.Endpoint).Msg("Webhooking")
 
 		var payload WebhookPayload
+		var esbulkpayload string
+
 		if containsString(hook.EventTypes, "policy") {
 
 			if len(sarifReport.Runs) == 0 {
@@ -154,6 +209,59 @@ func PostResultsToWebhooks(sarifReport SARIFReport) error {
 		// ---------------------------------------------- POC Polcicies END
 		// ----------------------------------------------
 
+		// ----------------------------------------------
+		// ---------------------------------------------- ES Bulk
+		// ---------------------------------------------- adds { "index": { "_index": "ng" } } between results
+		if containsString(hook.EventTypes, "bulk") {
+
+			if len(sarifReport.Runs) == 0 {
+				log.Warn().Str("hook", hook.Name).Msg("SARIF report contains no runs, skipping")
+				continue
+			}
+
+			// Create a buffer to hold the bulk payload
+			var bulkPayload bytes.Buffer
+
+			// Function to write an index action
+			writeIndexAction := func() error {
+				indexAction := map[string]interface{}{
+					"index": map[string]interface{}{
+						"_index": observeIndex,
+					},
+				}
+				indexActionBytes, err := json.Marshal(indexAction)
+				if err != nil {
+					return err
+				}
+				bulkPayload.Write(indexActionBytes)
+				bulkPayload.WriteByte('\n')
+				return nil
+			}
+
+			for _, result := range sarifReport.Runs[0].Results {
+				// Write the index action
+				if err := writeIndexAction(); err != nil {
+					log.Printf("Error marshalling index action: %v", err)
+					continue
+				}
+
+				// Write the result JSON
+				resultBytes, err := json.Marshal(result)
+				if err != nil {
+					log.Printf("Error marshalling result: %v", err)
+					continue
+				}
+				bulkPayload.Write(resultBytes)
+				bulkPayload.WriteByte('\n')
+			}
+
+			esbulkpayload = bulkPayload.String()
+
+		}
+		// ----------------------------------------------
+		// ---------------------------------------------- ES Bulk Polcicies END
+		// ----------------------------------------------
+
 		client := resty.New()
 		client.SetTimeout(time.Duration(hook.TimeoutSeconds) * time.Second)
 		if hook.Insecure {
@@ -164,6 +272,10 @@ func PostResultsToWebhooks(sarifReport SARIFReport) error {
 		req := client.R()
 		req.SetHeaders(hook.Headers)
 		req.SetBody(payload)
+
+		if containsString(hook.EventTypes, "bulk") {
+			req.SetBody(esbulkpayload)
+		}
 
 		// Apply authentication
 		if err := applyAuth(req, hook.Auth); err != nil {
