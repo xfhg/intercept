@@ -46,7 +46,7 @@ build: clean
 
 # Compress binary using UPX
 compress-binary:
-	- docker run --rm -w $(shell pwd) -v $(shell pwd):$(shell pwd) xfhg/upx:latest -9 release/$(BINARY_NAME)
+	- docker run --rm -w $(shell pwd) -v $(shell pwd):$(shell pwd) docker.io/xfhg/upx:latest -9 release/$(BINARY_NAME)
 
 #Checksums
 sha256sums:
