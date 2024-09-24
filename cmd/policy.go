@@ -27,6 +27,7 @@ type Config struct {
 	Flags struct {
 		OutputType     []string `yaml:"output_type,omitempty"`
 		Target         string   `yaml:"target,omitempty"`
+		Index          string   `yaml:"index,omitempty"`
 		Ignore         []string `yaml:"ignore,omitempty"`
 		Tags           []string `yaml:"tags,omitempty"`
 		PolicySchedule string   `yaml:"policy_schedule,omitempty"`

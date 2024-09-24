@@ -57,7 +57,7 @@ func PostReportToWebhooks(sarifReport SARIFReport) error {
 				writeIndexAction := func() error {
 					indexAction := map[string]interface{}{
 						"index": map[string]interface{}{
-							"_index": observeIndex,
+							"_index": observeConfig.Flags.Index,
 						},
 					}
 					indexActionBytes, err := json.Marshal(indexAction)
@@ -226,7 +226,7 @@ func PostResultsToWebhooks(sarifReport SARIFReport) error {
 			writeIndexAction := func() error {
 				indexAction := map[string]interface{}{
 					"index": map[string]interface{}{
-						"_index": observeIndex,
+						"_index": observeConfig.Flags.Index,
 					},
 				}
 				indexActionBytes, err := json.Marshal(indexAction)
