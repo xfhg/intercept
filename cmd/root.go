@@ -39,8 +39,6 @@ var (
 
 	lLog bool
 	sLog bool
-	tLog bool
-	rLog bool
 
 	log  zerolog.Logger
 	clog zerolog.Logger
@@ -60,7 +58,7 @@ func init() {
 	rootCmd.PersistentFlags().BoolVar(&experimentalMode, "experimental", false, "Enables unreleased experimental features")
 	rootCmd.PersistentFlags().BoolVar(&silentMode, "silent", false, "Enables log to file intercept.log")
 	rootCmd.PersistentFlags().BoolVar(&nologMode, "nolog", false, "Disables all loggging")
-	rootCmd.PersistentFlags().StringVar(&outputType, "output-type", "SARIF", "Output types (can be a list) : SARIF,LOG,REPORT")
+	rootCmd.PersistentFlags().StringVar(&outputType, "output-type", "SARIF", "Output types (can be a list) : SARIF,LOG")
 
 	// running id
 	intercept_run_id = ksuid.New().String()
@@ -163,7 +161,7 @@ func setupLogging() {
 		}
 	}
 
-	if containsLogType(strings.Split(outputType, ","), "log") || containsLogType(strings.Split(outputType, ","), "report") {
+	if containsLogType(strings.Split(outputType, ","), "log") {
 		lLog = true
 		compliancelogfilepath := fmt.Sprintf("c_log_intercept_%s.log", intercept_run_id[:6])
 		if outputDir != "" {
@@ -189,9 +187,6 @@ func setupLogging() {
 	}
 	if containsLogType(strings.Split(outputType, ","), "sarif") {
 		sLog = true
-	}
-	if containsLogType(strings.Split(outputType, ","), "report") {
-		rLog = true
 	}
 
 }

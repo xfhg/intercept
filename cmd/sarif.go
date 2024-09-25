@@ -378,7 +378,7 @@ func GenerateAssureSARIFReport(inputFile string, policy Policy, status string) (
 			{
 				Tool: Tool{
 					Driver: Driver{
-						Name:    "Intercept",
+						Name:    "INTERCEPT",
 						Version: buildVersion,
 					},
 				},
@@ -489,7 +489,7 @@ func GenerateSchemaSARIFReport(policy Policy, filePath string, valid bool, issue
 			{
 				Tool: Tool{
 					Driver: Driver{
-						Name:    "Intercept",
+						Name:    "INTERCEPT",
 						Version: buildVersion,
 					},
 				},
@@ -639,7 +639,7 @@ func MergeSARIFReports(commandLine string, perf Performance, isScheduled bool) (
 			{
 				Tool: Tool{
 					Driver: Driver{
-						Name:    "Intercept",
+						Name:    "INTERCEPT",
 						Version: buildVersion,
 					},
 				},
@@ -769,7 +769,7 @@ func createSARIFReport(results []Result) SARIFReport {
 			{
 				Tool: Tool{
 					Driver: Driver{
-						Name:    "Intercept",
+						Name:    "INTERCEPT",
 						Version: buildVersion,
 					},
 				},
@@ -787,7 +787,7 @@ func GenerateAPISARIFReport(policy Policy, endpoint string, matchFound bool, iss
 			{
 				Tool: Tool{
 					Driver: Driver{
-						Name:    "Intercept",
+						Name:    "INTERCEPT",
 						Version: buildVersion,
 					},
 				},

@@ -21,7 +21,7 @@ func ProcessAPIType(policy Policy, rgPath string) error {
 	req := client.R()
 
 	req.SetHeader("Content-Type", policy.API.ResponseType)
-	req.SetHeader("User-Agent", "Intercept/v1.0.0")
+	req.SetHeader("User-Agent", "INTERCEPT/v1.0.X")
 
 	// Apply authentication
 	if err := applyAuth(req, policy.API.Auth); err != nil {

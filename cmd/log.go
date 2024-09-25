@@ -61,10 +61,10 @@ func PostReportToComplianceLog(sarifReport SARIFReport) error {
 
 	payloadBytes, _ := json.Marshal(sarifReport)
 
-	clog.Log().Str("intercept-run-id", sarifReport.Runs[0].Invocations[0].Properties.RunId).Bool("report-compliant", sarifReport.Runs[0].Invocations[0].Properties.ReportCompliant).Str("report-status", sarifReport.Runs[0].Invocations[0].Properties.ReportStatus).Str("report-timestamp", sarifReport.Runs[0].Invocations[0].Properties.ReportTimestamp).Send()
+	clog.Log().Bool("report-compliant", sarifReport.Runs[0].Invocations[0].Properties.ReportCompliant).Str("report-status", sarifReport.Runs[0].Invocations[0].Properties.ReportStatus).Str("report-timestamp", sarifReport.Runs[0].Invocations[0].Properties.ReportTimestamp).Send()
 
 	if sLog {
-		clog.Log().Str("intercept-run-id", sarifReport.Runs[0].Invocations[0].Properties.RunId).Bool("report-compliant", sarifReport.Runs[0].Invocations[0].Properties.ReportCompliant).RawJSON("report", payloadBytes).Send()
+		clog.Log().Bool("report-compliant", sarifReport.Runs[0].Invocations[0].Properties.ReportCompliant).RawJSON("report", payloadBytes).Send()
 	}
 
 	return nil
