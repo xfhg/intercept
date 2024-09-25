@@ -1,4 +1,5 @@
-// hook.go
+//go:build !windows
+// +build !windows
 
 package cmd
 

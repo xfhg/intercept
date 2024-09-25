@@ -51,3 +51,5 @@ docs/.vitepress/cache/
 
 local/
 dist/
+
+cmd/rg/staging

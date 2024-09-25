@@ -208,6 +208,18 @@ func Permissions(targetPaths []string) (bool, error) {
 			// Close and remove the temporary file
 			tmpFile.Close()
 			os.Remove(tmpFile.Name())
+
+			newtmpFile, err := os.OpenFile(
+				filepath.Join(path, "permtest.tmp"),
+				os.O_CREATE|os.O_RDWR|os.O_EXCL,
+				0600,
+			)
+			if err != nil {
+				return false, fmt.Errorf("cannot create file in directory %s: %v", path, err)
+			}
+			// Close and remove the temporary file
+			newtmpFile.Close()
+			os.Remove(newtmpFile.Name())
 		}
 	}
 	return true, nil
