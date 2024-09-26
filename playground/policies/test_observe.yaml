@@ -1,13 +1,9 @@
 
 Config: 
   Flags:
-    policy_schedule: "20 * * * * *"
-    report_schedule:  "10 * * * * *"
-    target: "targets_extra/"
-  Observe:
-    max_report_size:
-    compression_age:
-    deletion_age:
+    policy_schedule: "50 * * * * *"
+    report_schedule:  "1 * * * *"
+
   Hooks:
     # - name: "Test Webhook Report"
     #   endpoint: "https://webhook.site/ea939de5-d1bc-4078-8f6e-8873103e77bd"
@@ -57,7 +53,6 @@ Policies:
 
   - id: "RUNTIM-001"
     type: "runtime"
-    schedule: "5 * * * * *"
     enforcement:
       - environment: "all"
         fatal: "false"
@@ -75,7 +70,7 @@ Policies:
       score: "8"
     _runtime:
       config: runtime/simple_https.yaml
-      observe: "_dispatch_this/_status/20240912T065810Z_intercept_2lxad6.sarif.json"
+      observe: "_target/a.json"
       
 
   # - id: "RUNTIM-002"
@@ -96,37 +91,37 @@ Policies:
   #   _runtime:
   #     config: runtime/simple_https.yaml
       
-  # - id: "API-001"
-  #   type: "api"
-  #   schedule: "*/15 * * * * *"
-  #   enforcement:
-  #     - environment: "production"
-  #       fatal: "true"
-  #       exceptions: "false"
-  #       confidence: "high"
-  #     - environment: "development"
-  #       fatal: "true"
-  #       exceptions: "false"
-  #       confidence: "high"
-  #   metadata:
-  #     name: "API Regex Compliance"
-  #     description: "Enforce schema compliance on API configuration files"
-  #     tags:
-  #       - "config"
-  #       - "ini"
-  #       - "schema"
-  #     confidence: "high"
-  #     score: "8"
-  #   _api:
-  #     endpoint: "https://httpbin.org/user-agent"
-  #     insecure: false
-  #     request: "GET"
-  #     response_type: "application/json"
-  #     auth: 
-  #       type: bearer
-  #       token_env: TOKEN 
-  #   _regex:
-  #     - \s*user-agent\s*
+  - id: "API-001"
+    type: "api"
+    schedule: "*/30 * * * * *"
+    enforcement:
+      - environment: "production"
+        fatal: "true"
+        exceptions: "false"
+        confidence: "high"
+      - environment: "development"
+        fatal: "true"
+        exceptions: "false"
+        confidence: "high"
+    metadata:
+      name: "API Regex Compliance"
+      description: "Enforce schema compliance on API configuration files"
+      tags:
+        - "config"
+        - "ini"
+        - "schema"
+      confidence: "high"
+      score: "8"
+    _api:
+      endpoint: "https://httpbin.org/user-agent"
+      insecure: false
+      request: "GET"
+      response_type: "application/json"
+      auth: 
+        type: bearer
+        token_env: TOKEN 
+    _regex:
+      - \s*user-agent\s*
 
 
   # - id: "SCAN-002 Custom"

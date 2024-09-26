@@ -16,7 +16,7 @@ func ProcessTOMLType(policy Policy, targetDir string, filePaths []string) error 
 		}
 
 		cueContent := policy.Schema.Structure
-		valid, issues := validateContentAndCUE(tomlContent, cueContent, "toml", policy.Schema.Strict)
+		valid, issues := validateContentAndCUE(tomlContent, cueContent, "toml", policy.Schema.Strict, policy.ID)
 
 		// Generate results for this file
 		fileResults := generateSchemaResults(policy, filePath, valid, issues, false)
@@ -34,6 +34,10 @@ func ProcessTOMLType(policy Policy, targetDir string, filePaths []string) error 
 
 	// Create a single SARIF report for all files
 	sarifReport := createSARIFReport(allResults)
+
+	if outputTypeMatrixConfig.LOG {
+		PostResultsToComplianceLog(sarifReport)
+	}
 
 	// Write SARIF report to file
 	var sarifOutputFile string

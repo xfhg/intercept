@@ -53,3 +53,9 @@ func extractExecutable(tempDir, executableName string) (string, error) {
 
 	return executablePath, nil
 }
+
+// Funtion Override for unavailable features of this platform
+
+func PostResultsToWebhooks(sarifReport SARIFReport) error {
+	return nil
+}

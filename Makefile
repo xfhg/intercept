@@ -5,8 +5,6 @@ BINARY_NAME=intercept
 GIT_TAG := $(shell git describe --tags --abbrev=0 2>/dev/null || echo "v1.0.X")
 GIT_COMMIT := $(shell git rev-parse --short HEAD 2>/dev/null || echo "unknown")
 
-
-
 # Go parameters
 GOCMD=go
 GOBUILD=$(GOCMD) build
@@ -14,16 +12,19 @@ GOCLEAN=$(GOCMD) clean
 GOTEST=$(GOCMD) test
 
 # Build flags
-# LDFLAGS=-ldflags="-s -w"
-# BUILD_FLAGS=-mod=readonly $(LDFLAGS)
-
-BUILD_FLAGS=-mod=readonly -ldflags="-s -w -X intercept/cmd.buildVersion=$(GIT_TAG)-$(GIT_COMMIT)" 
+BUILD_FLAGS=-mod=readonly -ldflags="-s -w -X intercept/cmd.buildVersion=$(GIT_TAG)-$(GIT_COMMIT)"
 
 # All compilation platforms
-ALL_PLATFORMS=darwin/amd64 darwin/arm64 linux/amd64 linux/arm linux/arm64 windows/amd64
+PLATFORMS := \
+    darwin/amd64 \
+    darwin/arm64 \
+    windows/amd64 \
+    linux/amd64 \
+    linux/arm64 \
+    linux/arm/v7
 
 # Docker build platforms
-DOCKER_PLATFORMS=linux/amd64 linux/arm linux/arm64
+DOCKER_PLATFORMS := linux/amd64 linux/arm64 
 
 # Docker image name
 DOCKER_IMAGE=test/intercept
@@ -34,7 +35,7 @@ all: clean build-all
 # Clean
 clean:
 	$(GOCLEAN)
-	rm -f release/$(BINARY_NAME)*
+	rm -rf release/$(BINARY_NAME)*
 
 # Run tests
 test:
@@ -46,46 +47,57 @@ build: clean
 
 # Compress binary using UPX
 compress-binary:
-	- docker run --rm -w $(shell pwd) -v $(shell pwd):$(shell pwd) xfhg/upx:latest -9 release/$(BINARY_NAME)
+	- docker run --rm -v $(shell pwd):/workspace -w /workspace docker.io/xfhg/upx:latest -9 release/$(BINARY_NAME)
 
-#Checksums
+# Checksums
 sha256sums:
-	@for file in release/*; do \
+	@for file in release/$(BINARY_NAME)*; do \
 		echo "Generating SHA256 for $$file"; \
 		sha256sum "$$file" > "$$file.sha256"; \
 	done
 
 # Build for all platforms
-build-all: clean $(ALL_PLATFORMS) sha256sums
+build-all: clean $(PLATFORMS) sha256sums
 
 define BUILD_PLATFORM
-build-$(1)-$(2):
-	CGO_ENABLED=0 GOOS=$(1) GOARCH=$(2) $(GOBUILD) $(BUILD_FLAGS) -o release/$(BINARY_NAME)-$(1)-$(2)$(if $(filter windows,$(1)),.exe,) .
-	$(MAKE) compress-binary BINARY_NAME=$(BINARY_NAME)-$(1)-$(2)$(if $(filter windows,$(1)),.exe,)
-
-.PHONY: build-$(1)-$(2)
+build-$(1):
+	@echo "Building for platform $(1)"
+	$(eval GOOS := $(word 1, $(subst /, ,$(1))))
+	$(eval GOARCH := $(word 2, $(subst /, ,$(1))))
+	$(eval GOARM := $(word 3, $(subst /, ,$(1))))
+	$(eval BIN_SUFFIX := $(if $(GOARM),-$(GOARM),))
+	$(eval OUTPUT_NAME := $(BINARY_NAME)-$(GOOS)-$(GOARCH)$(BIN_SUFFIX)$(if $(filter windows,$(GOOS)),.exe,))
+	CGO_ENABLED=0 GOOS=$(GOOS) GOARCH=$(GOARCH) $(if $(GOARM),GOARM=$(GOARM),) \
+		$(GOBUILD) $(BUILD_FLAGS) -o release/$(OUTPUT_NAME) .
+	$(MAKE) compress-binary BINARY_NAME=$(OUTPUT_NAME)
+.PHONY: build-$(1)
 endef
 
-$(foreach platform,$(ALL_PLATFORMS),$(eval $(call BUILD_PLATFORM,$(word 1,$(subst /, ,$(platform))),$(word 2,$(subst /, ,$(platform))))))
+$(foreach platform,$(PLATFORMS),$(eval $(call BUILD_PLATFORM,$(platform))))
 
-$(ALL_PLATFORMS): 
-	$(MAKE) build-$(word 1,$(subst /, ,$@))-$(word 2,$(subst /, ,$@))
+$(PLATFORMS):
+	$(MAKE) build-$@
 
 # Docker build commands for specific platforms
 define DOCKER_BUILD_PLATFORM
-docker-build-$(1)-$(2): build-$(1)-$(2)
-	docker buildx build --platform $(1)/$(2) \
-		--build-arg BINARY=release/$(BINARY_NAME)-$(1)-$(2) \
-		-t $(DOCKER_IMAGE):$(1)-$(2) \
+docker-build-$(1):
+	$(MAKE) build-$(1)
+	$(eval GOOS := $(word 1, $(subst /, ,$(1))))
+	$(eval GOARCH := $(word 2, $(subst /, ,$(1))))
+	$(eval GOARM := $(word 3, $(subst /, ,$(1))))
+	$(eval BIN_SUFFIX := $(if $(GOARM),-v$(GOARM),))
+	$(eval OUTPUT_NAME := $(BINARY_NAME)-$(GOOS)-$(GOARCH)$(BIN_SUFFIX)$(if $(filter windows,$(GOOS)),.exe,))
+	docker buildx build --platform $(GOOS)/$(GOARCH)$(if $(GOARM),/v$(GOARM),) \
+		--build-arg BINARY=release/$(OUTPUT_NAME) \
+		-t $(DOCKER_IMAGE):$(GOOS)-$(GOARCH)$(BIN_SUFFIX) \
 		--load \
 		.
-
-.PHONY: docker-build-$(1)-$(2)
+.PHONY: docker-build-$(1)
 endef
 
-$(foreach platform,$(DOCKER_PLATFORMS),$(eval $(call DOCKER_BUILD_PLATFORM,$(word 1,$(subst /, ,$(platform))),$(word 2,$(subst /, ,$(platform))))))
+$(foreach platform,$(DOCKER_PLATFORMS),$(eval $(call DOCKER_BUILD_PLATFORM,$(platform))))
 
-# Build Docker images for all specified Linux platforms
-docker-build-all: $(foreach platform,$(DOCKER_PLATFORMS),docker-build-$(word 1,$(subst /, ,$(platform)))-$(word 2,$(subst /, ,$(platform))))
+# Build Docker images for all specified platforms
+docker-build-all: $(foreach platform,$(DOCKER_PLATFORMS),docker-build-$(platform))
 
-.PHONY: all clean build build-all test docker-build-all compress-binary $(ALL_PLATFORMS) sha256sums
+.PHONY: all clean build build-all compress-binary docker-build-all $(PLATFORMS) sha256sums
