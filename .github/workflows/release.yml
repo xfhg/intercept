@@ -58,6 +58,7 @@ jobs:
       - name: Upload All artifacts
         uses: meeDamian/github-release@2.0
         with:
+          tag: ${{ steps.get_latest_tag.outputs.LATEST_TAG }}
           allow_override: "true"
           draft: "true"
           token: ${{ secrets.GITHUB_TOKEN }}
