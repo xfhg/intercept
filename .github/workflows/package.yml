@@ -48,11 +48,10 @@ jobs:
             dep ensure
         fi
 
-    - name: Update
-      run: sudo apt-get update -y
-
-    - name: Make all release artifacts
-      run: make build-all
+    - name: Build binaries
+      run: |
+        make build-linux/amd64
+        make build-linux/arm64
 
     - name: Set up QEMU
       uses: docker/setup-qemu-action@v2
@@ -77,16 +76,33 @@ jobs:
       run: |
         PLATFORMS=(linux/amd64 linux/arm64)
         for platform in "${PLATFORMS[@]}"; do
+          make docker-build-$platform
+          
           os=$(echo $platform | cut -d'/' -f1)
           arch=$(echo $platform | cut -d'/' -f2)
           
-          docker buildx build --platform $platform \
-            --build-arg BINARY=release/intercept-$os-$arch \
-            -t xfhg/intercept:${{ env.VERSION }}-$os-$arch \
-            -t xfhg/intercept:latest-$os-$arch \
-            -t ghcr.io/${{ github.repository }}:${{ env.VERSION }}-$os-$arch \
-            -t ghcr.io/${{ github.repository }}:latest-$os-$arch \
-            --push \
-            .
+          docker tag test/intercept:$os-$arch xfhg/intercept:${{ env.VERSION }}-$os-$arch
+          docker tag test/intercept:$os-$arch xfhg/intercept:latest-$os-$arch
+          docker tag test/intercept:$os-$arch ghcr.io/${{ github.repository }}:${{ env.VERSION }}-$os-$arch
+          docker tag test/intercept:$os-$arch ghcr.io/${{ github.repository }}:latest-$os-$arch
+          
+          docker push xfhg/intercept:${{ env.VERSION }}-$os-$arch
+          docker push xfhg/intercept:latest-$os-$arch
+          docker push ghcr.io/${{ github.repository }}:${{ env.VERSION }}-$os-$arch
+          docker push ghcr.io/${{ github.repository }}:latest-$os-$arch
         done
+
+    - name: Create multi-arch manifests
+      run: |
+        # Create and push multi-arch manifest for DockerHub
+        docker manifest create xfhg/intercept:latest \
+          xfhg/intercept:latest-linux-amd64 \
+          xfhg/intercept:latest-linux-arm64
+        docker manifest push xfhg/intercept:latest
+
+        # Create and push multi-arch manifest for GitHub Container Registry
+        docker manifest create ghcr.io/${{ github.repository }}:latest \
+          ghcr.io/${{ github.repository }}:latest-linux-amd64 \
+          ghcr.io/${{ github.repository }}:latest-linux-arm64
+        docker manifest push ghcr.io/${{ github.repository }}:latest
 
