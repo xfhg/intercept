@@ -73,8 +73,8 @@ jobs:
             release/intercept-darwin-arm64.sha256
             release/intercept-linux-amd64
             release/intercept-linux-amd64.sha256
-            release/intercept-linux-arm
-            release/intercept-linux-arm.sha256
+            release/intercept-linux-arm-v7
+            release/intercept-linux-arm-v7.sha256
             release/intercept-linux-arm64
             release/intercept-linux-arm64.sha256
             release/intercept-windows-amd64.exe
