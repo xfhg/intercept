@@ -28,25 +28,19 @@ var (
 	hostData        string
 	hostFingerprint string
 	hostIps         string
-
-	buildVersion   string
-	buildSignature string
+	buildVersion    string
+	buildSignature  string
 
 	rootCmd = &cobra.Command{
 		Use:   "intercept",
-		Short: "DevSecOps toolkit",
-		Long:  `Code Compliance`,
+		Short: "INTERCEPT - DevSecOps toolkit",
+		Long:  `Compliance as Code `,
 	}
 
 	logTypeMatrixConfig    logTypeMatrix
 	outputTypeMatrixConfig outputTypeMatrix
 
-	lLog bool
-	sLog bool
-
 	log zerolog.Logger
-
-	clog zerolog.Logger
 
 	mlog zerolog.Logger
 	flog zerolog.Logger
@@ -147,6 +141,7 @@ func setupLogging() {
 
 	log.Info().Msgf("Host Data: %s", hostData)
 	log.Info().Msgf("Host Fingerprint: %s", hostFingerprint)
+	log.Info().Msgf("Host Ips: %s", hostIps)
 
 	log = zerolog.New(output).With().Timestamp().Logger()
 
@@ -200,7 +195,7 @@ func setupLogging() {
 	if outputTypeMatrixConfig.LOG {
 
 		if logTypeMatrixConfig.Minimal {
-			minimallogfilepath := fmt.Sprintf("state_log_int_%s.log", intercept_run_id[:6])
+			minimallogfilepath := fmt.Sprintf("log_minimal_%s.log", intercept_run_id[:6])
 			if outputDir != "" {
 				minimallogfilepath = filepath.Join(outputDir, minimallogfilepath)
 			}
@@ -223,7 +218,7 @@ func setupLogging() {
 
 		}
 		if logTypeMatrixConfig.Results {
-			resultslogfilepath := fmt.Sprintf("results_log_int_%s.log", intercept_run_id[:6])
+			resultslogfilepath := fmt.Sprintf("log_results_%s.log", intercept_run_id[:6])
 			if outputDir != "" {
 				resultslogfilepath = filepath.Join(outputDir, resultslogfilepath)
 			}
@@ -244,7 +239,7 @@ func setupLogging() {
 			flog.Log().Msg("Results Log Active")
 		}
 		if logTypeMatrixConfig.Policy {
-			policylogfilepath := fmt.Sprintf("policy_log_int_%s.log", intercept_run_id[:6])
+			policylogfilepath := fmt.Sprintf("log_policy_%s.log", intercept_run_id[:6])
 			if outputDir != "" {
 				policylogfilepath = filepath.Join(outputDir, policylogfilepath)
 			}
@@ -265,7 +260,7 @@ func setupLogging() {
 			plog.Log().Msg("Policy Log Active")
 		}
 		if logTypeMatrixConfig.Report {
-			reportlogfilepath := fmt.Sprintf("report_log_int_%s.log", intercept_run_id[:6])
+			reportlogfilepath := fmt.Sprintf("log_report_%s.log", intercept_run_id[:6])
 			if outputDir != "" {
 				reportlogfilepath = filepath.Join(outputDir, reportlogfilepath)
 			}
@@ -286,7 +281,7 @@ func setupLogging() {
 			rlog.Log().Msg("Report Log Active")
 		}
 		if logTypeMatrixConfig.One {
-			onelogfilepath := fmt.Sprintf("one_log_int_%s.log", intercept_run_id[:6])
+			onelogfilepath := fmt.Sprintf("log_one_%s.log", intercept_run_id[:6])
 			if outputDir != "" {
 				onelogfilepath = filepath.Join(outputDir, onelogfilepath)
 			}

@@ -152,11 +152,23 @@ func processWithRegex(policy Policy, data []byte, rgPath string) error {
 	}
 
 	// Write SARIF report
-	err = writeSARIFReport(policy.ID, sarifReport)
-	if err != nil {
-		log.Error().Err(err).Msg("error writing SARIF report for policy %s")
-		return fmt.Errorf("error writing SARIF report for policy %s: %w", policy.ID, err)
+	var sarifOutputFile string
+
+	if policy.RunID != "" {
+		if err := writeSARIFReport(policy.RunID, sarifReport); err != nil {
+			log.Error().Err(err).Msg("error writing SARIF report")
+			return fmt.Errorf("error writing SARIF report: %w", err)
+		}
+		sarifOutputFile = fmt.Sprintf("%s.sarif", policy.RunID)
+	} else {
+		if err := writeSARIFReport(policy.ID, sarifReport); err != nil {
+			log.Error().Err(err).Msg("error writing SARIF report")
+			return fmt.Errorf("error writing SARIF report: %w", err)
+		}
+		sarifOutputFile = fmt.Sprintf("%s.sarif", NormalizeFilename(policy.ID))
+
 	}
+	log.Debug().Msgf("Policy %s processed. SARIF report written to: %s ", policy.ID, sarifOutputFile)
 
 	if matchesFound {
 		log.Debug().Msgf("Policy %s assurance passed for API response (pattern found) ", policy.ID)

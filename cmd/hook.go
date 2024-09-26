@@ -173,10 +173,10 @@ func PostResultsToWebhooks(sarifReport SARIFReport) error {
 		}
 
 		// ----------------------------------------------
-		// ---------------------------------------------- POC Polcicies
+		// ---------------------------------------------- Split Results
 		// ---------------------------------------------- Rewrites the payload with split data
 
-		if containsString(hook.EventTypes, "poc") {
+		if containsString(hook.EventTypes, "split") {
 
 			if len(sarifReport.Runs) == 0 {
 				log.Warn().Str("hook", hook.Name).Msg("SARIF report contains no runs, skipping")
@@ -200,14 +200,13 @@ func PostResultsToWebhooks(sarifReport SARIFReport) error {
 			// If the event type is "poc", we split the array
 			payload = WebhookPayload{
 				EventType: "policy",
-				Data:      sarifReport.Runs[0].Results,
 				Summary:   summary,
 				Results:   details,
 			}
 		}
 
 		// ----------------------------------------------
-		// ---------------------------------------------- POC Polcicies END
+		// ---------------------------------------------- Split Results END
 		// ----------------------------------------------
 
 		// ----------------------------------------------

@@ -257,6 +257,7 @@ func GenerateSARIFReport(inputFile string, policy Policy) (SARIFReport, error) {
 				Invocations: []Invocation{
 					{
 						ExecutionSuccessful: true,
+						Properties:          InvocationProperties{},
 					},
 				},
 			},
@@ -347,6 +348,8 @@ func GenerateSARIFReport(inputFile string, policy Policy) (SARIFReport, error) {
 
 	sarifReport.Runs[0].Results = results
 
+	sarifReport.Runs[0].Invocations[0].Properties.ReportCompliant = ComplianceStatus(sarifReport)
+
 	if outputTypeMatrixConfig.LOG {
 		PostResultsToComplianceLog(sarifReport)
 	}
@@ -386,6 +389,7 @@ func GenerateAssureSARIFReport(inputFile string, policy Policy, status string) (
 				Invocations: []Invocation{
 					{
 						ExecutionSuccessful: true,
+						Properties:          InvocationProperties{},
 					},
 				},
 			},
@@ -474,6 +478,8 @@ func GenerateAssureSARIFReport(inputFile string, policy Policy, status string) (
 
 	sarifReport.Runs[0].Results = append(sarifReport.Runs[0].Results, result)
 
+	sarifReport.Runs[0].Invocations[0].Properties.ReportCompliant = ComplianceStatus(sarifReport)
+
 	if outputTypeMatrixConfig.LOG {
 		PostResultsToComplianceLog(sarifReport)
 	}
@@ -494,7 +500,7 @@ func GenerateSchemaSARIFReport(policy Policy, filePath string, valid bool, issue
 					},
 				},
 				Results:     []Result{},
-				Invocations: []Invocation{{ExecutionSuccessful: true}},
+				Invocations: []Invocation{{ExecutionSuccessful: true, Properties: InvocationProperties{}}},
 			},
 		},
 	}
@@ -574,6 +580,8 @@ func GenerateSchemaSARIFReport(policy Policy, filePath string, valid bool, issue
 		},
 	}
 	sarifReport.Runs[0].Results = append(sarifReport.Runs[0].Results, summaryResult)
+
+	sarifReport.Runs[0].Invocations[0].Properties.ReportCompliant = ComplianceStatus(sarifReport)
 
 	if outputTypeMatrixConfig.LOG {
 		PostResultsToComplianceLog(sarifReport)
@@ -774,7 +782,7 @@ func createSARIFReport(results []Result) SARIFReport {
 					},
 				},
 				Results:     results,
-				Invocations: []Invocation{{ExecutionSuccessful: true}},
+				Invocations: []Invocation{{ExecutionSuccessful: true, Properties: InvocationProperties{}}},
 			},
 		},
 	}
@@ -792,7 +800,7 @@ func GenerateAPISARIFReport(policy Policy, endpoint string, matchFound bool, iss
 					},
 				},
 				Results:     []Result{},
-				Invocations: []Invocation{{ExecutionSuccessful: true}},
+				Invocations: []Invocation{{ExecutionSuccessful: true, Properties: InvocationProperties{}}},
 			},
 		},
 	}
@@ -886,9 +894,24 @@ func GenerateAPISARIFReport(policy Policy, endpoint string, matchFound bool, iss
 		sarifReport.Runs[0].Results = append(sarifReport.Runs[0].Results, issueResult)
 	}
 
+	sarifReport.Runs[0].Invocations[0].Properties.ReportCompliant = ComplianceStatus(sarifReport)
+
 	if outputTypeMatrixConfig.LOG {
 		PostResultsToComplianceLog(sarifReport)
 	}
 
 	return sarifReport, nil
+}
+
+func ComplianceStatus(sarifReport SARIFReport) bool {
+
+	for _, result := range sarifReport.Runs[0].Results {
+		if result.Level == "error" {
+			return false
+		}
+		if result.Level == "warning" {
+			return false
+		}
+	}
+	return true
 }
