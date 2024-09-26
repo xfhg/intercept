@@ -18,17 +18,26 @@ jobs:
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
+      with:
+        fetch-depth: 0  # Fetch all history for all tags and branches
 
     - name: Setup Go
       uses: actions/setup-go@v4
       with:
         go-version-file: go.mod
 
-    - name: Fetch Tags
+    - name: Get latest tag
       run: |
-        git fetch --tags -f
-        TAG=$(git describe --tags --always)
-        VERSION=${TAG#v}
+        # Try to get tag for the current commit
+        CURRENT_TAG=$(git describe --exact-match --tags HEAD 2>/dev/null || echo "")
+        
+        # If no tag for current commit, get the most recent tag
+        if [ -z "$CURRENT_TAG" ]; then
+          CURRENT_TAG=$(git describe --tags --abbrev=0)
+        fi
+        
+        # Remove 'v' prefix if present
+        VERSION=${CURRENT_TAG#v}
         echo "VERSION=$VERSION" >> $GITHUB_ENV
 
     - name: Get dependencies
@@ -66,7 +75,7 @@ jobs:
 
     - name: Build and push Docker images
       run: |
-        PLATFORMS=(linux/amd64 linux/arm linux/arm64)
+        PLATFORMS=(linux/amd64 linux/arm64)
         for platform in "${PLATFORMS[@]}"; do
           os=$(echo $platform | cut -d'/' -f1)
           arch=$(echo $platform | cut -d'/' -f2)
@@ -81,4 +90,3 @@ jobs:
             .
         done
 
-    

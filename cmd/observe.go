@@ -57,8 +57,8 @@ func init() {
 	observeCmd.Flags().StringVar(&observePolicyFile, "policy", "", "Policy file")
 	observeCmd.Flags().StringVar(&observeSchedule, "schedule", "", "Global Cron Schedule")
 	observeCmd.Flags().StringVar(&observeReport, "report", "", "Report Cron Schedule")
-	observeCmd.Flags().StringVar(&observeMode, "mode", "last", "Observe mode for path monitoring")
-	observeCmd.Flags().StringVar(&observeIndex, "index", "intercept", "Index name for bulk operations")
+	observeCmd.Flags().StringVar(&observeMode, "mode", "last", "Observe mode for path monitoring : first,last,all ")
+	observeCmd.Flags().StringVar(&observeIndex, "index", "intercept", "Index name for ES bulk operations")
 
 }
 
