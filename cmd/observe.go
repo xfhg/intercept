@@ -31,12 +31,10 @@ var (
 	observeSchedule     string
 	observeReport       string
 	observeMode         string
-	observeIndex        string
 	reportMutex         sync.Mutex
 	reportDir           string = "_status"
 	allFileInfos        []FileInfo
 	observeList         []string
-	observeConfig       Config
 )
 
 var observeCmd = &cobra.Command{
@@ -58,7 +56,6 @@ func init() {
 	observeCmd.Flags().StringVar(&observeSchedule, "schedule", "", "Global Cron Schedule")
 	observeCmd.Flags().StringVar(&observeReport, "report", "", "Report Cron Schedule")
 	observeCmd.Flags().StringVar(&observeMode, "mode", "last", "Observe mode for path monitoring")
-	observeCmd.Flags().StringVar(&observeIndex, "index", "intercept", "Index name for bulk operations")
 
 }
 
@@ -108,21 +105,13 @@ func runObserve(cmd *cobra.Command, args []string) {
 		log.Fatal().Err(err).Msgf("failed to create directory %s", reportDir)
 	}
 
-	if outputType != "" {
-		policyData.Config.Flags.OutputType = strings.Split(outputType, ",")
-	}
-
-	observeConfig = GetConfig()
+	config := GetConfig()
 
 	// Needed for scan/assure/schema policies
-	if observeConfig.Flags.Target != "" {
-		targetDir = observeConfig.Flags.Target
+	if config.Flags.Target != "" {
+		targetDir = config.Flags.Target
 		allFileInfos, _ = CalculateFileHashes(targetDir)
 		log.Debug().Msgf("Setting up policy target directory: %s", targetDir)
-	}
-	// check if index
-	if observeIndex != "" {
-		observeConfig.Flags.Index = observeIndex
 	}
 
 	// check embed
@@ -131,12 +120,12 @@ func runObserve(cmd *cobra.Command, args []string) {
 
 	// check if global schedule
 	if observeSchedule != "" {
-		observeConfig.Flags.PolicySchedule = observeSchedule
+		config.Flags.PolicySchedule = observeSchedule
 	}
 
 	// check if schedule Report
 	if observeReport != "" {
-		observeConfig.Flags.ReportSchedule = observeReport
+		config.Flags.ReportSchedule = observeReport
 	}
 
 	policies := loadFilteredPolicies()
@@ -157,7 +146,7 @@ func runObserve(cmd *cobra.Command, args []string) {
 	for _, policy := range policies {
 
 		// SCHEDULERS
-		schedule := getScheduleForPolicy(policy, observeConfig.Flags.PolicySchedule)
+		schedule := getScheduleForPolicy(policy, config.Flags.PolicySchedule)
 		if schedule == "" && policy.Observe == "" && policy.Runtime.Observe == "" {
 			log.Warn().Str("policy", policy.ID).Msg("No schedule available for policy, skipping")
 			continue
@@ -270,13 +259,13 @@ func runObserve(cmd *cobra.Command, args []string) {
 
 	}
 
-	if observeConfig.Flags.ReportSchedule != "" {
-		if validateCronExpression(observeConfig.Flags.ReportSchedule) {
+	if config.Flags.ReportSchedule != "" {
+		if validateCronExpression(config.Flags.ReportSchedule) {
 			reportTask := createReportTask()
-			taskr.Task(observeConfig.Flags.ReportSchedule, reportTask)
-			log.Info().Str("schedule", observeConfig.Flags.ReportSchedule).Msg("Added Report Task to Scheduler")
+			taskr.Task(config.Flags.ReportSchedule, reportTask)
+			log.Info().Str("schedule", config.Flags.ReportSchedule).Msg("Added Report Task to Scheduler")
 		} else {
-			log.Fatal().Str("schedule", observeConfig.Flags.ReportSchedule).Msg("Invalid cron expression for Report, quitting")
+			log.Fatal().Str("schedule", config.Flags.ReportSchedule).Msg("Invalid cron expression for Report, quitting")
 		}
 	}
 

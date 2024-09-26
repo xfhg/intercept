@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
-	"time"
 
 	"github.com/open-policy-agent/opa/rego"
 	"github.com/open-policy-agent/opa/storage/inmem"
@@ -72,8 +71,7 @@ func ProcessRegoType(policy Policy, targetDir string, filePaths []string) error 
 		if !compliant {
 			sarifLevel = calculateSARIFLevel(policy, environment)
 		}
-
-		timestamp := time.Now().Format(time.RFC3339)
+		levelProperty := sarifLevelToString(sarifLevel)
 
 		result := Result{
 			RuleID: policy.ID,
@@ -90,16 +88,14 @@ func ProcessRegoType(policy Policy, targetDir string, filePaths []string) error 
 					},
 				},
 			},
-			Properties: ResultProperties{
-				ResultType:      "summary",
-				ObserveRunId:    policy.RunID,
-				ResultTimestamp: timestamp,
-				Environment:     environment,
-				Name:            policy.Metadata.Name,
-				Description:     policy.Metadata.Description,
-				MsgError:        policy.Metadata.MsgError,
-				MsgSolution:     policy.Metadata.MsgSolution,
-				SarifInt:        sarifLevelToInt(sarifLevel),
+			Properties: map[string]string{
+				"result-type":  "summary",
+				"name":         policy.Metadata.Name,
+				"description":  policy.Metadata.Description,
+				"msg-error":    policy.Metadata.MsgError,
+				"msg-solution": policy.Metadata.MsgSolution,
+
+				levelProperty: "true",
 			},
 		}
 

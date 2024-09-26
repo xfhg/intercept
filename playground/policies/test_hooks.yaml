@@ -38,7 +38,7 @@ Config:
     #   event_types:
     #     - "results"
     - name: "Test Webhook Policy"
-      endpoint: https://webhook-test.com/f62a2b3c4905f0ceefd802eb17aeeb73
+      endpoint: "https://webhook-test.com/e42b61438d6f12f0478e253bb6c1dfa1"
       insecure: false
       method: "POST"
       auth: 
@@ -50,8 +50,7 @@ Config:
       retry_delay: "5s"
       timeout_seconds: 30
       event_types:
-        - "results"
-        - "bulk"
+        - "policy"
 
 
 Policies:

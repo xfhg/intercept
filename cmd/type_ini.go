@@ -20,7 +20,7 @@ func ProcessINIType(policy Policy, targetDir string, filePaths []string) error {
 		}
 
 		cueContent := policy.Schema.Structure
-		valid, issues := validateContentAndCUE(iniContent, cueContent, "ini", policy.Schema.Strict, policy.ID)
+		valid, issues := validateContentAndCUE(iniContent, cueContent, "ini", policy.Schema.Strict)
 
 		// Generate results for this file
 		fileResults := generateSchemaResults(policy, filePath, valid, issues, false)
@@ -38,10 +38,6 @@ func ProcessINIType(policy Policy, targetDir string, filePaths []string) error {
 
 	// Create a single SARIF report for all files
 	sarifReport := createSARIFReport(allResults)
-
-	if outputTypeMatrixConfig.LOG {
-		PostResultsToComplianceLog(sarifReport)
-	}
 
 	// Write SARIF report to file
 	var sarifOutputFile string

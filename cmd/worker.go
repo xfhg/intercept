@@ -19,20 +19,10 @@ func processPolicyInWorker(e event.Event, policyType string) error {
 		return fmt.Errorf("invalid policy data for %s", policyType)
 	}
 
-	// this data only needed for non-runtime non-api policies
 	targetDir, _ := e.Get("targetDir").(string)
 	filePaths, _ := e.Get("filePaths").([]string)
 
-	if policy.ID == "" {
-		log.Error().Msg("Error: policy ID is empty, can't proceed with policy auditing")
-		return fmt.Errorf("policy ID is empty, can't proceed with policy auditing")
-	}
-
-	if policy.Type == "runtime" || policy.Type == "api" {
-		log.Debug().Str("policy", policy.ID).Str("type", policy.Type).Msgf("Working")
-	} else {
-		log.Debug().Str("policy", policy.ID).Str("type", policy.Type).Msgf("Working [%s] [%s]", targetDir, filePaths)
-	}
+	log.Debug().Str("policy", policy.ID).Msgf("Working [%s] [%s]", targetDir, filePaths)
 
 	switch policyType {
 	case "scan":

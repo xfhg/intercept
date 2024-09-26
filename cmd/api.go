@@ -21,7 +21,7 @@ func ProcessAPIType(policy Policy, rgPath string) error {
 	req := client.R()
 
 	req.SetHeader("Content-Type", policy.API.ResponseType)
-	req.SetHeader("User-Agent", "INTERCEPT/v1.0.X")
+	req.SetHeader("User-Agent", "Intercept/v1.0.0")
 
 	// Apply authentication
 	if err := applyAuth(req, policy.API.Auth); err != nil {
@@ -78,7 +78,7 @@ func applyAuth(req *resty.Request, auth map[string]string) error {
 }
 
 func processWithCUE(policy Policy, data []byte) error {
-	valid, issues := validateContentAndCUE(data, policy.Schema.Structure, "json", policy.Schema.Strict, policy.ID)
+	valid, issues := validateContentAndCUE(data, policy.Schema.Structure, "json", policy.Schema.Strict)
 
 	// Generate SARIF report
 	sarifReport, err := GenerateAPISARIFReport(policy, policy.API.Endpoint, valid, issues)
@@ -152,23 +152,11 @@ func processWithRegex(policy Policy, data []byte, rgPath string) error {
 	}
 
 	// Write SARIF report
-	var sarifOutputFile string
-
-	if policy.RunID != "" {
-		if err := writeSARIFReport(policy.RunID, sarifReport); err != nil {
-			log.Error().Err(err).Msg("error writing SARIF report")
-			return fmt.Errorf("error writing SARIF report: %w", err)
-		}
-		sarifOutputFile = fmt.Sprintf("%s.sarif", policy.RunID)
-	} else {
-		if err := writeSARIFReport(policy.ID, sarifReport); err != nil {
-			log.Error().Err(err).Msg("error writing SARIF report")
-			return fmt.Errorf("error writing SARIF report: %w", err)
-		}
-		sarifOutputFile = fmt.Sprintf("%s.sarif", NormalizeFilename(policy.ID))
-
+	err = writeSARIFReport(policy.ID, sarifReport)
+	if err != nil {
+		log.Error().Err(err).Msg("error writing SARIF report for policy %s")
+		return fmt.Errorf("error writing SARIF report for policy %s: %w", policy.ID, err)
 	}
-	log.Debug().Msgf("Policy %s processed. SARIF report written to: %s ", policy.ID, sarifOutputFile)
 
 	if matchesFound {
 		log.Debug().Msgf("Policy %s assurance passed for API response (pattern found) ", policy.ID)

@@ -27,6 +27,7 @@ var (
 	gossPath         string
 	policyFile       string
 	policyFileSHA256 string
+	outputType       string
 	policyData       *PolicyFile
 )
 
@@ -40,13 +41,14 @@ var runAuditPerfCmd = &cobra.Command{
 func init() {
 	rootCmd.AddCommand(runAuditPerfCmd)
 	runAuditPerfCmd.Flags().StringVarP(&targetDir, "target", "t", "", "Target directory to audit")
-	runAuditPerfCmd.Flags().StringVarP(&tagsAny, "tags-any", "f", "", "Filter policies that match any of the provided tags (comma-separated)")
-	runAuditPerfCmd.Flags().StringVar(&tagsAll, "tags-all", "", "Filter policies that match all of the provided tags (comma-separated)")
+	runAuditPerfCmd.Flags().StringVarP(&tagsAny, "tags_any", "f", "", "Filter policies that match any of the provided tags (comma-separated)")
+	runAuditPerfCmd.Flags().StringVar(&tagsAll, "tags_all", "", "Filter policies that match all of the provided tags (comma-separated)")
 	runAuditPerfCmd.Flags().StringVarP(&environment, "environment", "e", "", "Filter policies that match the specified environment")
 	runAuditPerfCmd.Flags().BoolVar(&envDetection, "env-detection", false, "Enable environment detection if no environment is specified")
 	runAuditPerfCmd.Flags().BoolVar(&debugOutput, "debug", false, "Enable debug verbose output")
-	runAuditPerfCmd.Flags().StringVarP(&policyFile, "policy", "p", "", "Policy <FILEPATH> or <URL>")
-	runAuditPerfCmd.Flags().StringVar(&policyFileSHA256, "checksum", "", "Policy SHA256 expected checksum")
+	runAuditPerfCmd.Flags().StringVarP(&policyFile, "policy", "p", "", "policy FILE or URL")
+	runAuditPerfCmd.Flags().StringVar(&policyFileSHA256, "checksum", "", "policy file SHA256 checksum")
+	runAuditPerfCmd.Flags().StringVar(&outputType, "output", "sarif", "output type")
 }
 
 func runAuditPerf(cmd *cobra.Command, args []string) {
@@ -92,15 +94,15 @@ func runAuditPerf(cmd *cobra.Command, args []string) {
 
 	}
 
-	// Override output type if provided in command line
-	if outputType != "" {
-		policyData.Config.Flags.OutputType = strings.Split(outputType, ",")
-	}
-
 	config := GetConfig()
 
 	policies_provided := GetPolicies()
 	policies_filtered := filterPolicies(policies_provided, config.Flags.Tags)
+
+	// Override output type if provided in command line
+	if outputType != "" {
+		policyData.Config.Flags.OutputType = outputType
+	}
 
 	// printConfigInfo(config, policies_filtered, environment, rgPath, gossPath)
 

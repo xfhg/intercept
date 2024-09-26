@@ -134,7 +134,7 @@ func generateRuntimeSARIFReport(policy Policy, gossResult GossResult) (SARIFRepo
 			{
 				Tool: Tool{
 					Driver: Driver{
-						Name:    "INTERCEPT",
+						Name:    "Intercept",
 						Version: buildVersion,
 					},
 				},
@@ -142,9 +142,6 @@ func generateRuntimeSARIFReport(policy Policy, gossResult GossResult) (SARIFRepo
 				Invocations: []Invocation{
 					{
 						ExecutionSuccessful: true,
-						Properties: InvocationProperties{
-							ReportCompliant: true,
-						},
 					},
 				},
 			},
@@ -175,6 +172,8 @@ func generateRuntimeSARIFReport(policy Policy, gossResult GossResult) (SARIFRepo
 			messageText = res.SummaryLine
 		}
 
+		levelProperty := sarifLevelToString(sarifLevel)
+
 		sarifResult := Result{
 			RuleID:  policy.ID,
 			Level:   sarifLevel,
@@ -186,24 +185,24 @@ func generateRuntimeSARIFReport(policy Policy, gossResult GossResult) (SARIFRepo
 					},
 				},
 			},
-			Properties: ResultProperties{
-				ResourceType:    res.ResourceType,
-				Property:        res.Property,
-				ResultType:      "detail",
-				ObserveRunId:    policy.RunID,
-				ResultTimestamp: timestamp,
-				Environment:     environment,
-				Name:            policy.Metadata.Name,
-				Description:     policy.Metadata.Description,
-				MsgError:        policy.Metadata.MsgError,
-				MsgSolution:     policy.Metadata.MsgSolution,
-				SarifInt:        sarifLevelToInt(sarifLevel),
+			Properties: map[string]string{
+				"resource-type":    res.ResourceType,
+				"property":         res.Property,
+				"result-type":      "detail",
+				"observe-run-id":   policy.RunID,
+				"result-timestamp": timestamp,
+				"name":             policy.Metadata.Name,
+				"description":      policy.Metadata.Description,
+				"msg-error":        policy.Metadata.MsgError,
+				"msg-solution":     policy.Metadata.MsgSolution,
+				levelProperty:      "true",
 			},
 		}
 		sarifReport.Runs[0].Results = append(sarifReport.Runs[0].Results, sarifResult)
 	}
 
 	summaryLevel := getSummaryLevel(gossResult.Summary, policyLevel)
+	levelProperty := sarifLevelToString(summaryLevel)
 
 	// Add overall summary as a separate result
 	summarySarifResult := Result{
@@ -217,25 +216,18 @@ func generateRuntimeSARIFReport(policy Policy, gossResult GossResult) (SARIFRepo
 				},
 			},
 		},
-		Properties: ResultProperties{
-			ResultType:      "summary",
-			ObserveRunId:    policy.RunID,
-			ResultTimestamp: timestamp,
-			Environment:     environment,
-			Name:            policy.Metadata.Name,
-			Description:     policy.Metadata.Description,
-			MsgError:        policy.Metadata.MsgError,
-			MsgSolution:     policy.Metadata.MsgSolution,
-			SarifInt:        sarifLevelToInt(summaryLevel),
+		Properties: map[string]string{
+			"result-type":      "summary",
+			"observe-run-id":   policy.RunID,
+			"result-timestamp": timestamp,
+			"name":             policy.Metadata.Name,
+			"description":      policy.Metadata.Description,
+			"msg-error":        policy.Metadata.MsgError,
+			"msg-solution":     policy.Metadata.MsgSolution,
+			levelProperty:      "true",
 		},
 	}
 	sarifReport.Runs[0].Results = append(sarifReport.Runs[0].Results, summarySarifResult)
-
-	sarifReport.Runs[0].Invocations[0].Properties.ReportCompliant = summaryLevel == SARIFNote
-
-	if outputTypeMatrixConfig.LOG {
-		PostResultsToComplianceLog(sarifReport)
-	}
 
 	return sarifReport, nil
 }
