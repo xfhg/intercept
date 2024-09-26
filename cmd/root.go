@@ -18,6 +18,7 @@ var (
 	verbosity        int
 	outputDir        string
 	outputType       string
+	logType          string
 	experimentalMode bool
 	silentMode       bool
 	nologMode        bool
@@ -37,12 +38,34 @@ var (
 		Long:  `Code Compliance`,
 	}
 
+	logTypeMatrixConfig    logTypeMatrix
+	outputTypeMatrixConfig outputTypeMatrix
+
 	lLog bool
 	sLog bool
 
-	log  zerolog.Logger
+	log zerolog.Logger
+
 	clog zerolog.Logger
+
+	mlog zerolog.Logger
+	flog zerolog.Logger
+	plog zerolog.Logger
+	rlog zerolog.Logger
+	olog zerolog.Logger
 )
+
+type logTypeMatrix struct {
+	Minimal bool
+	Results bool
+	Policy  bool
+	Report  bool
+	One     bool
+}
+type outputTypeMatrix struct {
+	SARIF bool
+	LOG   bool
+}
 
 func Execute() {
 	if err := rootCmd.Execute(); err != nil {
@@ -59,6 +82,7 @@ func init() {
 	rootCmd.PersistentFlags().BoolVar(&silentMode, "silent", false, "Enables log to file intercept.log")
 	rootCmd.PersistentFlags().BoolVar(&nologMode, "nolog", false, "Disables all loggging")
 	rootCmd.PersistentFlags().StringVar(&outputType, "output-type", "SARIF", "Output types (can be a list) : SARIF,LOG")
+	rootCmd.PersistentFlags().StringVar(&logType, "log-type", "RESULTS", "Compliance Log types (can be a list) : MINIMAL,RESULTS,POLICY,REPORT,ONE")
 
 	// running id
 	intercept_run_id = ksuid.New().String()
@@ -161,32 +185,128 @@ func setupLogging() {
 		}
 	}
 
-	if containsLogType(strings.Split(outputType, ","), "log") {
-		lLog = true
-		compliancelogfilepath := fmt.Sprintf("c_log_intercept_%s.log", intercept_run_id[:6])
-		if outputDir != "" {
-			compliancelogfilepath = filepath.Join(outputDir, compliancelogfilepath)
-		}
-
-		clogFile, err := lumberjack.NewRoller(
-			compliancelogfilepath,
-			100*1024*1024, // 100 megabytes
-			&lumberjack.Options{
-				MaxBackups: 5,
-				MaxAge:     90 * time.Hour * 24,
-				Compress:   true,
-			})
-
-		if err != nil {
-			log.Fatal().Err(err).Msg("Failed to create log roller")
-		}
-		zerolog.TimeFieldFormat = time.RFC3339
-		clog = zerolog.New(clogFile).With().Timestamp().Str("host", hostData).Logger().With().Str("intercept_run_id", intercept_run_id).Logger()
-		clog.Log().Msg("Compliance Log Active")
-
+	outputTypeMatrixConfig = outputTypeMatrix{
+		SARIF: containsLogType(strings.Split(outputType, ","), "sarif"),
+		LOG:   containsLogType(strings.Split(outputType, ","), "log"),
 	}
-	if containsLogType(strings.Split(outputType, ","), "sarif") {
-		sLog = true
+	logTypeMatrixConfig = logTypeMatrix{
+		Minimal: containsLogType(strings.Split(logType, ","), "minimal"),
+		Results: containsLogType(strings.Split(logType, ","), "results"),
+		Policy:  containsLogType(strings.Split(logType, ","), "policy"),
+		Report:  containsLogType(strings.Split(logType, ","), "report"),
+		One:     containsLogType(strings.Split(logType, ","), "one"),
+	}
+
+	if outputTypeMatrixConfig.LOG {
+
+		if logTypeMatrixConfig.Minimal {
+			minimallogfilepath := fmt.Sprintf("state_log_int_%s.log", intercept_run_id[:6])
+			if outputDir != "" {
+				minimallogfilepath = filepath.Join(outputDir, minimallogfilepath)
+			}
+			minlogFile, err := lumberjack.NewRoller(
+				minimallogfilepath,
+				100*1024*1024, // 100 megabytes
+				&lumberjack.Options{
+					MaxBackups: 5,
+					MaxAge:     90 * time.Hour * 24,
+					Compress:   true,
+				})
+			if err != nil {
+				log.Fatal().Err(err).Msg("Failed to create log roller")
+			}
+			log.Debug().Msg("Minimal log type selected")
+
+			zerolog.TimeFieldFormat = time.RFC3339
+			mlog = zerolog.New(minlogFile).With().Timestamp().Str("host-id", hostData).Logger().With().Str("intercept_run_id", intercept_run_id).Logger()
+			mlog.Log().Msg("Minimal Log Active")
+
+		}
+		if logTypeMatrixConfig.Results {
+			resultslogfilepath := fmt.Sprintf("results_log_int_%s.log", intercept_run_id[:6])
+			if outputDir != "" {
+				resultslogfilepath = filepath.Join(outputDir, resultslogfilepath)
+			}
+			resultslogFile, err := lumberjack.NewRoller(
+				resultslogfilepath,
+				100*1024*1024, // 100 megabytes
+				&lumberjack.Options{
+					MaxBackups: 5,
+					MaxAge:     90 * time.Hour * 24,
+					Compress:   true,
+				})
+			if err != nil {
+				log.Fatal().Err(err).Msg("Failed to create log roller")
+			}
+			log.Debug().Msg("Results log type selected")
+			zerolog.TimeFieldFormat = time.RFC3339
+			flog = zerolog.New(resultslogFile).With().Timestamp().Str("host-id", hostData).Logger().With().Str("intercept_run_id", intercept_run_id).Logger()
+			flog.Log().Msg("Results Log Active")
+		}
+		if logTypeMatrixConfig.Policy {
+			policylogfilepath := fmt.Sprintf("policy_log_int_%s.log", intercept_run_id[:6])
+			if outputDir != "" {
+				policylogfilepath = filepath.Join(outputDir, policylogfilepath)
+			}
+			policylogFile, err := lumberjack.NewRoller(
+				policylogfilepath,
+				100*1024*1024, // 100 megabytes
+				&lumberjack.Options{
+					MaxBackups: 5,
+					MaxAge:     90 * time.Hour * 24,
+					Compress:   true,
+				})
+			if err != nil {
+				log.Fatal().Err(err).Msg("Failed to create log roller")
+			}
+			log.Debug().Msg("Policy log type selected")
+			zerolog.TimeFieldFormat = time.RFC3339
+			plog = zerolog.New(policylogFile).With().Timestamp().Str("host-id", hostData).Logger().With().Str("intercept_run_id", intercept_run_id).Logger()
+			plog.Log().Msg("Policy Log Active")
+		}
+		if logTypeMatrixConfig.Report {
+			reportlogfilepath := fmt.Sprintf("report_log_int_%s.log", intercept_run_id[:6])
+			if outputDir != "" {
+				reportlogfilepath = filepath.Join(outputDir, reportlogfilepath)
+			}
+			reportlogFile, err := lumberjack.NewRoller(
+				reportlogfilepath,
+				100*1024*1024, // 100 megabytes
+				&lumberjack.Options{
+					MaxBackups: 5,
+					MaxAge:     90 * time.Hour * 24,
+					Compress:   true,
+				})
+			if err != nil {
+				log.Fatal().Err(err).Msg("Failed to create log roller")
+			}
+			log.Debug().Msg("Report log type selected")
+			zerolog.TimeFieldFormat = time.RFC3339
+			rlog = zerolog.New(reportlogFile).With().Timestamp().Str("host-id", hostData).Logger().With().Str("intercept_run_id", intercept_run_id).Logger()
+			rlog.Log().Msg("Report Log Active")
+		}
+		if logTypeMatrixConfig.One {
+			onelogfilepath := fmt.Sprintf("one_log_int_%s.log", intercept_run_id[:6])
+			if outputDir != "" {
+				onelogfilepath = filepath.Join(outputDir, onelogfilepath)
+			}
+			onelogFile, err := lumberjack.NewRoller(
+				onelogfilepath,
+				100*1024*1024, // 100 megabytes
+				&lumberjack.Options{
+					MaxBackups: 5,
+					MaxAge:     90 * time.Hour * 24,
+					Compress:   true,
+				})
+			if err != nil {
+				log.Fatal().Err(err).Msg("Failed to create log roller")
+			}
+			log.Debug().Msg("One log type selected")
+			zerolog.TimeFieldFormat = time.RFC3339
+			olog = zerolog.New(onelogFile).With().Timestamp().Str("host-id", hostData).Logger().With().Str("intercept_run_id", intercept_run_id).Logger()
+			olog.Log().Msg("One Log Active")
+		}
+
 	}
 
 }

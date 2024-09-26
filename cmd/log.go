@@ -32,24 +32,49 @@ func PostResultsToComplianceLog(sarifReport SARIFReport) error {
 	var resultLevelInt int
 
 	for _, result := range sarifReport.Runs[0].Results {
+
 		policyID = result.RuleID
 		resultLevel = sarifLevelToString(result.Level)
 		resultLevelInt = sarifLevelToInt(result.Level)
 
+		resultBytes, _ := json.Marshal(result)
+
 		if result.Properties.ResultType == "summary" {
-			resultBytes, _ := json.Marshal(result)
-			clog.Log().Str("policy-id", policyID).Str("result-level", resultLevel).Int("sarif-level", resultLevelInt).RawJSON("summary", resultBytes).Send()
+
+			if logTypeMatrixConfig.Results {
+				flog.Log().Str("policy-id", policyID).Str("result-level", resultLevel).Int("sarif-level", resultLevelInt).RawJSON("summary", resultBytes).Send()
+			}
+			if logTypeMatrixConfig.One {
+				olog.Log().Str("policy-id", policyID).Str("result-level", resultLevel).Int("sarif-level", resultLevelInt).RawJSON("summary", resultBytes).Send()
+			}
+
 		} else {
-			resultBytes, _ := json.Marshal(result)
-			clog.Log().Str("policy-id", policyID).Str("result-level", resultLevel).Int("sarif-level", resultLevelInt).RawJSON("detail", resultBytes).Send()
+
+			if logTypeMatrixConfig.Results {
+				flog.Log().Str("policy-id", policyID).Str("result-level", resultLevel).Int("sarif-level", resultLevelInt).RawJSON("detail", resultBytes).Send()
+			}
+			if logTypeMatrixConfig.One {
+				olog.Log().Str("policy-id", policyID).Str("result-level", resultLevel).Int("sarif-level", resultLevelInt).RawJSON("detail", resultBytes).Send()
+			}
 		}
 
 	}
 
-	if sLog {
-		payloadBytes, _ := json.Marshal(sarifReport.Runs[0].Results)
-		clog.Log().Str("policy-id", policyID).RawJSON("policy", payloadBytes).Send()
+	payloadBytes, _ := json.Marshal(sarifReport.Runs[0].Results)
+
+	if logTypeMatrixConfig.Minimal {
+		mlog.Log().Str("policy-id", policyID).Bool("policy-compliant", sarifReport.Runs[0].Invocations[0].Properties.ReportCompliant).Send()
 	}
+
+	if logTypeMatrixConfig.Policy {
+		plog.Log().Str("policy-id", policyID).RawJSON("policy", payloadBytes).Send()
+	}
+
+	if logTypeMatrixConfig.One {
+		olog.Log().Str("policy-id", policyID).Bool("policy-compliant", sarifReport.Runs[0].Invocations[0].Properties.ReportCompliant).Send()
+		olog.Log().Str("policy-id", policyID).RawJSON("policy", payloadBytes).Send()
+	}
+
 	return nil
 }
 
@@ -61,10 +86,16 @@ func PostReportToComplianceLog(sarifReport SARIFReport) error {
 
 	payloadBytes, _ := json.Marshal(sarifReport)
 
-	clog.Log().Bool("report-compliant", sarifReport.Runs[0].Invocations[0].Properties.ReportCompliant).Str("report-status", sarifReport.Runs[0].Invocations[0].Properties.ReportStatus).Str("report-timestamp", sarifReport.Runs[0].Invocations[0].Properties.ReportTimestamp).Send()
-
-	if sLog {
-		clog.Log().Bool("report-compliant", sarifReport.Runs[0].Invocations[0].Properties.ReportCompliant).RawJSON("report", payloadBytes).Send()
+	if logTypeMatrixConfig.Report {
+		rlog.Log().Bool("report-compliant", sarifReport.Runs[0].Invocations[0].Properties.ReportCompliant).Str("report-status", sarifReport.Runs[0].Invocations[0].Properties.ReportStatus).Str("report-timestamp", sarifReport.Runs[0].Invocations[0].Properties.ReportTimestamp).Send()
+		rlog.Log().Bool("report-compliant", sarifReport.Runs[0].Invocations[0].Properties.ReportCompliant).RawJSON("report", payloadBytes).Send()
+	}
+	if logTypeMatrixConfig.One {
+		olog.Log().Bool("report-compliant", sarifReport.Runs[0].Invocations[0].Properties.ReportCompliant).Str("report-status", sarifReport.Runs[0].Invocations[0].Properties.ReportStatus).Str("report-timestamp", sarifReport.Runs[0].Invocations[0].Properties.ReportTimestamp).Send()
+		olog.Log().Bool("report-compliant", sarifReport.Runs[0].Invocations[0].Properties.ReportCompliant).RawJSON("report", payloadBytes).Send()
+	}
+	if logTypeMatrixConfig.Minimal {
+		mlog.Log().Bool("report-compliant", sarifReport.Runs[0].Invocations[0].Properties.ReportCompliant).Str("report-status", sarifReport.Runs[0].Invocations[0].Properties.ReportStatus).Str("report-timestamp", sarifReport.Runs[0].Invocations[0].Properties.ReportTimestamp).Send()
 	}
 
 	return nil

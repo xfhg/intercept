@@ -347,7 +347,7 @@ func GenerateSARIFReport(inputFile string, policy Policy) (SARIFReport, error) {
 
 	sarifReport.Runs[0].Results = results
 
-	if lLog {
+	if outputTypeMatrixConfig.LOG {
 		PostResultsToComplianceLog(sarifReport)
 	}
 
@@ -474,7 +474,7 @@ func GenerateAssureSARIFReport(inputFile string, policy Policy, status string) (
 
 	sarifReport.Runs[0].Results = append(sarifReport.Runs[0].Results, result)
 
-	if lLog {
+	if outputTypeMatrixConfig.LOG {
 		PostResultsToComplianceLog(sarifReport)
 	}
 
@@ -575,7 +575,7 @@ func GenerateSchemaSARIFReport(policy Policy, filePath string, valid bool, issue
 	}
 	sarifReport.Runs[0].Results = append(sarifReport.Runs[0].Results, summaryResult)
 
-	if lLog {
+	if outputTypeMatrixConfig.LOG {
 		PostResultsToComplianceLog(sarifReport)
 	}
 
@@ -726,7 +726,7 @@ func MergeSARIFReports(commandLine string, perf Performance, isScheduled bool) (
 
 	log.Debug().Msgf("SARIF Report written to: %s ", mergeOutputPath)
 
-	if lLog {
+	if outputTypeMatrixConfig.LOG {
 		PostReportToComplianceLog(mergedReport)
 	}
 
@@ -886,7 +886,7 @@ func GenerateAPISARIFReport(policy Policy, endpoint string, matchFound bool, iss
 		sarifReport.Runs[0].Results = append(sarifReport.Runs[0].Results, issueResult)
 	}
 
-	if lLog {
+	if outputTypeMatrixConfig.LOG {
 		PostResultsToComplianceLog(sarifReport)
 	}
 

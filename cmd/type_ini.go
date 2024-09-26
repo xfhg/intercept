@@ -39,7 +39,7 @@ func ProcessINIType(policy Policy, targetDir string, filePaths []string) error {
 	// Create a single SARIF report for all files
 	sarifReport := createSARIFReport(allResults)
 
-	if lLog {
+	if outputTypeMatrixConfig.LOG {
 		PostResultsToComplianceLog(sarifReport)
 	}
 

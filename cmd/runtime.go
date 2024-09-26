@@ -142,6 +142,9 @@ func generateRuntimeSARIFReport(policy Policy, gossResult GossResult) (SARIFRepo
 				Invocations: []Invocation{
 					{
 						ExecutionSuccessful: true,
+						Properties: InvocationProperties{
+							ReportCompliant: true,
+						},
 					},
 				},
 			},
@@ -228,7 +231,9 @@ func generateRuntimeSARIFReport(policy Policy, gossResult GossResult) (SARIFRepo
 	}
 	sarifReport.Runs[0].Results = append(sarifReport.Runs[0].Results, summarySarifResult)
 
-	if lLog {
+	sarifReport.Runs[0].Invocations[0].Properties.ReportCompliant = summaryLevel == SARIFNote
+
+	if outputTypeMatrixConfig.LOG {
 		PostResultsToComplianceLog(sarifReport)
 	}
 
