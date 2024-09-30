@@ -31,6 +31,8 @@ var (
 	buildVersion    string
 	buildSignature  string
 
+	debugOutput bool
+
 	rootCmd = &cobra.Command{
 		Use:   "intercept",
 		Short: "INTERCEPT - DevSecOps toolkit",
@@ -73,6 +75,7 @@ func init() {
 	rootCmd.PersistentFlags().CountVarP(&verbosity, "verbose", "v", "increase verbosity level")
 	rootCmd.PersistentFlags().StringVarP(&outputDir, "output-dir", "o", "", "directory to write output files")
 	rootCmd.PersistentFlags().BoolVar(&experimentalMode, "experimental", false, "Enables unreleased experimental features")
+	rootCmd.PersistentFlags().BoolVar(&debugOutput, "debug", false, "Enable extra dev debug output")
 	rootCmd.PersistentFlags().BoolVar(&silentMode, "silent", false, "Enables log to file intercept.log")
 	rootCmd.PersistentFlags().BoolVar(&nologMode, "nolog", false, "Disables all loggging")
 	rootCmd.PersistentFlags().StringVar(&outputType, "output-type", "SARIF", "Output types (can be a list) : SARIF,LOG")

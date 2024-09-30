@@ -103,6 +103,7 @@ func PostReportToWebhooks(sarifReport SARIFReport) error {
 		if hook.Insecure {
 			client.SetTLSClientConfig(&tls.Config{InsecureSkipVerify: true})
 		}
+		client.SetDebug(debugOutput)
 
 		// Prepare the request
 		req := client.R()

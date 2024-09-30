@@ -18,11 +18,11 @@ type Performance struct {
 }
 
 var (
-	targetDir        string
-	tagsAny          string
-	tagsAll          string
-	envDetection     bool
-	debugOutput      bool
+	targetDir    string
+	tagsAny      string
+	tagsAll      string
+	envDetection bool
+
 	rgPath           string
 	gossPath         string
 	policyFile       string
@@ -44,7 +44,7 @@ func init() {
 	runAuditPerfCmd.Flags().StringVar(&tagsAll, "tags-all", "", "Filter policies that match all of the provided tags (comma-separated)")
 	runAuditPerfCmd.Flags().StringVarP(&environment, "environment", "e", "", "Filter policies that match the specified environment")
 	runAuditPerfCmd.Flags().BoolVar(&envDetection, "env-detection", false, "Enable environment detection if no environment is specified")
-	runAuditPerfCmd.Flags().BoolVar(&debugOutput, "debug", false, "Enable debug verbose output")
+
 	runAuditPerfCmd.Flags().StringVarP(&policyFile, "policy", "p", "", "Policy <FILEPATH> or <URL>")
 	runAuditPerfCmd.Flags().StringVar(&policyFileSHA256, "checksum", "", "Policy SHA256 expected checksum")
 }
