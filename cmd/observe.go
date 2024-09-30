@@ -232,22 +232,14 @@ func runObserve(cmd *cobra.Command, args []string) {
 
 		//PATH WATCHERS
 		if policy.Type == "runtime" && policy.Runtime.Observe != "" {
-
 			exists, isDirectory, _ := PathInfo(policy.Runtime.Observe)
-
 			if exists && !PolicyExistsInCache(policy.Runtime.Observe) {
-
 				log.Debug().Str("policy", policy.ID).Bool("exists", exists).Bool("isDirectory", isDirectory).Msgf("Setting up watch : %s", policy.Runtime.Observe)
-
 				StorePolicyInCache(policy.Runtime.Observe, policy)
-
 				log.Debug().Int("Cache count", GetPolicyCacheCount()).Msg("Cache Status")
-
 				if PolicyExistsInCache(policy.Runtime.Observe) {
 					log.Info().Str("policy", policy.ID).Str("Observe", policy.Runtime.Observe).Msg("Added policy to Path Watcher")
-
 					run = true
-
 					//path watcher
 					go func() {
 						defer func() {
@@ -257,19 +249,14 @@ func runObserve(cmd *cobra.Command, args []string) {
 						}()
 						watchPaths(policy.Runtime.Observe)
 					}()
-
 				} else {
 					log.Warn().Str("policy", policy.ID).Msg("Failed Caching the policy - investigate")
 				}
-
 			} else {
 				log.Error().Str("policy", policy.ID).Str("path", policy.Runtime.Observe).Msg("Runtime observe has invalid path, skipping")
 			}
-
 		}
-
 	}
-
 	if observeConfig.Flags.ReportSchedule != "" {
 		if validateCronExpression(observeConfig.Flags.ReportSchedule) {
 			reportTask := createReportTask()
