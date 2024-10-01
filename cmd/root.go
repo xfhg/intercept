@@ -306,6 +306,9 @@ func setupLogging() {
 		}
 
 	}
+	if debugOutput {
+		log.Warn().Msg("DEBUG OUTPUT ENABLED - It can print sensitive data")
+	}
 
 }
 

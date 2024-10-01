@@ -26,7 +26,6 @@ var (
 	observeTagsAll      string
 	observeEnvironment  string
 	observeEnvDetection bool
-	observeDebugOutput  bool
 	observePolicyFile   string
 	observeSchedule     string
 	observeReport       string
@@ -53,7 +52,6 @@ func init() {
 	observeCmd.Flags().StringVar(&observeTagsAll, "tags_all", "", "Filter policies that match all of the provided tags (comma-separated)")
 	observeCmd.Flags().StringVar(&observeEnvironment, "environment", "", "Filter policies that match the specified environment")
 	observeCmd.Flags().BoolVar(&observeEnvDetection, "env-detection", false, "Enable environment detection if no environment is specified")
-	observeCmd.Flags().BoolVar(&observeDebugOutput, "debug", false, "Enable debug verbose output")
 	observeCmd.Flags().StringVar(&observePolicyFile, "policy", "", "Policy file")
 	observeCmd.Flags().StringVar(&observeSchedule, "schedule", "", "Global Cron Schedule")
 	observeCmd.Flags().StringVar(&observeReport, "report", "", "Report Cron Schedule")
@@ -148,8 +146,9 @@ func runObserve(cmd *cobra.Command, args []string) {
 	dispatcher := GetDispatcher()
 
 	taskr := tasker.New(tasker.Option{
-		Verbose: observeDebugOutput,
+		Verbose: debugOutput,
 		Tz:      "UTC", // You can change this to your preferred timezone
+
 	})
 
 	run := false
@@ -394,7 +393,7 @@ func observeCleanup(perf Performance) {
 		log.Error().Err(err).Msg("Failed to clean up SARIF folder")
 	}
 
-	log.Info().Msg("Performance Metrics:")
+	log.Info().Str("id", intercept_run_id).Msg("Metrics:")
 	log.Info().Msgf("  Start Time: %s", perf.StartTime.Format(time.RFC3339))
 	log.Info().Msgf("  End Time: %s", perf.EndTime.Format(time.RFC3339))
 	log.Info().Msgf("  Execution Time: %d milliseconds", perf.Delta.Milliseconds())

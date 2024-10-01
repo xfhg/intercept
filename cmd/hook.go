@@ -24,6 +24,7 @@ func PostReportToWebhooks(sarifReport SARIFReport) error {
 	config := GetConfig()
 
 	for _, hook := range config.Hooks {
+
 		if !containsString(hook.EventTypes, "report") && !containsString(hook.EventTypes, "results") {
 			continue
 		}
@@ -104,6 +105,14 @@ func PostReportToWebhooks(sarifReport SARIFReport) error {
 			client.SetTLSClientConfig(&tls.Config{InsecureSkipVerify: true})
 		}
 		client.SetDebug(debugOutput)
+
+		// if debugOutput {
+		// 	log.Debug().
+		// 		Str("hook", hook.Name).
+		// 		Interface("payload", payload).
+		// 		Str("esBulkPayload", esbulkpayload).
+		// 		Msg("Request payload")
+		// }
 
 		// Prepare the request
 		req := client.R()
@@ -268,6 +277,14 @@ func PostResultsToWebhooks(sarifReport SARIFReport) error {
 		if hook.Insecure {
 			client.SetTLSClientConfig(&tls.Config{InsecureSkipVerify: true})
 		}
+
+		// if debugOutput {
+		// 	log.Debug().
+		// 		Str("hook", hook.Name).
+		// 		Interface("payload", payload).
+		// 		Str("esBulkPayload", esbulkpayload).
+		// 		Msg("Request payload")
+		// }
 
 		// Prepare the request
 		req := client.R()
