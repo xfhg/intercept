@@ -26,7 +26,7 @@ func ProcessAPIType(policy Policy, rgPath string) error {
 	// Apply authentication
 	if err := applyAuth(req, policy.API.Auth); err != nil {
 		log.Error().Err(err).Msg("error applying authentication")
-		return fmt.Errorf("error applying authentication: %w", err)
+		return handlePolicyError(policy, fmt.Errorf("error applying authentication: %w", err))
 	}
 
 	// Set request body if method is POST
@@ -38,7 +38,8 @@ func ProcessAPIType(policy Policy, rgPath string) error {
 	resp, err := req.Execute(policy.API.Method, policy.API.Endpoint)
 	if err != nil {
 		log.Error().Err(err).Msg("error making API request")
-		return fmt.Errorf("error making API request: %w", err)
+		return handlePolicyError(policy, fmt.Errorf("error making API request: %w", err))
+
 	}
 
 	// check for accepted policy.API.ResponseType and map to schema type is defined , or use regex
@@ -50,7 +51,7 @@ func ProcessAPIType(policy Policy, rgPath string) error {
 		return processWithRegex(policy, resp.Body(), rgPath)
 	}
 
-	return fmt.Errorf("no processing method specified for policy %s", policy.ID)
+	return handlePolicyError(policy, fmt.Errorf("no processing method specified for policy %s", policy.ID))
 }
 
 func applyAuth(req *resty.Request, auth map[string]string) error {
@@ -67,9 +68,12 @@ func applyAuth(req *resty.Request, auth map[string]string) error {
 	case "bearer":
 		token := os.Getenv(auth["token_env"])
 		req.SetHeader("Authorization", "Bearer "+token)
-	case "api_key":
+	case "header":
 		key := os.Getenv(auth["key_env"])
 		req.SetHeader(auth["header"], key)
+	case "authorization":
+		key := fmt.Sprintf("%s %s", auth["prefix"], os.Getenv(auth["key_env"]))
+		req.SetHeader("Authorization", key)
 	default:
 		return fmt.Errorf("unsupported authentication type: %s", authType)
 	}
@@ -168,6 +172,7 @@ func processWithRegex(policy Policy, data []byte, rgPath string) error {
 		sarifOutputFile = fmt.Sprintf("%s.sarif", NormalizeFilename(policy.ID))
 
 	}
+
 	log.Debug().Msgf("Policy %s processed. SARIF report written to: %s ", policy.ID, sarifOutputFile)
 
 	if matchesFound {
@@ -218,4 +223,28 @@ func executeAssureForAPI(policy Policy, rgPath, filePath string) (bool, error) {
 	}
 
 	return matchesFound, nil
+}
+
+func handlePolicyError(policy Policy, err error) error {
+	issues := []string{err.Error()}
+	sarifReport, sarifErr := GenerateAPISARIFReport(policy, policy.API.Endpoint, false, issues)
+	if sarifErr != nil {
+		log.Error().Err(sarifErr).Msg("error generating SARIF report for policy error")
+		return fmt.Errorf("error generating SARIF report for policy error: %w", sarifErr)
+	}
+
+	var sarifOutputFile string
+	if policy.RunID != "" {
+		sarifOutputFile = fmt.Sprintf("%s.sarif", policy.RunID)
+	} else {
+		sarifOutputFile = fmt.Sprintf("%s.sarif", NormalizeFilename(policy.ID))
+	}
+
+	if writeErr := writeSARIFReport(sarifOutputFile, sarifReport); writeErr != nil {
+		log.Error().Err(writeErr).Msg("error writing SARIF report for policy error")
+		return fmt.Errorf("error writing SARIF report for policy error: %w", writeErr)
+	}
+
+	log.Debug().Msgf("Policy %s failed. SARIF report written to: %s", policy.ID, sarifOutputFile)
+	return err
 }

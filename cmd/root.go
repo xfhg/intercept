@@ -31,6 +31,8 @@ var (
 	buildVersion    string
 	buildSignature  string
 
+	debugOutput bool
+
 	rootCmd = &cobra.Command{
 		Use:   "intercept",
 		Short: "INTERCEPT - DevSecOps toolkit",
@@ -46,7 +48,6 @@ var (
 	flog zerolog.Logger
 	plog zerolog.Logger
 	rlog zerolog.Logger
-	olog zerolog.Logger
 )
 
 type logTypeMatrix struct {
@@ -54,7 +55,6 @@ type logTypeMatrix struct {
 	Results bool
 	Policy  bool
 	Report  bool
-	One     bool
 }
 type outputTypeMatrix struct {
 	SARIF bool
@@ -73,10 +73,11 @@ func init() {
 	rootCmd.PersistentFlags().CountVarP(&verbosity, "verbose", "v", "increase verbosity level")
 	rootCmd.PersistentFlags().StringVarP(&outputDir, "output-dir", "o", "", "directory to write output files")
 	rootCmd.PersistentFlags().BoolVar(&experimentalMode, "experimental", false, "Enables unreleased experimental features")
+	rootCmd.PersistentFlags().BoolVar(&debugOutput, "debug", false, "Enable extra dev debug output")
 	rootCmd.PersistentFlags().BoolVar(&silentMode, "silent", false, "Enables log to file intercept.log")
 	rootCmd.PersistentFlags().BoolVar(&nologMode, "nolog", false, "Disables all loggging")
 	rootCmd.PersistentFlags().StringVar(&outputType, "output-type", "SARIF", "Output types (can be a list) : SARIF,LOG")
-	rootCmd.PersistentFlags().StringVar(&logType, "log-type", "RESULTS", "Compliance Log types (can be a list) : MINIMAL,RESULTS,POLICY,REPORT,ONE")
+	rootCmd.PersistentFlags().StringVar(&logType, "log-type", "RESULTS", "Compliance Log types (can be a list) : MINIMAL,RESULTS,POLICY,REPORT")
 
 	// running id
 	intercept_run_id = ksuid.New().String()
@@ -189,7 +190,6 @@ func setupLogging() {
 		Results: containsLogType(strings.Split(logType, ","), "results"),
 		Policy:  containsLogType(strings.Split(logType, ","), "policy"),
 		Report:  containsLogType(strings.Split(logType, ","), "report"),
-		One:     containsLogType(strings.Split(logType, ","), "one"),
 	}
 
 	if outputTypeMatrixConfig.LOG {
@@ -280,28 +280,33 @@ func setupLogging() {
 			rlog = zerolog.New(reportlogFile).With().Timestamp().Str("host-id", hostData).Logger().With().Str("intercept_run_id", intercept_run_id).Logger()
 			rlog.Log().Msg("Report Log Active")
 		}
-		if logTypeMatrixConfig.One {
-			onelogfilepath := fmt.Sprintf("log_one_%s.log", intercept_run_id[:6])
-			if outputDir != "" {
-				onelogfilepath = filepath.Join(outputDir, onelogfilepath)
-			}
-			onelogFile, err := lumberjack.NewRoller(
-				onelogfilepath,
-				100*1024*1024, // 100 megabytes
-				&lumberjack.Options{
-					MaxBackups: 5,
-					MaxAge:     90 * time.Hour * 24,
-					Compress:   true,
-				})
-			if err != nil {
-				log.Fatal().Err(err).Msg("Failed to create log roller")
-			}
-			log.Debug().Msg("One log type selected")
-			zerolog.TimeFieldFormat = time.RFC3339
-			olog = zerolog.New(onelogFile).With().Timestamp().Str("host-id", hostData).Logger().With().Str("intercept_run_id", intercept_run_id).Logger()
-			olog.Log().Msg("One Log Active")
-		}
+		// if logTypeMatrixConfig.One {
+		// 	onelogfilepath := fmt.Sprintf("log_one_%s.log", intercept_run_id[:6])
+		// 	if outputDir != "" {
+		// 		onelogfilepath = filepath.Join(outputDir, onelogfilepath)
+		// 	}
+		// 	onelogFile, err := lumberjack.NewRoller(
+		// 		onelogfilepath,
+		// 		100*1024*1024, // 100 megabytes
+		// 		&lumberjack.Options{
+		// 			MaxBackups: 5,
+		// 			MaxAge:     90 * time.Hour * 24,
+		// 			Compress:   true,
+		// 		})
+		// 	if err != nil {
+		// 		log.Fatal().Err(err).Msg("Failed to create log roller")
+		// 	}
+		// 	log.Debug().Msg("One log type selected")
+		// 	zerolog.TimeFieldFormat = time.RFC3339
+		// 	olog = zerolog.New(onelogFile).With().Timestamp().Str("host-id", hostData).Logger().With().Str("intercept_run_id", intercept_run_id).Logger()
+		// 	olog.Log().Msg("One Log Active")
+		// }
 
+	}
+	if debugOutput {
+		log.Warn().Msg("DEBUG OUTPUT ENABLED ")
+		log.Warn().Msg("DEBUG OUTPUT ENABLED - Output can print sensitive data")
+		log.Warn().Msg("DEBUG OUTPUT ENABLED ")
 	}
 
 }

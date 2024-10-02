@@ -139,7 +139,7 @@ func LoadPolicyFile(filename string) (*PolicyFile, error) {
 		return nil, err
 	}
 
-	log.Debug().Interface("raw config", policyFile.Config).Msg("Raw Config data")
+	// log.Debug().Interface("raw config", policyFile.Config).Msg("Raw Config data")
 
 	// Generate intercept_id for each policy, add its own ID as a tag for easy filtering with tags flag
 	for i := range policyFile.Policies {

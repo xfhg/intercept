@@ -26,7 +26,6 @@ var (
 	observeTagsAll      string
 	observeEnvironment  string
 	observeEnvDetection bool
-	observeDebugOutput  bool
 	observePolicyFile   string
 	observeSchedule     string
 	observeReport       string
@@ -53,7 +52,6 @@ func init() {
 	observeCmd.Flags().StringVar(&observeTagsAll, "tags_all", "", "Filter policies that match all of the provided tags (comma-separated)")
 	observeCmd.Flags().StringVar(&observeEnvironment, "environment", "", "Filter policies that match the specified environment")
 	observeCmd.Flags().BoolVar(&observeEnvDetection, "env-detection", false, "Enable environment detection if no environment is specified")
-	observeCmd.Flags().BoolVar(&observeDebugOutput, "debug", false, "Enable debug verbose output")
 	observeCmd.Flags().StringVar(&observePolicyFile, "policy", "", "Policy file")
 	observeCmd.Flags().StringVar(&observeSchedule, "schedule", "", "Global Cron Schedule")
 	observeCmd.Flags().StringVar(&observeReport, "report", "", "Report Cron Schedule")
@@ -148,8 +146,9 @@ func runObserve(cmd *cobra.Command, args []string) {
 	dispatcher := GetDispatcher()
 
 	taskr := tasker.New(tasker.Option{
-		Verbose: observeDebugOutput,
+		Verbose: debugOutput,
 		Tz:      "UTC", // You can change this to your preferred timezone
+
 	})
 
 	run := false
@@ -232,22 +231,14 @@ func runObserve(cmd *cobra.Command, args []string) {
 
 		//PATH WATCHERS
 		if policy.Type == "runtime" && policy.Runtime.Observe != "" {
-
 			exists, isDirectory, _ := PathInfo(policy.Runtime.Observe)
-
 			if exists && !PolicyExistsInCache(policy.Runtime.Observe) {
-
 				log.Debug().Str("policy", policy.ID).Bool("exists", exists).Bool("isDirectory", isDirectory).Msgf("Setting up watch : %s", policy.Runtime.Observe)
-
 				StorePolicyInCache(policy.Runtime.Observe, policy)
-
 				log.Debug().Int("Cache count", GetPolicyCacheCount()).Msg("Cache Status")
-
 				if PolicyExistsInCache(policy.Runtime.Observe) {
 					log.Info().Str("policy", policy.ID).Str("Observe", policy.Runtime.Observe).Msg("Added policy to Path Watcher")
-
 					run = true
-
 					//path watcher
 					go func() {
 						defer func() {
@@ -257,19 +248,14 @@ func runObserve(cmd *cobra.Command, args []string) {
 						}()
 						watchPaths(policy.Runtime.Observe)
 					}()
-
 				} else {
 					log.Warn().Str("policy", policy.ID).Msg("Failed Caching the policy - investigate")
 				}
-
 			} else {
 				log.Error().Str("policy", policy.ID).Str("path", policy.Runtime.Observe).Msg("Runtime observe has invalid path, skipping")
 			}
-
 		}
-
 	}
-
 	if observeConfig.Flags.ReportSchedule != "" {
 		if validateCronExpression(observeConfig.Flags.ReportSchedule) {
 			reportTask := createReportTask()
@@ -407,7 +393,7 @@ func observeCleanup(perf Performance) {
 		log.Error().Err(err).Msg("Failed to clean up SARIF folder")
 	}
 
-	log.Info().Msg("Performance Metrics:")
+	log.Info().Str("id", intercept_run_id).Msg("Metrics:")
 	log.Info().Msgf("  Start Time: %s", perf.StartTime.Format(time.RFC3339))
 	log.Info().Msgf("  End Time: %s", perf.EndTime.Format(time.RFC3339))
 	log.Info().Msgf("  Execution Time: %d milliseconds", perf.Delta.Milliseconds())

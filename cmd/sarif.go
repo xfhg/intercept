@@ -770,7 +770,7 @@ func cleanupSARIFFolder() error {
 }
 
 func createSARIFReport(results []Result) SARIFReport {
-	return SARIFReport{
+	sarifReport := SARIFReport{
 		Version: "2.1.0",
 		Schema:  "https://raw.githubusercontent.com/oasis-tcs/sarif-spec/master/Schemata/sarif-schema-2.1.0.json",
 		Runs: []Run{
@@ -786,6 +786,15 @@ func createSARIFReport(results []Result) SARIFReport {
 			},
 		},
 	}
+
+	sarifReport.Runs[0].Invocations[0].Properties.ReportCompliant = ComplianceStatus(sarifReport)
+
+	if outputTypeMatrixConfig.LOG {
+		PostResultsToComplianceLog(sarifReport)
+	}
+
+	return sarifReport
+
 }
 func GenerateAPISARIFReport(policy Policy, endpoint string, matchFound bool, issues []string) (SARIFReport, error) {
 	sarifReport := SARIFReport{

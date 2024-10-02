@@ -81,12 +81,14 @@ $(PLATFORMS):
 # Docker build commands for specific platforms
 define DOCKER_BUILD_PLATFORM
 docker-build-$(1):
-	$(MAKE) build-$(1)
 	$(eval GOOS := $(word 1, $(subst /, ,$(1))))
 	$(eval GOARCH := $(word 2, $(subst /, ,$(1))))
 	$(eval GOARM := $(word 3, $(subst /, ,$(1))))
 	$(eval BIN_SUFFIX := $(if $(GOARM),-v$(GOARM),))
 	$(eval OUTPUT_NAME := $(BINARY_NAME)-$(GOOS)-$(GOARCH)$(BIN_SUFFIX)$(if $(filter windows,$(GOOS)),.exe,))
+	CGO_ENABLED=0 GOOS=$(GOOS) GOARCH=$(GOARCH) $(if $(GOARM),GOARM=$(GOARM),) \
+		$(GOBUILD) $(BUILD_FLAGS) -tags container -o release/$(OUTPUT_NAME) .
+	$(MAKE) compress-binary BINARY_NAME=$(OUTPUT_NAME)
 	docker buildx build --platform $(GOOS)/$(GOARCH)$(if $(GOARM),/v$(GOARM),) \
 		--build-arg BINARY=release/$(OUTPUT_NAME) \
 		-t $(DOCKER_IMAGE):$(GOOS)-$(GOARCH)$(BIN_SUFFIX) \
