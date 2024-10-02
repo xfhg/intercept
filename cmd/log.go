@@ -27,7 +27,7 @@ type LogPolicy struct {
 	PolicyCompliant bool   `json:"policy-compliant"`
 	PolicyID        string `json:"policy-id"`
 
-	Summary []Result `json:"summary,omitempty"`
+	Summary Result   `json:"summary,omitempty"`
 	Results []Result `json:"results,omitempty"`
 
 	PolicyProperties interface{} `json:"policy-properties,omitempty"`
@@ -96,7 +96,17 @@ func processSARIF2LogStruct(sarifReport SARIFReport, payloadType int) ([]LogMini
 		individualLogPolicy.PolicyID = policyID
 		individualLogPolicy.PolicyProperties = sarifReport.Runs[0].Invocations[0].Properties
 		individualLogPolicy.Results = detailsResults
-		individualLogPolicy.Summary = summaryResults
+		if len(summaryResults) > 0 {
+			individualLogPolicy.Summary = summaryResults[0]
+		} else {
+			individualLogPolicy.Summary = Result{
+				RuleID: policyID,
+				Level:  "note",
+				Message: Message{
+					Text: "No summary results for this policy",
+				},
+			}
+		}
 
 		individualLogMinimal.PolicyCompliant = policyCompliant
 		individualLogMinimal.PolicyID = policyID

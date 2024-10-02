@@ -20,7 +20,7 @@ import (
 
 type HookStandardPayload struct {
 	WebhookID      string      `json:"webhook-id"`
-	Timestamp      string      `json:"timestamp"`
+	Timestamp      string      `json:"time"`
 	InterceptRunID string      `json:"intercept-run-id"`
 	HostID         string      `json:"host-id"`
 	Events         interface{} `json:"events"`
@@ -29,7 +29,7 @@ type HookStandardPayload struct {
 
 type DatalakePayload struct {
 	WebhookID       string      `json:"webhook-id"`
-	Timestamp       string      `json:"timestamp"`
+	Timestamp       string      `json:"time"`
 	InterceptRunID  string      `json:"intercept-run-id"`
 	HostID          string      `json:"host-id"`
 	PolicyCompliant bool        `json:"policy-compliant"`
