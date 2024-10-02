@@ -27,6 +27,16 @@ type HookStandardPayload struct {
 	EventCount     int         `json:"event-count"`
 }
 
+type DatalakePayload struct {
+	WebhookID       string      `json:"webhook-id"`
+	Timestamp       string      `json:"timestamp"`
+	InterceptRunID  string      `json:"intercept-run-id"`
+	HostID          string      `json:"host-id"`
+	PolicyCompliant bool        `json:"policy-compliant"`
+	Summary         interface{} `json:"summary"`
+	Results         interface{} `json:"results"`
+}
+
 // event types same as log types : minimal, results, policy, report
 // custom modifiers : policy+bulk, report+bulk,
 
@@ -70,14 +80,27 @@ func PostResultsToWebhooks(sarifReport SARIFReport) error {
 
 		}
 		if containsEventType(hook.EventTypes, "policy") {
-
-			payload = HookStandardPayload{
-				WebhookID:      NormalizePolicyName(hook.Name),
-				Timestamp:      timestamp,
-				InterceptRunID: intercept_run_id,
-				HostID:         hostData,
-				Events:         logPol,
-				EventCount:     len(logPol),
+			if containsEventType(hook.EventTypes, "log") {
+				if len(logPol) > 0 {
+					payload = DatalakePayload{
+						WebhookID:       NormalizePolicyName(hook.Name),
+						Timestamp:       timestamp,
+						InterceptRunID:  intercept_run_id,
+						HostID:          hostData,
+						PolicyCompliant: logPol[0].PolicyCompliant,
+						Summary:         logPol[0].Summary,
+						Results:         logPol[0].Results,
+					}
+				}
+			} else {
+				payload = HookStandardPayload{
+					WebhookID:      NormalizePolicyName(hook.Name),
+					Timestamp:      timestamp,
+					InterceptRunID: intercept_run_id,
+					HostID:         hostData,
+					Events:         logPol,
+					EventCount:     len(logPol),
+				}
 			}
 		}
 		if containsEventType(hook.EventTypes, "report") {
