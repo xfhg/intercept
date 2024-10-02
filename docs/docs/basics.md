@@ -9,16 +9,23 @@ As a forward-thinking CISO/CIO, you understand the critical importance of mainta
 3. **Proactive Risk Management**: Stay ahead of threats, leaks and drift by continuously monitoring and auditing your infrastructure.
 
 
+<br><br>
+
+::: tip 
+To gain a deeper understanding of INTERCEPT's architecture and how it fits into your security strategy, please refer to our [Architecture page](/docs/architecture). This page provides a comprehensive overview of INTERCEPT's capabilities, operational modes, and how it can transform your security operations.
+:::
+
 
 <br><br>
 
-The policy file (also known as the configuration file) is the primary component of the INTERCEPT workflow. It configures the policy engine and provides all necessary policies, triggers, and hooks to generate a comprehensive compliance report and distribute it to the appropriate recipients.
+
 
 ---
 
 
- <img alt="Intercept Arch" src="/focus.png">
+<img alt="Intercept Arch" src="/focus.png">
 
+The POLICY file (also known as the configuration file) is the primary component of the INTERCEPT workflow. It configures the policy engine and provides all necessary policies, triggers, and hooks to generate a comprehensive compliance report and distribute it to the appropriate recipients.
 <br><br>
 
 ## The Policy File Structure

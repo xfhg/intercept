@@ -28,6 +28,51 @@ Discover how INTERCEPT can transform your security operations and provide unpara
 
 # 🔋 Batteries Included
 
+## 2 Operational Modes
+
+### INTERCEPT AUDIT
+
+The AUDIT mode in INTERCEPT is a comprehensive scanning and analysis process that evaluates your entire codebase, infrastructure, or system state against predefined security and compliance policies. This mode operates as follows:
+
+1. Policy Loading: INTERCEPT loads all defined policies from the policy file.
+
+2. Target Scanning: It scans the specified target directory or system, collecting relevant information for policy evaluation.
+
+3. Parallel Processing: INTERCEPT processes all applicable policies in parallel, optimizing performance and reducing overall audit time.
+
+4. Comprehensive Evaluation: Each policy (SCAN, ASSURE, RUNTIME, REGO, API) is evaluated against the collected data.
+
+5. Result Aggregation: Results from all policy evaluations are aggregated into a detailed SARIF report.
+
+6. Output Generation: INTERCEPT generates detailed output in various formats (e.g., JSON, SARIF) based on configuration.
+
+7. Webhook Integration: If configured, audit results can be sent to specified endpoints for further processing or notification.
+
+The AUDIT mode provides a point-in-time assessment of your system's compliance status, making it ideal for periodic checks, pre-deployment verifications, or on-demand security audits. It offers a holistic view of your system's security posture and compliance adherence.
+
+### INTERCEPT OBSERVE
+
+The OBSERVE mode in INTERCEPT is a continuous monitoring and real-time analysis process that provides ongoing surveillance of your system's security and compliance status. This mode operates as follows:
+
+1. Policy Selection: INTERCEPT loads and applies policies marked for continuous observation (either by schedule or path monitoring).
+
+2. Continuous Monitoring: It constantly watches specified targets (files, directories, APIs, or system states) for changes.
+
+3. Real-time Evaluation: When changes are detected, INTERCEPT immediately evaluates the affected areas against relevant policies.
+
+4. Instant Alerting: If any non-compliance is detected, INTERCEPT can trigger immediate alerts or actions (through webhooks).
+
+5. Incremental Processing: Only changed components are re-evaluated, ensuring efficient use of resources.
+
+6. Live Reporting: INTERCEPT provides real-time updates on the system's compliance status.
+
+The OBSERVE mode offers continuous, real-time protection and compliance monitoring, making it ideal for production environments, critical systems, or any scenario where immediate detection of and response to compliance violations is crucial. It provides an always-on, vigilant approach to maintaining your system's security and compliance posture.
+
+---
+
+#### Both modes can be used together. Improved integration with CI/CD to ensure compliance at every stage of development and deployment and extend your compliance assurance into runtime context.
+
+
 
 
 ## Policy Types
@@ -51,7 +96,7 @@ Low footprint, works everywhere.
 
 ## Integration Webhooks
 
-Send your Compliance Reports immediatly to the right stakeholders
+Send your Compliance Reports immediatly to the right stakeholders, multiple levels of detail are provided out of the box.
 
 
 ## Platform compatibility
@@ -63,4 +108,4 @@ Send your Compliance Reports immediatly to the right stakeholders
 | Linux (ARM64) | intercept-linux-arm64 |  Full | Full |
 | macOS (Intel) | intercept-darwin-amd64 | Full |Limited |
 | macOS (Apple Silicon) | intercept-darwin-arm64 | Full |Limited |
-| Windows (x86_64) | intercept-windows-amd64.exe | Limited |Limited |
+| Windows (x86_64) | intercept-windows-amd64.exe | Most |Limited |
