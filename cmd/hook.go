@@ -80,7 +80,7 @@ func PostResultsToWebhooks(sarifReport SARIFReport) error {
 
 		}
 		if containsEventType(hook.EventTypes, "policy") {
-			if containsEventType(hook.EventTypes, "log") {
+			if containsEventType(hook.EventTypes, "datalake") {
 				if len(logPol) > 0 {
 					payload = DatalakePayload{
 						WebhookID:       NormalizePolicyName(hook.Name),
