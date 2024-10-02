@@ -146,19 +146,6 @@ func PostResultsToWebhooks(sarifReport SARIFReport) error {
 			if containsEventType(hook.EventTypes, "log") {
 				payload, _ = convertLogsToNDJSON(logPol)
 				payloadType = "x-ndjson"
-			} else if containsEventType(hook.EventTypes, "datalake") {
-				if len(logPol) > 0 {
-					payload = DatalakePayload{
-						WebhookID:       NormalizePolicyName(hook.Name),
-						Timestamp:       timestamp,
-						InterceptRunID:  intercept_run_id,
-						HostID:          hostData,
-						PolicyCompliant: logPol[0].PolicyCompliant,
-						Summary:         logPol[0].Summary,
-						Results:         logPol[0].Results,
-					}
-					payloadType = "json"
-				}
 			} else {
 				payload = HookStandardPayload{
 					WebhookID:      NormalizePolicyName(hook.Name),
