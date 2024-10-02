@@ -220,7 +220,7 @@ func PostReportToWebhooks(sarifReport SARIFReport) error {
 
 	var payloadType string
 
-	_, logRes, _, logRep, _ := processSARIF2LogStruct(sarifReport, 1, false)
+	_, logRes, _, logRep, _ := processSARIF2LogStruct(sarifReport, 2, false)
 
 	config := GetConfig()
 
