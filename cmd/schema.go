@@ -8,7 +8,7 @@ import (
 	"cuelang.org/go/cue/errors"
 )
 
-func validateContentAndCUE(content []byte, cueContent string, contentType string, strictSchema bool) (bool, []string) {
+func validateContentAndCUE(content []byte, cueContent string, contentType string, strictSchema bool, policyID string) (bool, []string) {
 	var issues []string
 
 	// Convert content to JSON (implementation depends on contentType)
@@ -51,8 +51,8 @@ func validateContentAndCUE(content []byte, cueContent string, contentType string
 		}
 	}
 
-	log.Warn().Msgf("Missing fields: %s", missingFields)
-	log.Warn().Msgf("Extra fields: %s", extraFields)
+	log.Warn().Str("policy", policyID).Msgf("Missing fields: %s", missingFields)
+	log.Warn().Str("policy", policyID).Msgf("Extra fields: %s", extraFields)
 
 	return len(issues) == 0, issues
 }

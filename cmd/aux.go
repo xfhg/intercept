@@ -239,13 +239,13 @@ func convertToJSON(content []byte, contentType string) ([]byte, error) {
 	}
 }
 
-func convertFromJSON(content []byte, outputType string) ([]byte, error) {
+func convertFromJSON(content []byte, coutputType string) ([]byte, error) {
 	var jsonObj interface{}
 	if err := json.Unmarshal(content, &jsonObj); err != nil {
 		return nil, fmt.Errorf("error unmarshaling JSON: %w", err)
 	}
 
-	switch outputType {
+	switch coutputType {
 	case "json":
 		return content, nil
 	case "yaml":
@@ -265,7 +265,7 @@ func convertFromJSON(content []byte, outputType string) ([]byte, error) {
 	case "toml":
 		return convertJSONToTOML(jsonObj)
 	default:
-		return nil, fmt.Errorf("unsupported output type: %s", outputType)
+		return nil, fmt.Errorf("unsupported output type: %s", coutputType)
 	}
 }
 

@@ -25,8 +25,9 @@ type Config struct {
 		InterceptVersion string `yaml:"InterceptVersion,omitempty"`
 	} `yaml:"System,omitempty"`
 	Flags struct {
-		OutputType     string   `yaml:"output_type,omitempty"`
+		OutputType     []string `yaml:"output_type,omitempty"`
 		Target         string   `yaml:"target,omitempty"`
+		Index          string   `yaml:"index,omitempty"`
 		Ignore         []string `yaml:"ignore,omitempty"`
 		Tags           []string `yaml:"tags,omitempty"`
 		PolicySchedule string   `yaml:"policy_schedule,omitempty"`
@@ -138,7 +139,7 @@ func LoadPolicyFile(filename string) (*PolicyFile, error) {
 		return nil, err
 	}
 
-	log.Debug().Interface("raw config", policyFile.Config).Msg("Raw Config data")
+	// log.Debug().Interface("raw config", policyFile.Config).Msg("Raw Config data")
 
 	// Generate intercept_id for each policy, add its own ID as a tag for easy filtering with tags flag
 	for i := range policyFile.Policies {

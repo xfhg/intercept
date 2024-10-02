@@ -23,59 +23,73 @@ Config:
     #   timeout_seconds: 30
     #   event_types:
     #     - "report"
-    # - name: "Test Webhook Results"
-    #   endpoint: "https://webhook.site/3191679d-67c2-49e8-a722-7c20cefa6ab0"
+    - name: "Test Webhook Results"
+      endpoint: "https://hkdk.events/y1whk6u99kbekd"
+      insecure: false
+      method: "POST"
+      auth: 
+        type: bearer
+        token_env: TOKEN 
+      retry_attempts: 3
+      retry_delay: "5s"
+      timeout_seconds: 30
+      event_types:
+        - "results"
+        - "log"
+
+    - name: "XXX Test Webhook Results"
+      endpoint: "https://hkdk.events/y1whk6u99kbekd"
+      insecure: false
+      method: "POST"
+      auth: 
+        type: bearer
+        token_env: TOKEN 
+      retry_attempts: 3
+      retry_delay: "5s"
+      timeout_seconds: 30
+      event_types:
+        - "report"
+        - "log"
+    # - name: "Test ES BULK"
+    #   endpoint: https://f7380f223b634b07b67cc9075b4929ea.us-central1.gcp.cloud.es.io:443/_bulk
     #   insecure: false
     #   method: "POST"
     #   auth: 
-    #     type: bearer
-    #     token_env: TOKEN 
+    #     type: authorization
+    #     key_env: ARKA
+    #     prefix: "ApiKey"
     #   headers:
     #     Content-Type: "application/json"
     #   retry_attempts: 3
     #   retry_delay: "5s"
     #   timeout_seconds: 30
     #   event_types:
-    #     - "results"
-    - name: "Test Webhook Policy"
-      endpoint: "https://webhook-test.com/e42b61438d6f12f0478e253bb6c1dfa1"
-      insecure: false
-      method: "POST"
-      auth: 
-        type: bearer
-        token_env: TOKEN 
-      headers:
-        Content-Type: "application/json"
-      retry_attempts: 3
-      retry_delay: "5s"
-      timeout_seconds: 30
-      event_types:
-        - "policy"
+    #     - "policy"
+    #     - "bulk"
 
 
 Policies:
 
-  # - id: "RUNTIM-001"
-  #   type: "runtime"
-  #   schedule: "*/55 * * * * *"
-  #   enforcement:
-  #     - environment: "all"
-  #       fatal: "false"
-  #       exceptions: "development"
-  #       msg_solution: ""
-  #       msg_error: ""
-  #   metadata:
-  #     name: "RUNTIME System Compliance"
-  #     description: "Enforce system compliance at runtime"
-  #     tags:
-  #       - "config"
-  #       - "runtime"
-  #       - "enforce"
-  #     confidence: "high"
-  #     score: "8"
-  #   _runtime:
-  #     config: runtime/simple_https.yaml
-  #     observe: "_status/"
+  - id: "RUNTIM-001"
+    type: "runtime"
+    schedule: "*/55 * * * * *"
+    enforcement:
+      - environment: "all"
+        fatal: "false"
+        exceptions: "development"
+        msg_solution: ""
+        msg_error: ""
+    metadata:
+      name: "RUNTIME System Compliance"
+      description: "Enforce system compliance at runtime"
+      tags:
+        - "config"
+        - "runtime"
+        - "enforce"
+      confidence: "high"
+      score: "8"
+    _runtime:
+      config: runtime/simple_https.yaml
       
 
   - id: "RUNTIM-002"
@@ -101,7 +115,7 @@ Policies:
       
   # - id: "API-001"
   #   type: "api"
-  #   schedule: "*/15 * * * * *"
+  #   schedule: "*/45 * * * * *"
   #   enforcement:
   #     - environment: "production"
   #       fatal: "true"

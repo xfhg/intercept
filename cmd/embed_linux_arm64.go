@@ -1,5 +1,5 @@
-//go:build linux && arm64
-// +build linux,arm64
+//go:build linux && arm64 && !container
+// +build linux,arm64,!container
 
 package cmd
 

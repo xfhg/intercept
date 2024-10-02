@@ -19,10 +19,25 @@ jobs:
 
       - name: Check out code 
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Fetch all history for all tags and branches
 
       - uses: actions/setup-go@v4
         with: 
           go-version-file: go.mod
+
+      - name: Get latest tag
+        id: get_latest_tag
+        run: |
+          # Try to get tag for the current commit
+          CURRENT_TAG=$(git describe --exact-match --tags HEAD 2>/dev/null || echo "")
+          
+          # If no tag for current commit, get the most recent tag
+          if [ -z "$CURRENT_TAG" ]; then
+            CURRENT_TAG=$(git describe --tags --abbrev=0)
+          fi
+          
+          echo "LATEST_TAG=${CURRENT_TAG}" >> $GITHUB_OUTPUT
 
       - name: Fetch Tags
         run: |
@@ -40,19 +55,16 @@ jobs:
       - name: Make all release artifacts
         run: make build-all
 
-      - name: Get the version
-        id: get_version
-        run: echo ::set-output name=VERSION::${GITHUB_REF/refs\/tags\//}
-
       - name: Upload All artifacts
         uses: meeDamian/github-release@2.0
         with:
+          tag: ${{ steps.get_latest_tag.outputs.LATEST_TAG }}
           allow_override: "true"
           draft: "true"
           token: ${{ secrets.GITHUB_TOKEN }}
-          name: ${{ steps.get_version.outputs.VERSION }}
+          name: ${{ steps.get_latest_tag.outputs.LATEST_TAG }}
           body: >
-            Release ${{ steps.get_version.outputs.VERSION }}
+            Release ${{ steps.get_latest_tag.outputs.LATEST_TAG }}
           gzip: "true"
           files: >
             release/intercept-darwin-amd64
@@ -61,8 +73,8 @@ jobs:
             release/intercept-darwin-arm64.sha256
             release/intercept-linux-amd64
             release/intercept-linux-amd64.sha256
-            release/intercept-linux-arm
-            release/intercept-linux-arm.sha256
+            release/intercept-linux-arm-v7
+            release/intercept-linux-arm-v7.sha256
             release/intercept-linux-arm64
             release/intercept-linux-arm64.sha256
             release/intercept-windows-amd64.exe

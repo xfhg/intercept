@@ -22,5 +22,25 @@ Policies:
     _rego:
       policy_file: policies/rego/simple.rego
       policy_data: policies/rego/simple_policy_data.json
-      policy_query: data.policies.allow
+      policy_query: data.rbac.allow
 
+  - id: "REGO-002"
+    type: "rego"
+    filepattern: 'nginx\.conf$'
+    enforcement:
+      - environment: "all"
+        fatal: "false"
+        exceptions: "development"
+        confidence: "high"
+    metadata:
+      name: "Nginx Configuration Security Compliance"
+      description: "Enforce security best practices for Nginx configuration"
+      tags:
+        - "nginx"
+        - "security"
+        - "configuration"
+      score: "9"
+    _rego:
+      policy_file: policies/rego/nginx_security.rego
+      policy_data: policies/rego/nginx_security_data.json
+      policy_query: data.nginx.allow
