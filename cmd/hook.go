@@ -7,7 +7,10 @@ import (
 	"bytes"
 	"crypto/tls"
 	"encoding/json"
+	"fmt"
+	"reflect"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/go-resty/resty/v2"
@@ -37,6 +40,54 @@ type DatalakePayload struct {
 	Results         interface{} `json:"results"`
 }
 
+type NDJSONBuilder struct {
+	buffer []string
+	mutex  sync.Mutex
+}
+
+func NewNDJSONBuilder() *NDJSONBuilder {
+	return &NDJSONBuilder{
+		buffer: make([]string, 0),
+	}
+}
+
+func (nb *NDJSONBuilder) AddLogObject(logObj interface{}) error {
+	jsonBytes, err := json.Marshal(logObj)
+	if err != nil {
+		return fmt.Errorf("error marshaling log object: %v", err)
+	}
+
+	nb.mutex.Lock()
+	nb.buffer = append(nb.buffer, string(jsonBytes))
+	nb.mutex.Unlock()
+
+	return nil
+}
+
+func (nb *NDJSONBuilder) GetNDJSON() string {
+	nb.mutex.Lock()
+	defer nb.mutex.Unlock()
+	return strings.Join(nb.buffer, "\n")
+}
+func convertLogsToNDJSON(logs interface{}) (string, error) {
+	reflectValue := reflect.ValueOf(logs)
+	if reflectValue.Kind() != reflect.Slice {
+		return "", fmt.Errorf("input must be a slice")
+	}
+
+	var ndjsonLines []string
+	for i := 0; i < reflectValue.Len(); i++ {
+		logEntry := reflectValue.Index(i).Interface()
+		jsonBytes, err := json.Marshal(logEntry)
+		if err != nil {
+			return "", fmt.Errorf("error marshaling log entry: %v", err)
+		}
+		ndjsonLines = append(ndjsonLines, string(jsonBytes))
+	}
+
+	return strings.Join(ndjsonLines, "\n"), nil
+}
+
 // event types same as log types : minimal, results, policy, report
 // custom modifiers : policy+bulk, report+bulk,
 
@@ -48,39 +99,54 @@ func PostResultsToWebhooks(sarifReport SARIFReport) error {
 		return nil
 	}
 	var payload interface{}
+	var payloadType string
 
-	logMin, logRes, logPol, _, _ := processSARIF2LogStruct(sarifReport, 1)
+	logMin, logRes, logPol, _, _ := processSARIF2LogStruct(sarifReport, 1, false)
 
 	config := GetConfig()
 
 	for _, hook := range config.Hooks {
 
 		if containsEventType(hook.EventTypes, "minimal") {
-
-			payload = HookStandardPayload{
-				WebhookID:      NormalizePolicyName(hook.Name),
-				Timestamp:      timestamp,
-				InterceptRunID: intercept_run_id,
-				HostID:         hostData,
-				Events:         logMin,
-				EventCount:     len(logMin),
+			if containsEventType(hook.EventTypes, "log") {
+				payload, _ = convertLogsToNDJSON(logMin)
+				payloadType = "x-ndjson"
+			} else {
+				payload = HookStandardPayload{
+					WebhookID:      NormalizePolicyName(hook.Name),
+					Timestamp:      timestamp,
+					InterceptRunID: intercept_run_id,
+					HostID:         hostData,
+					Events:         logMin,
+					EventCount:     len(logMin),
+				}
+				payloadType = "json"
 			}
 
 		}
 		if containsEventType(hook.EventTypes, "results") {
+			if containsEventType(hook.EventTypes, "log") {
+				payload, _ = convertLogsToNDJSON(logRes)
+				payloadType = "x-ndjson"
+			} else {
 
-			payload = HookStandardPayload{
-				WebhookID:      NormalizePolicyName(hook.Name),
-				Timestamp:      timestamp,
-				InterceptRunID: intercept_run_id,
-				HostID:         hostData,
-				Events:         logRes,
-				EventCount:     len(logRes),
+				payload = HookStandardPayload{
+					WebhookID:      NormalizePolicyName(hook.Name),
+					Timestamp:      timestamp,
+					InterceptRunID: intercept_run_id,
+					HostID:         hostData,
+					Events:         logRes,
+					EventCount:     len(logRes),
+				}
+				payloadType = "json"
 			}
-
 		}
 		if containsEventType(hook.EventTypes, "policy") {
-			if containsEventType(hook.EventTypes, "datalake") {
+
+			if containsEventType(hook.EventTypes, "log") {
+				payload, _ = convertLogsToNDJSON(logPol)
+				payloadType = "x-ndjson"
+			} else if containsEventType(hook.EventTypes, "datalake") {
 				if len(logPol) > 0 {
 					payload = DatalakePayload{
 						WebhookID:       NormalizePolicyName(hook.Name),
@@ -91,6 +157,7 @@ func PostResultsToWebhooks(sarifReport SARIFReport) error {
 						Summary:         logPol[0].Summary,
 						Results:         logPol[0].Results,
 					}
+					payloadType = "json"
 				}
 			} else {
 				payload = HookStandardPayload{
@@ -101,6 +168,7 @@ func PostResultsToWebhooks(sarifReport SARIFReport) error {
 					Events:         logPol,
 					EventCount:     len(logPol),
 				}
+				payloadType = "json"
 			}
 		}
 		if containsEventType(hook.EventTypes, "report") {
@@ -108,127 +176,11 @@ func PostResultsToWebhooks(sarifReport SARIFReport) error {
 			continue
 		}
 
-		// ----------------------------------------------
-		// ----------------------------------------------
-		// ----------------------------------------------
-
-		// if !containsString(hook.EventTypes, "policy") {
-		// 	continue
-		// }
-
-		// log.Info().Str("hook_name", hook.Name).Str("endpoint", hook.Endpoint).Msg("Webhooking")
-
-		// var payload WebhookPayload
-		// var esbulkpayload string
-
-		// if containsString(hook.EventTypes, "policy") {
-
-		// 	if len(sarifReport.Runs) == 0 {
-		// 		log.Warn().Str("hook", hook.Name).Msg("SARIF report contains no runs, skipping")
-		// 		continue
-		// 	}
-
-		// 	// If the event type is "results", only send the Results array
-		// 	payload = WebhookPayload{
-		// 		EventType: "policy",
-		// 		Data:      sarifReport.Runs[0].Results,
-		// 	}
-		// }
-
-		// // ----------------------------------------------
-		// // ---------------------------------------------- Split Results
-		// // ---------------------------------------------- Rewrites the payload with split data
-
-		// if containsString(hook.EventTypes, "split") {
-
-		// 	if len(sarifReport.Runs) == 0 {
-		// 		log.Warn().Str("hook", hook.Name).Msg("SARIF report contains no runs, skipping")
-		// 		continue
-		// 	}
-
-		// 	var details []Result
-		// 	var summary Result
-
-		// 	// Split the Results
-		// 	for _, result := range sarifReport.Runs[0].Results {
-
-		// 		if result.Properties.ResultType == "summary" {
-		// 			summary = result
-		// 		} else {
-		// 			details = append(details, result)
-		// 		}
-
-		// 	}
-
-		// 	// If the event type is "poc", we split the array
-		// 	payload = WebhookPayload{
-		// 		EventType: "policy",
-		// 		Summary:   summary,
-		// 		Results:   details,
-		// 	}
-		// }
-
-		// // ----------------------------------------------
-		// // ---------------------------------------------- Split Results END
-		// // ----------------------------------------------
-
-		// // ----------------------------------------------
-		// // ---------------------------------------------- ES Bulk
-		// // ---------------------------------------------- adds { "index": { "_index": "ng" } } between results
-		// if containsString(hook.EventTypes, "bulk") {
-
-		// 	if len(sarifReport.Runs) == 0 {
-		// 		log.Warn().Str("hook", hook.Name).Msg("SARIF report contains no runs, skipping")
-		// 		continue
-		// 	}
-
-		// 	// Create a buffer to hold the bulk payload
-		// 	var bulkPayload bytes.Buffer
-
-		// 	// Function to write an index action
-		// 	writeIndexAction := func() error {
-		// 		indexAction := map[string]interface{}{
-		// 			"index": map[string]interface{}{
-		// 				"_index": observeConfig.Flags.Index,
-		// 			},
-		// 		}
-		// 		indexActionBytes, err := json.Marshal(indexAction)
-		// 		if err != nil {
-		// 			return err
-		// 		}
-		// 		bulkPayload.Write(indexActionBytes)
-		// 		bulkPayload.WriteByte('\n')
-		// 		return nil
-		// 	}
-
-		// 	for _, result := range sarifReport.Runs[0].Results {
-		// 		// Write the index action
-		// 		if err := writeIndexAction(); err != nil {
-		// 			log.Printf("Error marshalling index action: %v", err)
-		// 			continue
-		// 		}
-
-		// 		// Write the result JSON
-		// 		resultBytes, err := json.Marshal(result)
-		// 		if err != nil {
-		// 			log.Printf("Error marshalling result: %v", err)
-		// 			continue
-		// 		}
-		// 		bulkPayload.Write(resultBytes)
-		// 		bulkPayload.WriteByte('\n')
-		// 	}
-
-		// 	esbulkpayload = bulkPayload.String()
-
-		// }
-
-		// if containsString(hook.EventTypes, "bulk") {
-		// 	req.SetBody(esbulkpayload)
-		// }
-
-		// ----------------------------------------------
-		// ---------------------------------------------- ES Bulk Polcicies END
-		// ----------------------------------------------
+		// Check if payload is empty
+		if payload == nil || payload == "" {
+			log.Debug().Str("hook", hook.Name).Msg("Payload is empty, skipping webhook")
+			continue
+		}
 
 		client := resty.New()
 		client.SetTimeout(time.Duration(hook.TimeoutSeconds) * time.Second)
@@ -240,6 +192,13 @@ func PostResultsToWebhooks(sarifReport SARIFReport) error {
 		req := client.R()
 		req.SetHeaders(hook.Headers)
 		req.SetBody(payload)
+
+		// Set content type based on payloadType
+		if payloadType == "x-ndjson" {
+			req.SetHeader("Content-Type", "application/x-ndjson")
+		} else {
+			req.SetHeader("Content-Type", "application/json")
+		}
 
 		// Apply authentication
 		if err := applyAuth(req, hook.Auth); err != nil {
@@ -282,7 +241,9 @@ func PostReportToWebhooks(sarifReport SARIFReport) error {
 	}
 	var payload interface{}
 
-	_, logRes, _, logRep, _ := processSARIF2LogStruct(sarifReport, 1)
+	var payloadType string
+
+	_, logRes, _, logRep, _ := processSARIF2LogStruct(sarifReport, 1, false)
 
 	config := GetConfig()
 
@@ -293,7 +254,11 @@ func PostReportToWebhooks(sarifReport SARIFReport) error {
 			continue
 		}
 		if containsEventType(hook.EventTypes, "results") {
-			if containsEventType(hook.EventTypes, "bulk") {
+
+			if containsEventType(hook.EventTypes, "log") {
+				payload, _ = convertLogsToNDJSON(logRes)
+				payloadType = "x-ndjson"
+			} else if containsEventType(hook.EventTypes, "bulk") {
 
 				// Create a buffer to hold the bulk payload
 				var bulkPayload bytes.Buffer
@@ -332,6 +297,7 @@ func PostReportToWebhooks(sarifReport SARIFReport) error {
 				}
 
 				payload = bulkPayload.String()
+				payloadType = "x-ndjson"
 
 			} else {
 
@@ -343,6 +309,7 @@ func PostReportToWebhooks(sarifReport SARIFReport) error {
 					Events:         logRes,
 					EventCount:     len(logRes),
 				}
+				payloadType = "json"
 
 			}
 		}
@@ -351,93 +318,28 @@ func PostReportToWebhooks(sarifReport SARIFReport) error {
 			continue
 		}
 		if containsEventType(hook.EventTypes, "report") {
-			payload = HookStandardPayload{
-				WebhookID:      NormalizePolicyName(hook.Name),
-				Timestamp:      timestamp,
-				InterceptRunID: intercept_run_id,
-				HostID:         hostData,
-				Events:         logRep,
-				EventCount:     len(logRep),
+
+			if containsEventType(hook.EventTypes, "log") {
+				payload, _ = convertLogsToNDJSON(logRep)
+				payloadType = "x-ndjson"
+			} else {
+
+				payload = HookStandardPayload{
+					WebhookID:      NormalizePolicyName(hook.Name),
+					Timestamp:      timestamp,
+					InterceptRunID: intercept_run_id,
+					HostID:         hostData,
+					Events:         logRep,
+					EventCount:     len(logRep),
+				}
+				payloadType = "json"
 			}
 		}
 
-		// if !containsString(hook.EventTypes, "report") && !containsString(hook.EventTypes, "results") {
-		// 	continue
-		// }
-
-		// log.Info().Str("hook_name", hook.Name).Str("endpoint", hook.Endpoint).Msg("Webhooking")
-
-		// var payload WebhookPayload
-		// var esbulkpayload string
-
-		// if containsString(hook.EventTypes, "results") {
-
-		// 	if len(sarifReport.Runs) == 0 {
-		// 		log.Warn().Str("hook", hook.Name).Msg("SARIF report contains no runs, skipping results webhook")
-		// 		continue
-		// 	}
-
-		// 	// If the event type is "results", only send the Results array
-		// 	payload = WebhookPayload{
-		// 		EventType: "results",
-		// 		Data:      sarifReport.Runs[0].Results,
-		// 	}
-
-		// 	// ----------------------------------------------
-		// 	// ---------------------------------------------- ES Bulk
-		// 	// ---------------------------------------------- adds { "index": { "_index": "ng" } } between results
-
-		// 	if containsString(hook.EventTypes, "bulk") {
-		// 		// Create a buffer to hold the bulk payload
-		// 		var bulkPayload bytes.Buffer
-
-		// 		// Function to write an index action
-		// 		writeIndexAction := func() error {
-		// 			indexAction := map[string]interface{}{
-		// 				"index": map[string]interface{}{
-		// 					"_index": observeConfig.Flags.Index,
-		// 				},
-		// 			}
-		// 			indexActionBytes, err := json.Marshal(indexAction)
-		// 			if err != nil {
-		// 				return err
-		// 			}
-		// 			bulkPayload.Write(indexActionBytes)
-		// 			bulkPayload.WriteByte('\n')
-		// 			return nil
-		// 		}
-
-		// 		for _, result := range sarifReport.Runs[0].Results {
-		// 			// Write the index action
-		// 			if err := writeIndexAction(); err != nil {
-		// 				log.Printf("Error marshalling index action: %v", err)
-		// 				continue
-		// 			}
-
-		// 			// Write the result JSON
-		// 			resultBytes, err := json.Marshal(result)
-		// 			if err != nil {
-		// 				log.Printf("Error marshalling result: %v", err)
-		// 				continue
-		// 			}
-		// 			bulkPayload.Write(resultBytes)
-		// 			bulkPayload.WriteByte('\n')
-		// 		}
-
-		// 		esbulkpayload = bulkPayload.String()
-		// 	}
-
-		// } else if containsString(hook.EventTypes, "report") {
-		// 	// For "report" event type, send the full SARIF report
-		// 	payload = WebhookPayload{
-		// 		EventType: "report",
-		// 		Data:      sarifReport,
-		// 	}
-		// }
-
 		// Check if payload is empty
-		if payload == nil {
-			log.Warn().Str("hook", hook.Name).Msg("Payload is empty, skipping webhook")
+
+		if payload == nil || payload == "" {
+			log.Debug().Str("hook", hook.Name).Msg("Payload is empty, skipping webhook")
 			continue
 		}
 
@@ -456,6 +358,11 @@ func PostReportToWebhooks(sarifReport SARIFReport) error {
 		// if containsString(hook.EventTypes, "bulk") {
 		// 	req.SetBody(esbulkpayload)
 		// }
+		if payloadType == "x-ndjson" {
+			req.SetHeader("Content-Type", "application/x-ndjson")
+		} else {
+			req.SetHeader("Content-Type", "application/json")
+		}
 
 		// Apply authentication
 		if err := applyAuth(req, hook.Auth); err != nil {

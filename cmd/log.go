@@ -12,6 +12,10 @@ import (
 type LogMinimal struct {
 	PolicyCompliant bool   `json:"policy-compliant"`
 	PolicyID        string `json:"policy-id"`
+
+	Timestamp string `json:"timestamp,omitempty"`
+	HostID    string `json:"host-id,omitempty"`
+	RunID     string `json:"run-id,omitempty"`
 }
 
 type LogResults struct {
@@ -22,6 +26,10 @@ type LogResults struct {
 
 	ResultType string `json:"result-type"`
 	Result     Result `json:"result"`
+
+	Timestamp string `json:"timestamp,omitempty"`
+	HostID    string `json:"host-id,omitempty"`
+	RunID     string `json:"run-id,omitempty"`
 }
 type LogPolicy struct {
 	PolicyCompliant bool   `json:"policy-compliant"`
@@ -31,6 +39,10 @@ type LogPolicy struct {
 	Results []Result `json:"results,omitempty"`
 
 	PolicyProperties interface{} `json:"policy-properties,omitempty"`
+
+	Timestamp string `json:"timestamp,omitempty"`
+	HostID    string `json:"host-id,omitempty"`
+	RunID     string `json:"run-id,omitempty"`
 }
 
 type LogReport struct {
@@ -41,9 +53,13 @@ type LogReport struct {
 	Results []Result `json:"results,omitempty"`
 
 	ReportProperties interface{} `json:"report-properties,omitempty"`
+
+	Timestamp string `json:"timestamp,omitempty"`
+	HostID    string `json:"host-id,omitempty"`
+	RunID     string `json:"run-id,omitempty"`
 }
 
-func processSARIF2LogStruct(sarifReport SARIFReport, payloadType int) ([]LogMinimal, []LogResults, []LogPolicy, []LogReport, error) {
+func processSARIF2LogStruct(sarifReport SARIFReport, payloadType int, isLog bool) ([]LogMinimal, []LogResults, []LogPolicy, []LogReport, error) {
 
 	if len(sarifReport.Runs) == 0 {
 		return nil, nil, nil, nil, nil
@@ -67,6 +83,8 @@ func processSARIF2LogStruct(sarifReport SARIFReport, payloadType int) ([]LogMini
 		var detailsResults []Result
 		var summaryResults []Result
 
+		var reportTimestamp string
+
 		policyCompliant = sarifReport.Runs[0].Invocations[0].Properties.ReportCompliant
 
 		for _, result := range sarifReport.Runs[0].Results {
@@ -74,6 +92,7 @@ func processSARIF2LogStruct(sarifReport SARIFReport, payloadType int) ([]LogMini
 			policyID = result.RuleID
 			resultLevel = sarifLevelToString(result.Level)
 			resultLevelInt = sarifLevelToInt(result.Level)
+			reportTimestamp = result.Properties.ResultTimestamp
 
 			individualLogResults.PolicyCompliant = policyCompliant
 			individualLogResults.PolicyID = policyID
@@ -81,6 +100,12 @@ func processSARIF2LogStruct(sarifReport SARIFReport, payloadType int) ([]LogMini
 			individualLogResults.ResultType = result.Properties.ResultType
 			individualLogResults.SarifLevelInt = resultLevelInt
 			individualLogResults.SarifLevel = resultLevel
+
+			if !isLog {
+				individualLogResults.Timestamp = result.Properties.ResultTimestamp
+				individualLogResults.HostID = hostData
+				individualLogResults.RunID = intercept_run_id
+			}
 
 			iLogRes = append(iLogRes, individualLogResults)
 
@@ -96,12 +121,18 @@ func processSARIF2LogStruct(sarifReport SARIFReport, payloadType int) ([]LogMini
 		individualLogPolicy.PolicyID = policyID
 		individualLogPolicy.PolicyProperties = sarifReport.Runs[0].Invocations[0].Properties
 		individualLogPolicy.Results = detailsResults
+		if !isLog {
+			individualLogPolicy.Timestamp = reportTimestamp
+			individualLogPolicy.HostID = hostData
+			individualLogPolicy.RunID = intercept_run_id
+		}
+
 		if len(summaryResults) > 0 {
 			individualLogPolicy.Summary = summaryResults[0]
 		} else {
 			individualLogPolicy.Summary = Result{
 				RuleID: policyID,
-				Level:  "note",
+				Level:  "none",
 				Message: Message{
 					Text: "No summary results for this policy",
 				},
@@ -110,6 +141,11 @@ func processSARIF2LogStruct(sarifReport SARIFReport, payloadType int) ([]LogMini
 
 		individualLogMinimal.PolicyCompliant = policyCompliant
 		individualLogMinimal.PolicyID = policyID
+		if !isLog {
+			individualLogMinimal.Timestamp = reportTimestamp
+			individualLogMinimal.HostID = hostData
+			individualLogMinimal.RunID = intercept_run_id
+		}
 
 		iLogPol = append(iLogPol, individualLogPolicy)
 		iLogMin = append(iLogMin, individualLogMinimal)
@@ -151,6 +187,12 @@ func processSARIF2LogStruct(sarifReport SARIFReport, payloadType int) ([]LogMini
 			mergedLogResults.SarifLevelInt = resultLevelInt
 			mergedLogResults.SarifLevel = resultLevel
 
+			if !isLog {
+				mergedLogResults.Timestamp = result.Properties.ResultTimestamp
+				mergedLogResults.HostID = hostData
+				mergedLogResults.RunID = intercept_run_id
+			}
+
 			mLogRes = append(mLogRes, mergedLogResults)
 
 			if result.Properties.ResultType == "summary" {
@@ -166,6 +208,12 @@ func processSARIF2LogStruct(sarifReport SARIFReport, payloadType int) ([]LogMini
 		mergedLogReport.ReportProperties = sarifReport.Runs[0].Invocations[0].Properties
 		mergedLogReport.Summary = summaryResults
 		mergedLogReport.Results = detailsResults
+
+		if !isLog {
+			mergedLogReport.Timestamp = sarifReport.Runs[0].Invocations[0].Properties.ReportTimestamp
+			mergedLogReport.HostID = hostData
+			mergedLogReport.RunID = intercept_run_id
+		}
 
 		mLogRep = append(mLogRep, mergedLogReport)
 
@@ -183,7 +231,7 @@ func PostResultsToComplianceLog(sarifReport SARIFReport) error {
 		return nil
 	}
 
-	logMin, logRes, logPol, _, _ := processSARIF2LogStruct(sarifReport, 1)
+	logMin, logRes, logPol, _, _ := processSARIF2LogStruct(sarifReport, 1, true)
 
 	if logTypeMatrixConfig.Minimal {
 		for _, log := range logMin {
@@ -238,7 +286,7 @@ func PostReportToComplianceLog(sarifReport SARIFReport) error {
 	}
 
 	if logTypeMatrixConfig.Report {
-		_, _, _, logRep, _ := processSARIF2LogStruct(sarifReport, 2)
+		_, _, _, logRep, _ := processSARIF2LogStruct(sarifReport, 2, true)
 
 		for _, log := range logRep {
 			rsBytes, _ := json.Marshal(log.Summary)

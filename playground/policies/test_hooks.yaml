@@ -24,35 +24,32 @@ Config:
     #   event_types:
     #     - "report"
     - name: "Test Webhook Results"
-      endpoint: "https://hkdk.events/yffpwp8x7ezu79"
+      endpoint: "https://hkdk.events/y1whk6u99kbekd"
       insecure: false
       method: "POST"
       auth: 
         type: bearer
         token_env: TOKEN 
-      headers:
-        Content-Type: "application/json"
       retry_attempts: 3
       retry_delay: "5s"
       timeout_seconds: 30
       event_types:
         - "results"
-        - "bulk"
+        - "log"
 
     - name: "XXX Test Webhook Results"
-      endpoint: "https://hkdk.events/yffpwp8x7ezu79"
+      endpoint: "https://hkdk.events/y1whk6u99kbekd"
       insecure: false
       method: "POST"
       auth: 
         type: bearer
         token_env: TOKEN 
-      headers:
-        Content-Type: "application/json"
       retry_attempts: 3
       retry_delay: "5s"
       timeout_seconds: 30
       event_types:
-        - "minimal"
+        - "report"
+        - "log"
     # - name: "Test ES BULK"
     #   endpoint: https://f7380f223b634b07b67cc9075b4929ea.us-central1.gcp.cloud.es.io:443/_bulk
     #   insecure: false
