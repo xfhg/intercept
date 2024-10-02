@@ -259,15 +259,3 @@ func cleanEventCache(cache *map[string]time.Time, mutex *sync.Mutex) {
 		}
 	}
 }
-
-func cleanEventCache(cache *map[string]time.Time, mutex *sync.Mutex) {
-	mutex.Lock()
-	defer mutex.Unlock()
-
-	now := time.Now()
-	for path, lastEventTime := range *cache {
-		if now.Sub(lastEventTime) > eventCacheDuration {
-			delete(*cache, path)
-		}
-	}
-}
