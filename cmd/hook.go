@@ -30,16 +30,6 @@ type HookStandardPayload struct {
 	EventCount     int         `json:"event-count"`
 }
 
-type DatalakePayload struct {
-	WebhookID       string      `json:"webhook-id"`
-	Timestamp       string      `json:"time"`
-	InterceptRunID  string      `json:"intercept-run-id"`
-	HostID          string      `json:"host-id"`
-	PolicyCompliant bool        `json:"policy-compliant"`
-	Summary         interface{} `json:"summary"`
-	Results         interface{} `json:"results"`
-}
-
 type NDJSONBuilder struct {
 	buffer []string
 	mutex  sync.Mutex
