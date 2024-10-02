@@ -23,28 +23,13 @@ Config:
     #   timeout_seconds: 30
     #   event_types:
     #     - "report"
-    # - name: "Test Webhook Results"
-    #   endpoint: "https://webhook.site/3191679d-67c2-49e8-a722-7c20cefa6ab0"
-    #   insecure: false
-    #   method: "POST"
-    #   auth: 
-    #     type: bearer
-    #     token_env: TOKEN 
-    #   headers:
-    #     Content-Type: "application/json"
-    #   retry_attempts: 3
-    #   retry_delay: "5s"
-    #   timeout_seconds: 30
-    #   event_types:
-    #     - "results"
-    - name: "Test ES BULK"
-      endpoint: https://f7380f223b634b07b67cc9075b4929ea.us-central1.gcp.cloud.es.io:443/_bulk
+    - name: "Test Webhook Results"
+      endpoint: "https://hkdk.events/yffpwp8x7ezu79"
       insecure: false
       method: "POST"
       auth: 
-        type: authorization
-        key_env: ARKA
-        prefix: "ApiKey"
+        type: bearer
+        token_env: TOKEN 
       headers:
         Content-Type: "application/json"
       retry_attempts: 3
@@ -54,30 +39,60 @@ Config:
         - "results"
         - "bulk"
 
+    - name: "XXX Test Webhook Results"
+      endpoint: "https://hkdk.events/yffpwp8x7ezu79"
+      insecure: false
+      method: "POST"
+      auth: 
+        type: bearer
+        token_env: TOKEN 
+      headers:
+        Content-Type: "application/json"
+      retry_attempts: 3
+      retry_delay: "5s"
+      timeout_seconds: 30
+      event_types:
+        - "minimal"
+    # - name: "Test ES BULK"
+    #   endpoint: https://f7380f223b634b07b67cc9075b4929ea.us-central1.gcp.cloud.es.io:443/_bulk
+    #   insecure: false
+    #   method: "POST"
+    #   auth: 
+    #     type: authorization
+    #     key_env: ARKA
+    #     prefix: "ApiKey"
+    #   headers:
+    #     Content-Type: "application/json"
+    #   retry_attempts: 3
+    #   retry_delay: "5s"
+    #   timeout_seconds: 30
+    #   event_types:
+    #     - "policy"
+    #     - "bulk"
+
 
 Policies:
 
-  # - id: "RUNTIM-001"
-  #   type: "runtime"
-  #   schedule: "*/55 * * * * *"
-  #   enforcement:
-  #     - environment: "all"
-  #       fatal: "false"
-  #       exceptions: "development"
-  #       msg_solution: ""
-  #       msg_error: ""
-  #   metadata:
-  #     name: "RUNTIME System Compliance"
-  #     description: "Enforce system compliance at runtime"
-  #     tags:
-  #       - "config"
-  #       - "runtime"
-  #       - "enforce"
-  #     confidence: "high"
-  #     score: "8"
-  #   _runtime:
-  #     config: runtime/simple_https.yaml
-  #     observe: "_status/"
+  - id: "RUNTIM-001"
+    type: "runtime"
+    schedule: "*/55 * * * * *"
+    enforcement:
+      - environment: "all"
+        fatal: "false"
+        exceptions: "development"
+        msg_solution: ""
+        msg_error: ""
+    metadata:
+      name: "RUNTIME System Compliance"
+      description: "Enforce system compliance at runtime"
+      tags:
+        - "config"
+        - "runtime"
+        - "enforce"
+      confidence: "high"
+      score: "8"
+    _runtime:
+      config: runtime/simple_https.yaml
       
 
   - id: "RUNTIM-002"
@@ -101,41 +116,41 @@ Policies:
     _runtime:
       config: runtime/simple_https.yaml
       
-  - id: "API-001"
-    type: "api"
-    schedule: "*/45 * * * * *"
-    enforcement:
-      - environment: "production"
-        fatal: "true"
-        exceptions: "false"
-        msg_solution: "Generic solution message to production issue."
-        msg_error: "Generic error message for production issue"
-        confidence: "high"
-      - environment: "development"
-        fatal: "true"
-        exceptions: "false"
-        msg_solution: "Generic solution message to development issue."
-        msg_error: "Generic error message for development issue"
-        confidence: "high"
-    metadata:
-      name: "API Regex Compliance"
-      description: "Enforce schema compliance on API configuration files"
-      tags:
-        - "config"
-        - "ini"
-        - "schema"
-      confidence: "high"
-      score: "8"
-    _api:
-      endpoint: "https://httpbin.org/user-agent"
-      insecure: false
-      request: "GET"
-      response_type: "application/json"
-      auth: 
-        type: bearer
-        token_env: TOKEN 
-    _regex:
-      - \s*user-agent\s*
+  # - id: "API-001"
+  #   type: "api"
+  #   schedule: "*/45 * * * * *"
+  #   enforcement:
+  #     - environment: "production"
+  #       fatal: "true"
+  #       exceptions: "false"
+  #       msg_solution: "Generic solution message to production issue."
+  #       msg_error: "Generic error message for production issue"
+  #       confidence: "high"
+  #     - environment: "development"
+  #       fatal: "true"
+  #       exceptions: "false"
+  #       msg_solution: "Generic solution message to development issue."
+  #       msg_error: "Generic error message for development issue"
+  #       confidence: "high"
+  #   metadata:
+  #     name: "API Regex Compliance"
+  #     description: "Enforce schema compliance on API configuration files"
+  #     tags:
+  #       - "config"
+  #       - "ini"
+  #       - "schema"
+  #     confidence: "high"
+  #     score: "8"
+  #   _api:
+  #     endpoint: "https://httpbin.org/user-agent"
+  #     insecure: false
+  #     request: "GET"
+  #     response_type: "application/json"
+  #     auth: 
+  #       type: bearer
+  #       token_env: TOKEN 
+  #   _regex:
+  #     - \s*user-agent\s*
 
 
   # - id: "SCAN-002 Custom"

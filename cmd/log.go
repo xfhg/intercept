@@ -7,14 +7,7 @@ import (
 	"time"
 )
 
-// type LogPayload struct {
-// 	EventType string      `json:"event_type"`
-// 	Data      interface{} `json:"data"`
-// 	Summary   interface{} `json:"summary,omitempty"`
-// 	Results   interface{} `json:"results,omitempty"`
-// }
-
-// Consistent Logging and Integration Data
+// Consistent Logging and Integration Data with (hook.go)
 
 type LogMinimal struct {
 	PolicyCompliant bool   `json:"policy-compliant"`
@@ -118,7 +111,15 @@ func processSARIF2LogStruct(sarifReport SARIFReport, payloadType int) ([]LogMini
 		var mergedLogReport LogReport
 		var mLogRep []LogReport
 
+		var mergedLogResults LogResults
+		var mLogRes []LogResults
+
 		var reportCompliant bool
+
+		var policyID string
+		var resultLevel string
+		var resultLevelInt int
+		var policyCompliant bool
 
 		var detailsResults []Result
 		var summaryResults []Result
@@ -128,6 +129,19 @@ func processSARIF2LogStruct(sarifReport SARIFReport, payloadType int) ([]LogMini
 		originalTime, _ := time.Parse(time.RFC3339, sarifReport.Runs[0].Invocations[0].Properties.ReportTimestamp)
 
 		for _, result := range sarifReport.Runs[0].Results {
+
+			policyID = result.RuleID
+			resultLevel = sarifLevelToString(result.Level)
+			resultLevelInt = sarifLevelToInt(result.Level)
+
+			mergedLogResults.PolicyCompliant = policyCompliant
+			mergedLogResults.PolicyID = policyID
+			mergedLogResults.Result = result
+			mergedLogResults.ResultType = result.Properties.ResultType
+			mergedLogResults.SarifLevelInt = resultLevelInt
+			mergedLogResults.SarifLevel = resultLevel
+
+			mLogRes = append(mLogRes, mergedLogResults)
 
 			if result.Properties.ResultType == "summary" {
 				summaryResults = append(summaryResults, result)
@@ -145,7 +159,7 @@ func processSARIF2LogStruct(sarifReport SARIFReport, payloadType int) ([]LogMini
 
 		mLogRep = append(mLogRep, mergedLogReport)
 
-		return nil, nil, nil, mLogRep, nil
+		return nil, mLogRes, nil, mLogRep, nil
 
 	}
 

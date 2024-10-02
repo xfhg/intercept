@@ -172,6 +172,7 @@ func processWithRegex(policy Policy, data []byte, rgPath string) error {
 		sarifOutputFile = fmt.Sprintf("%s.sarif", NormalizeFilename(policy.ID))
 
 	}
+
 	log.Debug().Msgf("Policy %s processed. SARIF report written to: %s ", policy.ID, sarifOutputFile)
 
 	if matchesFound {
