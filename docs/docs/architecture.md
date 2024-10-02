@@ -7,11 +7,11 @@ INTERCEPT provides an industry-standard, policy-based approach to security and c
 
 ---
 
-
- <img alt="Intercept Arch" src="/arch.png">
+<p align="center">
+  <img alt="Intercept Arch" src="/arch.png">
+</p>
 
 ---
-
 
 To accomplish a thorough scan of your codebase or system state, the INTERCEPT Policy Engine allows you to define a rich multitude of contextualized policy types that will fit most, if not all, of your compliance and security requirements.
 
