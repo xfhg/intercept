@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"strings"
@@ -233,12 +234,19 @@ func PostResultsToComplianceLog(sarifReport SARIFReport) error {
 
 	logMin, logRes, logPol, _, _ := processSARIF2LogStruct(sarifReport, 1, true)
 
+	ctx := context.Background()
+
 	if logTypeMatrixConfig.Minimal {
 		for _, log := range logMin {
 			mlog.Log().
 				Str("policy-id", log.PolicyID).
 				Bool("policy-compliant", log.PolicyCompliant).
 				Send()
+			if observeTelemetry {
+				// Record OpenTelemetry metric
+				RecordPolicyCompliance(ctx, log.PolicyID, log.PolicyCompliant)
+			}
+
 		}
 	}
 	if logTypeMatrixConfig.Results {
@@ -255,6 +263,11 @@ func PostResultsToComplianceLog(sarifReport SARIFReport) error {
 				Str("result-type", log.ResultType).
 				RawJSON("result", rBytes).
 				Send()
+			if observeTelemetry {
+				// Record OpenTelemetry metrics
+				RecordPolicyCompliance(ctx, log.PolicyID, log.PolicyCompliant)
+				RecordSarifLevel(ctx, log.PolicyID, log.SarifLevel, log.SarifLevelInt)
+			}
 		}
 	}
 	if logTypeMatrixConfig.Policy {
