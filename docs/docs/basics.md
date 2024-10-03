@@ -8,8 +8,9 @@ As a forward-thinking CISO/CIO, you understand the critical importance of mainta
 2. **Streamlined Compliance Workflow**: Implement a full-cycle compliance process with minimal setup time.
 3. **Proactive Risk Management**: Stay ahead of threats, leaks and drift by continuously monitoring and auditing your infrastructure.
 
+<img alt="Intercept Arch" src="/ifeatures.png">
 
-<br><br>
+<br>
 
 ::: tip 
 To gain a deeper understanding of INTERCEPT's architecture and how it fits into your security strategy, please refer to our [Architecture page](/docs/architecture). This page provides a comprehensive overview of INTERCEPT's capabilities, operational modes, and how it can transform your security operations.
@@ -17,7 +18,6 @@ To gain a deeper understanding of INTERCEPT's architecture and how it fits into 
 
 
 <br><br>
-
 
 
 ---
