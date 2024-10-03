@@ -31,6 +31,7 @@ var (
 	observeReport       string
 	observeMode         string
 	observeIndex        string
+	observeTelemetry    bool
 	reportMutex         sync.Mutex
 	reportDir           string = "_status"
 	allFileInfos        []FileInfo
@@ -52,6 +53,7 @@ func init() {
 	observeCmd.Flags().StringVar(&observeTagsAll, "tags_all", "", "Filter policies that match all of the provided tags (comma-separated)")
 	observeCmd.Flags().StringVar(&observeEnvironment, "environment", "", "Filter policies that match the specified environment")
 	observeCmd.Flags().BoolVar(&observeEnvDetection, "env-detection", false, "Enable environment detection if no environment is specified")
+	observeCmd.Flags().BoolVar(&observeTelemetry, "telemetry", false, "Enable telemetry")
 	observeCmd.Flags().StringVar(&observePolicyFile, "policy", "", "Policy file")
 	observeCmd.Flags().StringVar(&observeSchedule, "schedule", "", "Global Cron Schedule")
 	observeCmd.Flags().StringVar(&observeReport, "report", "", "Report Cron Schedule")
@@ -67,6 +69,20 @@ func runObserve(cmd *cobra.Command, args []string) {
 	sourceType, processedInput, err := DeterminePolicySource(observePolicyFile)
 	if err != nil {
 		log.Fatal().Err(err)
+	}
+
+	if observeTelemetry {
+		err := InitOpenTelemetry()
+		if err != nil {
+			log.Fatal().Err(err).Msg("Failed to initialize OpenTelemetry")
+		}
+		// Start the metrics server in a goroutine
+		go func() {
+			err := StartMetricsServer(":31337")
+			if err != nil {
+				log.Printf("Metrics server stopped: %v", err)
+			}
+		}()
 	}
 
 	switch sourceType {
