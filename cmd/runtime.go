@@ -134,10 +134,15 @@ func generateRuntimeSARIFReport(policy Policy, gossResult GossResult) (SARIFRepo
 			{
 				Tool: Tool{
 					Driver: Driver{
-						Name:    "INTERCEPT",
-						Version: buildVersion,
+						FullName:        fmt.Sprintf("%s %s", "INTERCEPT", buildVersion),
+						Name:            "INTERCEPT",
+						Version:         smVersion,
+						SemanticVersion: smVersion,
+						InformationURI:  "https://intercept.cc",
+						Rules:           policyData.SARIFRules,
 					},
 				},
+
 				Results: []Result{},
 				Invocations: []Invocation{
 					{
@@ -214,6 +219,14 @@ func generateRuntimeSARIFReport(policy Policy, gossResult GossResult) (SARIFRepo
 			{
 				PhysicalLocation: PhysicalLocation{
 					ArtifactLocation: ArtifactLocation{URI: "N/A"},
+					Region: Region{
+						StartLine:   1,
+						StartColumn: 1,
+						EndColumn:   1,
+						Snippet: Snippet{
+							Text: "N/A",
+						},
+					},
 				},
 			},
 		},

@@ -31,6 +31,7 @@ var (
 	observeReport       string
 	observeMode         string
 	observeIndex        string
+	webhookSecret       string
 	reportMutex         sync.Mutex
 	reportDir           string = "_status"
 	allFileInfos        []FileInfo
@@ -111,6 +112,19 @@ func runObserve(cmd *cobra.Command, args []string) {
 	}
 
 	observeConfig = GetConfig()
+
+	if len(observeConfig.Hooks) > 0 {
+		if observeConfig.Flags.WebhookSecret != "" {
+			webhookSecret = os.Getenv(observeConfig.Flags.WebhookSecret)
+		} else {
+			webhookSecret, err = GenerateWebhookSecret()
+
+			if err != nil {
+				log.Fatal().Err(err).Msg("Failed to generate webhook secret")
+			}
+		}
+		log.Info().Str("webhook_secret", webhookSecret).Msg("Webhook Secret for X-Signature")
+	}
 
 	// Needed for scan/assure/schema policies
 	if observeConfig.Flags.Target != "" {
