@@ -1,0 +1,170 @@
+
+Policies:
+  - id: "Mock SCAN-001 Server Tokens"
+    type: "scan"
+    filepattern: "nginx.conf"
+    enforcement:
+      - environment: "all"
+        fatal: "true"
+        exceptions: "false"
+        confidence: "high"
+    metadata:
+      name: "Detect server_tokens on"
+      description: "Ensure that server_tokens is not enabled to avoid revealing version info."
+      msg_solution: "Set server_tokens to off in the nginx configuration."
+      msg_error: "server_tokens is enabled, exposing Nginx version."
+      tags:
+        - "security"
+        - "nginx"
+      score: "7"
+    _regex:
+      - "server_tokens\\s+on;"
+
+  - id: "Mock SCAN-002 SSL Protocols"
+    type: "scan"
+    filepattern: "nginx.conf"
+    enforcement:
+      - environment: "all"
+        fatal: "true"
+        exceptions: "false"
+        confidence: "high"
+    metadata:
+      name: "Detect insecure SSL/TLS protocols"
+      description: "Detect the use of insecure SSLv3 or TLSv1/TLSv1.1 protocols."
+      msg_solution: "Use secure TLS versions (TLSv1.2 or higher)."
+      msg_error: "Mock nsecure SSL/TLS protocols detected."
+      tags:
+        - "security"
+        - "encryption"
+        - "tls"
+      score: "9"
+    _regex:
+      - "ssl_protocols.*(SSLv3|TLSv1(\\.1)?);"
+      - "ssl_protocols.*SSLv2;"
+
+
+  - id: "Mock SCAN-005 Weak SSL Ciphers"
+    type: "scan"
+    filepattern: "nginx.conf"
+    enforcement:
+      - environment: "all"
+        fatal: "true"
+        exceptions: "false"
+        confidence: "high"
+    metadata:
+      name: "Detect weak SSL ciphers"
+      description: "Ensure that weak SSL ciphers (DES, RC4, MD5) are not used."
+      msg_solution: "Use strong SSL ciphers in the nginx configuration."
+      msg_error: "Weak SSL ciphers detected (DES, RC4, MD5)."
+      tags:
+        - "security"
+        - "encryption"
+        - "tls"
+      score: "9"
+    _regex:
+      - "ssl_ciphers.*(DES|RC4|MD5);"
+
+  
+
+  - id: "Mock SCAN-007 Access Logs Disabled"
+    type: "scan"
+    filepattern: "nginx.conf"
+    enforcement:
+      - environment: "all"
+        fatal: "true"
+        exceptions: "false"
+        confidence: "medium"
+    metadata:
+      name: "Detect access_log off"
+      description: "Ensure access logs are enabled."
+      msg_solution: "Remove 'access_log off' to enable logging."
+      msg_error: "Access logs are disabled, which may hide important access data."
+      tags:
+        - "security"
+        - "logging"
+      score: "6"
+    _regex:
+      - "access_log\\s+off;"
+
+  - id: "Mock SCAN-008 Autoindex Enabled"
+    type: "scan"
+    filepattern: "nginx.conf"
+    enforcement:
+      - environment: "all"
+        fatal: "true"
+        exceptions: "false"
+        confidence: "high"
+    metadata:
+      name: "Detect autoindex on"
+      description: "Ensure directory indexing is not enabled."
+      msg_solution: "Disable 'autoindex on' to prevent directory listing."
+      msg_error: "Directory indexing is enabled, which may expose sensitive files."
+      tags:
+        - "security"
+        - "files"
+      score: "8"
+    _regex:
+      - "autoindex\\s+on;"
+
+  - id: "Mock SCAN-009 Large Buffer Size"
+    type: "scan"
+    filepattern: "nginx.conf"
+    enforcement:
+      - environment: "all"
+        fatal: "false"
+        exceptions: "true"
+        confidence: "medium"
+    metadata:
+      name: "Detect large buffer sizes"
+      description: "Ensure reasonable buffer sizes for client requests and headers."
+      msg_solution: "Review and reduce buffer sizes if needed."
+      msg_error: "Large buffer sizes detected, which may lead to memory exhaustion."
+      tags:
+        - "security"
+        - "performance"
+      score: "5"
+    _regex:
+      - "(client_body_buffer_size|client_max_body_size|client_header_buffer_size)\\s+[0-9]+[kK]?[mM]?\\s*;?\\b"
+
+
+
+  - id: "Mock SCAN-011 Unsafe HTTP Methods"
+    type: "scan"
+    filepattern: "nginx.conf"
+    enforcement:
+      - environment: "all"
+        fatal: "true"
+        exceptions: "false"
+        confidence: "high"
+    metadata:
+      name: "Detect unsafe HTTP methods"
+      description: "Ensure unsafe HTTP methods (TRACE, DELETE, PUT) are not allowed."
+      msg_solution: "Disallow unsafe HTTP methods in the nginx configuration."
+      msg_error: "Unsafe HTTP methods (TRACE, DELETE, PUT) are allowed."
+      tags:
+        - "security"
+        - "http"
+      score: "9"
+    _regex:
+      - "allow_methods.*(TRACE|DELETE|PUT);"
+
+
+  - id: "Mock SCAN-013 IP Spoofing"
+    type: "scan"
+    filepattern: "nginx.conf"
+    enforcement:
+      - environment: "all"
+        fatal: "true"
+        exceptions: "false"
+        confidence: "high"
+    metadata:
+      name: "Detect IP spoofing vulnerabilities"
+      description: "Ensure IP spoofing is not allowed by properly setting real IP headers."
+      msg_solution: "Ensure real IP headers are properly configured in the nginx configuration."
+      msg_error: "Mock P spoofing vulnerability detected."
+      tags:
+        - "security"
+        - "Mock p"
+      score: "9"
+    _regex:
+      - "set_real_ip_from\\s+\\d+\\.\\d+\\.\\d+\\.\\d+;"
