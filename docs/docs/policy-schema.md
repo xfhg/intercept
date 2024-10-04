@@ -3,7 +3,6 @@
 
 
 ```go
-
 type PolicyFile struct {
 	Config    Config   `yaml:"Config"`
 	Version   string   `yaml:"Version"`
@@ -11,29 +10,30 @@ type PolicyFile struct {
 	Policies  []Policy `yaml:"Policies"`
 }
 
-// Intercept Config
-
 type Config struct {
 	System struct {
-		RGVersion        string `yaml:"RGVersion"`
-		GossVersion      string `yaml:"GossVersion"`
-		InterceptVersion string `yaml:"InterceptVersion"`
-	} `yaml:"System"`
-	Flags struct {
-		OutputType     string   `yaml:"output_type"`
-		Target         string   `yaml:"target"`
-		Ignore         []string `yaml:"ignore"`
-		Tags           []string `yaml:"tags"`
-		PolicySchedule string   `yaml:"policy_schedule"`
-		ReportSchedule string   `yaml:"report_schedule"`
-	} `yaml:"Flags"`
-	Metadata struct {
     ...
-	} `yaml:"Metadata"`
+	} `yaml:"System,omitempty"`
+	Flags struct {
+		OutputType     []string `yaml:"output_type,omitempty"`
+		Target         string   `yaml:"target,omitempty"`
+		Index          string   `yaml:"index,omitempty"`
+		Ignore         []string `yaml:"ignore,omitempty"`
+		Tags           []string `yaml:"tags,omitempty"`
+		PolicySchedule string   `yaml:"policy_schedule,omitempty"`
+		ReportSchedule string   `yaml:"report_schedule,omitempty"`
+	} `yaml:"Flags,omitempty"`
+	Metadata struct {
+		HostOS          string `yaml:"host_os,omitempty"`
+		HostMAC         string `yaml:"host_mac,omitempty"`
+		HostARCH        string `yaml:"host_arch,omitempty"`
+		HostNAME        string `yaml:"host_name,omitempty"`
+		HostFingerprint string `yaml:"host_fingerprint,omitempty"`
+		HostInfo        string `yaml:"host_info,omitempty"`
+    ...
+	} `yaml:"Metadata,omitempty"`
 	Hooks []HookConfig `yaml:"Hooks"`
 }
-
-// Webhooks
 
 type HookConfig struct {
 	Name           string            `yaml:"name"`
@@ -48,8 +48,6 @@ type HookConfig struct {
 	EventTypes     []string          `yaml:"event_types"`
 }
 
-// Policies
-
 type Policy struct {
 	ID          string        `yaml:"id"`
 	InterceptID string        `yaml:"intercept_id,omitempty"`
@@ -59,7 +57,7 @@ type Policy struct {
 	Enforcement []Enforcement `yaml:"enforcement"`
 	Metadata    Metadata      `yaml:"metadata"`
 	FilePattern string        `yaml:"filepattern"`
-  Observe     string        `yaml:"observe"`
+	Observe     string        `yaml:"observe"`
 	Schema      Schema        `yaml:"_schema"`
 	Rego        Rego          `yaml:"_rego"`
 	Regex       []string      `yaml:"_regex"`
