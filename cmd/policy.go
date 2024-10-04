@@ -158,7 +158,13 @@ func LoadPolicyFile(filename string) (*PolicyFile, error) {
 			ShortDescription: ShortDescription{
 				Text: policyFile.Policies[i].Metadata.Description,
 			},
+			FullDescription: &FullDescription{
+				Text: policyFile.Policies[i].Metadata.MsgError,
+			},
 			HelpURI: policyFile.Policies[i].Metadata.HelpURL,
+			Help: &Help{
+				Text: policyFile.Policies[i].Metadata.MsgSolution,
+			},
 			Properties: Properties{
 				Category: policyFile.Policies[i].Metadata.Tags[0],
 				Tags:     policyFile.Policies[i].Metadata.Tags,
