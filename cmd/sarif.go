@@ -132,7 +132,8 @@ type SARIFReport struct {
 }
 
 type Run struct {
-	Tool        Tool         `json:"tool"`
+	Tool Tool `json:"tool"`
+
 	Results     []Result     `json:"results"`
 	Invocations []Invocation `json:"invocations"`
 }
@@ -142,10 +143,12 @@ type Tool struct {
 }
 
 type Driver struct {
-	Name            string `json:"name"`
-	Version         string `json:"version"`
-	FullName        string `json:"fullName"`
-	SemanticVersion string `json:"semanticVersion"`
+	Name            string      `json:"name"`
+	Version         string      `json:"version"`
+	FullName        string      `json:"fullName"`
+	SemanticVersion string      `json:"semanticVersion"`
+	InformationURI  string      `json:"informationUri"`
+	Rules           []SARIFRule `json:"rules"`
 }
 
 type Result struct {
@@ -170,7 +173,7 @@ type PhysicalLocation struct {
 }
 
 type ArtifactLocation struct {
-	URI string `json:"uri"`
+	URI string `json:"uri,omitempty"`
 }
 
 type Region struct {
@@ -181,7 +184,40 @@ type Region struct {
 }
 
 type Snippet struct {
+	Text string `json:"text,omitempty"`
+}
+
+type SARIFRule struct {
+	ID                   string                `json:"id"`
+	ShortDescription     ShortDescription      `json:"shortDescription"`
+	FullDescription      *FullDescription      `json:"fullDescription,omitempty"`
+	HelpURI              string                `json:"helpUri,omitempty"`
+	Help                 *Help                 `json:"help,omitempty"`
+	Properties           Properties            `json:"properties,omitempty"`
+	DefaultLevel         string                `json:"defaultLevel,omitempty"`
+	DefaultConfiguration *DefaultConfiguration `json:"defaultConfiguration,omitempty"`
+}
+
+type ShortDescription struct {
 	Text string `json:"text"`
+}
+
+type FullDescription struct {
+	Text string `json:"text"`
+}
+
+type Help struct {
+	Text     string `json:"text"`
+	Markdown string `json:"markdown,omitempty"`
+}
+
+type Properties struct {
+	Category string   `json:"category,omitempty"`
+	Tags     []string `json:"tags,omitempty"`
+}
+
+type DefaultConfiguration struct {
+	Level string `json:"level,omitempty"`
 }
 
 type ResultProperties struct {
@@ -251,12 +287,15 @@ func GenerateSARIFReport(inputFile string, policy Policy) (SARIFReport, error) {
 			{
 				Tool: Tool{
 					Driver: Driver{
-						FullName:        "INTERCEPT",
+						FullName:        fmt.Sprintf("%s %s", "INTERCEPT", buildVersion),
 						Name:            "INTERCEPT",
-						Version:         buildVersion,
-						SemanticVersion: buildVersion,
+						Version:         smVersion,
+						SemanticVersion: smVersion,
+						InformationURI:  "https://intercept.cc",
+						Rules:           policyData.SARIFRules,
 					},
 				},
+
 				Results: []Result{},
 				Invocations: []Invocation{
 					{
@@ -283,6 +322,14 @@ func GenerateSARIFReport(inputFile string, policy Policy) (SARIFReport, error) {
 				{
 					PhysicalLocation: PhysicalLocation{
 						ArtifactLocation: ArtifactLocation{URI: "N/A"},
+						Region: Region{
+							StartLine:   1,
+							StartColumn: 1,
+							EndColumn:   1,
+							Snippet: Snippet{
+								Text: "N/A",
+							},
+						},
 					},
 				},
 			},
@@ -393,12 +440,15 @@ func GenerateAssureSARIFReport(inputFile string, policy Policy, status string) (
 			{
 				Tool: Tool{
 					Driver: Driver{
-						FullName:        "INTERCEPT",
+						FullName:        fmt.Sprintf("%s %s", "INTERCEPT", buildVersion),
 						Name:            "INTERCEPT",
-						Version:         buildVersion,
-						SemanticVersion: buildVersion,
+						Version:         smVersion,
+						SemanticVersion: smVersion,
+						InformationURI:  "https://intercept.cc",
+						Rules:           policyData.SARIFRules,
 					},
 				},
+
 				Results: []Result{},
 				Invocations: []Invocation{
 					{
@@ -480,6 +530,14 @@ func GenerateAssureSARIFReport(inputFile string, policy Policy, status string) (
 			{
 				PhysicalLocation: PhysicalLocation{
 					ArtifactLocation: ArtifactLocation{URI: "N/A"},
+					Region: Region{
+						StartLine:   1,
+						StartColumn: 1,
+						EndColumn:   1,
+						Snippet: Snippet{
+							Text: "N/A",
+						},
+					},
 				},
 			},
 		}
@@ -504,12 +562,15 @@ func GenerateSchemaSARIFReport(policy Policy, filePath string, valid bool, issue
 			{
 				Tool: Tool{
 					Driver: Driver{
-						FullName:        "INTERCEPT",
+						FullName:        fmt.Sprintf("%s %s", "INTERCEPT", buildVersion),
 						Name:            "INTERCEPT",
-						Version:         buildVersion,
-						SemanticVersion: buildVersion,
+						Version:         smVersion,
+						SemanticVersion: smVersion,
+						InformationURI:  "https://intercept.cc",
+						Rules:           policyData.SARIFRules,
 					},
 				},
+
 				Results:     []Result{},
 				Invocations: []Invocation{{ExecutionSuccessful: true, Properties: InvocationProperties{}}},
 			},
@@ -658,12 +719,15 @@ func MergeSARIFReports(commandLine string, perf Performance, isScheduled bool) (
 			{
 				Tool: Tool{
 					Driver: Driver{
-						FullName:        "INTERCEPT",
+						FullName:        fmt.Sprintf("%s %s", "INTERCEPT", buildVersion),
 						Name:            "INTERCEPT",
-						Version:         buildVersion,
-						SemanticVersion: buildVersion,
+						Version:         smVersion,
+						SemanticVersion: smVersion,
+						InformationURI:  "https://intercept.cc",
+						Rules:           policyData.SARIFRules,
 					},
 				},
+
 				Results: []Result{},
 				Invocations: []Invocation{
 					{
@@ -790,12 +854,15 @@ func createSARIFReport(results []Result) SARIFReport {
 			{
 				Tool: Tool{
 					Driver: Driver{
-						FullName:        "INTERCEPT",
+						FullName:        fmt.Sprintf("%s %s", "INTERCEPT", buildVersion),
 						Name:            "INTERCEPT",
-						Version:         buildVersion,
-						SemanticVersion: buildVersion,
+						Version:         smVersion,
+						SemanticVersion: smVersion,
+						InformationURI:  "https://intercept.cc",
+						Rules:           policyData.SARIFRules,
 					},
 				},
+
 				Results:     results,
 				Invocations: []Invocation{{ExecutionSuccessful: true, Properties: InvocationProperties{}}},
 			},
@@ -819,12 +886,15 @@ func GenerateAPISARIFReport(policy Policy, endpoint string, matchFound bool, iss
 			{
 				Tool: Tool{
 					Driver: Driver{
-						FullName:        "INTERCEPT",
+						FullName:        fmt.Sprintf("%s %s", "INTERCEPT", buildVersion),
 						Name:            "INTERCEPT",
-						Version:         buildVersion,
-						SemanticVersion: buildVersion,
+						Version:         smVersion,
+						SemanticVersion: smVersion,
+						InformationURI:  "https://intercept.cc",
+						Rules:           policyData.SARIFRules,
 					},
 				},
+
 				Results:     []Result{},
 				Invocations: []Invocation{{ExecutionSuccessful: true, Properties: InvocationProperties{}}},
 			},

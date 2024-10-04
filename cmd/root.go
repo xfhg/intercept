@@ -30,6 +30,7 @@ var (
 	hostIps         string
 	buildVersion    string
 	buildSignature  string
+	smVersion       string
 
 	debugOutput bool
 
@@ -81,6 +82,7 @@ func init() {
 
 	// running id
 	intercept_run_id = ksuid.New().String()
+	smVersion = strings.Split(strings.TrimPrefix(buildVersion, "v"), "-")[0]
 
 	// Setup logging based on verbosity flag
 	rootCmd.PersistentPreRunE = func(cmd *cobra.Command, args []string) error {
