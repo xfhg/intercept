@@ -12,10 +12,11 @@ import (
 )
 
 type PolicyFile struct {
-	Config    Config   `yaml:"Config"`
-	Version   string   `yaml:"Version"`
-	Namespace string   `yaml:"Namespace"`
-	Policies  []Policy `yaml:"Policies"`
+	Config     Config      `yaml:"Config"`
+	Version    string      `yaml:"Version"`
+	Namespace  string      `yaml:"Namespace"`
+	Policies   []Policy    `yaml:"Policies"`
+	SARIFRules []SARIFRule `json:"sarif_rules,omitempty"`
 }
 
 type Config struct {
@@ -32,6 +33,7 @@ type Config struct {
 		Tags           []string `yaml:"tags,omitempty"`
 		PolicySchedule string   `yaml:"policy_schedule,omitempty"`
 		ReportSchedule string   `yaml:"report_schedule,omitempty"`
+		WebhookSecret  string   `yaml:"webhook_secret_env,omitempty"`
 	} `yaml:"Flags,omitempty"`
 	Metadata struct {
 		HostOS          string `yaml:"host_os,omitempty"`
@@ -91,6 +93,7 @@ type Metadata struct {
 	Score       string   `yaml:"score"`
 	MsgSolution string   `yaml:"msg_solution"`
 	MsgError    string   `yaml:"msg_error"`
+	HelpURL     string   `yaml:"help_url"`
 	TargetInfo  []string `yaml:"target_info,omitempty"`
 }
 
@@ -141,12 +144,38 @@ func LoadPolicyFile(filename string) (*PolicyFile, error) {
 
 	// log.Debug().Interface("raw config", policyFile.Config).Msg("Raw Config data")
 
+	rules := make([]SARIFRule, 0, len(policyFile.Policies))
+
 	// Generate intercept_id for each policy, add its own ID as a tag for easy filtering with tags flag
 	for i := range policyFile.Policies {
 		policyFile.Policies[i].ID = NormalizePolicyName(policyFile.Policies[i].ID)
 		policyFile.Policies[i].InterceptID = intercept_run_id + "-" + NormalizeFilename(policyFile.Policies[i].ID)
 		policyFile.Policies[i].Metadata.Tags = append(policyFile.Policies[i].Metadata.Tags, policyFile.Policies[i].ID)
+
+		// Generate rule entry for SARIF
+		rule := SARIFRule{
+			ID: policyFile.Policies[i].ID,
+			ShortDescription: ShortDescription{
+				Text: policyFile.Policies[i].Metadata.Description,
+			},
+			FullDescription: &FullDescription{
+				Text: policyFile.Policies[i].Metadata.MsgError,
+			},
+			HelpURI: policyFile.Policies[i].Metadata.HelpURL,
+			Help: &Help{
+				Text: policyFile.Policies[i].Metadata.MsgSolution,
+			},
+			Properties: Properties{
+				Category: policyFile.Policies[i].Metadata.Tags[0],
+				Tags:     policyFile.Policies[i].Metadata.Tags,
+			},
+		}
+		rules = append(rules, rule)
+
 	}
+
+	// Add rules to policyFile
+	policyFile.SARIFRules = rules
 
 	return &policyFile, nil
 }

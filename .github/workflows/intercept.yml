@@ -1,0 +1,42 @@
+name: "Intercept Mock Code Scanning - Integration"
+
+on:
+  workflow_dispatch:
+    inputs:
+      branch:
+        description: 'Branch to scan'
+        required: true
+        default: 'master'
+  push:
+    branches: [ master, integration/github  ]
+  schedule:
+    - cron: '0 0 * * 0'
+
+
+jobs:
+  analyze:
+    name: Mock Code Scanning with Intercept
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+
+    - name: Compile intercept
+      run: |
+        make build && cp release/intercept .
+
+    - name: Run intercept with mock policy
+      run: |
+        ./intercept audit --policy playground/policies/mock_github.yaml --target playground/targets/ -vvvv 
+
+    - name: Find SARIF file
+      id: find-sarif
+      run: |
+        SARIF_FILE=$(find . -type f -regex ".*intercept_[a-zA-Z0-9]+\.sarif\.json" -print -quit)
+        echo "SARIF_FILE=${SARIF_FILE}" >> $GITHUB_OUTPUT
+
+    - name: Upload SARIF file
+      uses: github/codeql-action/upload-sarif@v2
+      with:
+        sarif_file: ${{ steps.find-sarif.outputs.SARIF_FILE }}

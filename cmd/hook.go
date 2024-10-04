@@ -5,7 +5,11 @@ package cmd
 
 import (
 	"bytes"
+	"crypto/hmac"
+	"crypto/rand"
+	"crypto/sha256"
 	"crypto/tls"
+	"encoding/base64"
 	"encoding/json"
 	"fmt"
 	"reflect"
@@ -76,6 +80,42 @@ func convertLogsToNDJSON(logs interface{}) (string, error) {
 	}
 
 	return strings.Join(ndjsonLines, "\n"), nil
+}
+
+func GenerateWebhookSecret() (string, error) {
+	// Generate 32 bytes of random data
+	randomBytes := make([]byte, 32)
+	_, err := rand.Read(randomBytes)
+	if err != nil {
+		return "", fmt.Errorf("failed to generate random bytes: %w", err)
+	}
+
+	// Encode the random bytes to base64
+	secret := base64.URLEncoding.EncodeToString(randomBytes)
+
+	// Prefix the secret with "whsec_" to match the format of the example
+	return "whsec_" + secret, nil
+}
+
+func calculateWebhookSignature(payload []byte, secret string) (string, error) {
+	// Split the secret and decode the base64 part
+	parts := strings.SplitN(secret, "_", 2)
+	if len(parts) != 2 {
+		return "", fmt.Errorf("invalid secret format")
+	}
+	secretBytes, err := base64.URLEncoding.DecodeString(parts[1])
+	if err != nil {
+		return "", fmt.Errorf("failed to decode secret: %w", err)
+	}
+
+	// Create the HMAC
+	h := hmac.New(sha256.New, secretBytes)
+	h.Write(payload)
+
+	// Get the result and encode to base64
+	signature := base64.StdEncoding.EncodeToString(h.Sum(nil))
+
+	return signature, nil
 }
 
 // event types same as log types : minimal, results, policy, report
@@ -168,6 +208,22 @@ func PostResultsToWebhooks(sarifReport SARIFReport) error {
 		// Prepare the request
 		req := client.R()
 		req.SetHeaders(hook.Headers)
+
+		// Set custom User-Agent
+		userAgent := fmt.Sprintf("intercept/%s", buildVersion)
+		req.SetHeader("User-Agent", userAgent)
+
+		// Convert payload to []byte for signature calculation
+		var payloadBytes []byte
+		if payloadType == "x-ndjson" {
+			payloadBytes = []byte(payload.(string))
+		} else {
+			payloadBytes, _ = json.Marshal(payload)
+		}
+		// Calculate and set the signature
+		signature, _ := calculateWebhookSignature(payloadBytes, webhookSecret)
+		req.SetHeader("X-Signature", signature)
+
 		req.SetBody(payload)
 
 		// Set content type based on payloadType
@@ -196,13 +252,15 @@ func PostResultsToWebhooks(sarifReport SARIFReport) error {
 				time.Sleep(retryDelay)
 			}
 		}
+		// Flatten hook.EventTypes to a single string
+		flatEventTypes := strings.Join(hook.EventTypes, ",")
 
 		if err != nil {
-			log.Error().Err(err).Str("hook", hook.Name).Msg("Failed to post to webhook")
+			log.Error().Err(err).Str("hook", hook.Name).Str("event_type", flatEventTypes).Msg("Failed to post to webhook")
 		} else if !resp.IsSuccess() {
-			log.Error().Str("hook", hook.Name).Int("status", resp.StatusCode()).Msg("Webhook request failed")
+			log.Error().Str("hook", hook.Name).Str("event_type", flatEventTypes).Int("status", resp.StatusCode()).Msg("Webhook request failed")
 		} else {
-			log.Info().Str("hook", hook.Name).Msg("Successfully posted to webhook")
+			log.Info().Str("hook", hook.Name).Str("event_type", flatEventTypes).Str("payload_type", payloadType).Msg("Successfully posted to webhook")
 		}
 	}
 
@@ -330,6 +388,22 @@ func PostReportToWebhooks(sarifReport SARIFReport) error {
 		// Prepare the request
 		req := client.R()
 		req.SetHeaders(hook.Headers)
+
+		// Set custom User-Agent
+		userAgent := fmt.Sprintf("intercept/%s", buildVersion)
+		req.SetHeader("User-Agent", userAgent)
+
+		// Convert payload to []byte for signature calculation
+		var payloadBytes []byte
+		if payloadType == "x-ndjson" {
+			payloadBytes = []byte(payload.(string))
+		} else {
+			payloadBytes, _ = json.Marshal(payload)
+		}
+		// Calculate and set the signature
+		signature, _ := calculateWebhookSignature(payloadBytes, webhookSecret)
+		req.SetHeader("X-Signature", signature)
+
 		req.SetBody(payload)
 
 		// if containsString(hook.EventTypes, "bulk") {
@@ -361,12 +435,15 @@ func PostReportToWebhooks(sarifReport SARIFReport) error {
 			}
 		}
 
+		// Flatten hook.EventTypes to a single string
+		flatEventTypes := strings.Join(hook.EventTypes, ",")
+
 		if err != nil {
-			log.Error().Err(err).Str("hook", hook.Name).Msg("Failed to post to webhook")
+			log.Error().Err(err).Str("hook", hook.Name).Str("event_type", flatEventTypes).Msg("Failed to post to webhook")
 		} else if !resp.IsSuccess() {
-			log.Error().Str("hook", hook.Name).Int("status", resp.StatusCode()).Msg("Webhook request failed")
+			log.Error().Str("hook", hook.Name).Str("event_type", flatEventTypes).Int("status", resp.StatusCode()).Msg("Webhook request failed")
 		} else {
-			log.Info().Str("hook", hook.Name).Msg("Successfully posted to webhook")
+			log.Info().Str("hook", hook.Name).Str("event_type", flatEventTypes).Str("payload_type", payloadType).Msg("Successfully posted to webhook")
 		}
 	}
 
