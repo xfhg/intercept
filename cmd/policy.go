@@ -32,6 +32,7 @@ type Config struct {
 		Tags           []string `yaml:"tags,omitempty"`
 		PolicySchedule string   `yaml:"policy_schedule,omitempty"`
 		ReportSchedule string   `yaml:"report_schedule,omitempty"`
+		WebhookSecret  string   `yaml:"webhook_secret_env,omitempty"`
 	} `yaml:"Flags,omitempty"`
 	Metadata struct {
 		HostOS          string `yaml:"host_os,omitempty"`

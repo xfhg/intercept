@@ -142,15 +142,17 @@ type Tool struct {
 }
 
 type Driver struct {
-	Name    string `json:"name"`
-	Version string `json:"version"`
+	Name            string `json:"name"`
+	Version         string `json:"version"`
+	FullName        string `json:"fullName"`
+	SemanticVersion string `json:"semanticVersion"`
 }
 
 type Result struct {
 	RuleID     string           `json:"ruleId"`
 	Level      SARIFLevel       `json:"level"`
 	Message    Message          `json:"message"`
-	Locations  []Location       `json:"locations"`
+	Locations  []Location       `json:"locations,omitempty"`
 	Properties ResultProperties `json:"properties,omitempty"`
 }
 
@@ -164,7 +166,7 @@ type Location struct {
 
 type PhysicalLocation struct {
 	ArtifactLocation ArtifactLocation `json:"artifactLocation"`
-	Region           Region           `json:"region"`
+	Region           Region           `json:"region,omitempty"`
 }
 
 type ArtifactLocation struct {
@@ -172,10 +174,10 @@ type ArtifactLocation struct {
 }
 
 type Region struct {
-	StartLine   int     `json:"startLine"`
-	StartColumn int     `json:"startColumn"`
-	EndColumn   int     `json:"endColumn"`
-	Snippet     Snippet `json:"snippet"`
+	StartLine   int     `json:"startLine,omitempty"`
+	StartColumn int     `json:"startColumn,omitempty"`
+	EndColumn   int     `json:"endColumn,omitempty"`
+	Snippet     Snippet `json:"snippet,omitempty"`
 }
 
 type Snippet struct {
@@ -249,8 +251,10 @@ func GenerateSARIFReport(inputFile string, policy Policy) (SARIFReport, error) {
 			{
 				Tool: Tool{
 					Driver: Driver{
-						Name:    "INTERCEPT",
-						Version: buildVersion,
+						FullName:        "INTERCEPT",
+						Name:            "INTERCEPT",
+						Version:         buildVersion,
+						SemanticVersion: buildVersion,
 					},
 				},
 				Results: []Result{},
@@ -306,20 +310,28 @@ func GenerateSARIFReport(inputFile string, policy Policy) (SARIFReport, error) {
 					startColumn := strings.Index(rgOutput.Data.Lines.Text, matchText) + 1
 					endColumn := startColumn + len(matchText)
 
+					var message string
+
+					if len(matchText) != 0 {
+						message = fmt.Sprintf("Policy violation: %s Matched text: %s", policy.Metadata.Name, matchText)
+					} else {
+						message = fmt.Sprintf("Policy violation: %s", policy.Metadata.Name)
+					}
+
 					result := Result{
 						RuleID: policy.ID,
 						Level:  sarifLevel,
 						Message: Message{
-							Text: fmt.Sprintf("Policy violation: %s Matched text: %s", policy.Metadata.Name, matchText),
+							Text: message,
 						},
 						Locations: []Location{
 							{
 								PhysicalLocation: PhysicalLocation{
 									ArtifactLocation: ArtifactLocation{URI: rgOutput.Data.Path.Text},
 									Region: Region{
-										StartLine:   rgOutput.Data.LineNumber,
-										StartColumn: startColumn,
-										EndColumn:   endColumn,
+										StartLine:   max(rgOutput.Data.LineNumber, 1),
+										StartColumn: max(startColumn, 1),
+										EndColumn:   max(endColumn, 1),
 										Snippet: Snippet{
 											Text: matchText,
 										},
@@ -381,8 +393,10 @@ func GenerateAssureSARIFReport(inputFile string, policy Policy, status string) (
 			{
 				Tool: Tool{
 					Driver: Driver{
-						Name:    "INTERCEPT",
-						Version: buildVersion,
+						FullName:        "INTERCEPT",
+						Name:            "INTERCEPT",
+						Version:         buildVersion,
+						SemanticVersion: buildVersion,
 					},
 				},
 				Results: []Result{},
@@ -452,9 +466,9 @@ func GenerateAssureSARIFReport(inputFile string, policy Policy, status string) (
 					PhysicalLocation: PhysicalLocation{
 						ArtifactLocation: ArtifactLocation{URI: rgOutput.Data.Path.Text},
 						Region: Region{
-							StartLine:   rgOutput.Data.LineNumber,
+							StartLine:   max(rgOutput.Data.LineNumber, 1),
 							StartColumn: 1,
-							EndColumn:   len(rgOutput.Data.Lines.Text),
+							EndColumn:   max(len(rgOutput.Data.Lines.Text), 1),
 						},
 					},
 				})
@@ -466,11 +480,6 @@ func GenerateAssureSARIFReport(inputFile string, policy Policy, status string) (
 			{
 				PhysicalLocation: PhysicalLocation{
 					ArtifactLocation: ArtifactLocation{URI: "N/A"},
-					Region: Region{
-						StartLine:   1,
-						StartColumn: 1,
-						EndColumn:   1,
-					},
 				},
 			},
 		}
@@ -495,8 +504,10 @@ func GenerateSchemaSARIFReport(policy Policy, filePath string, valid bool, issue
 			{
 				Tool: Tool{
 					Driver: Driver{
-						Name:    "INTERCEPT",
-						Version: buildVersion,
+						FullName:        "INTERCEPT",
+						Name:            "INTERCEPT",
+						Version:         buildVersion,
+						SemanticVersion: buildVersion,
 					},
 				},
 				Results:     []Result{},
@@ -647,8 +658,10 @@ func MergeSARIFReports(commandLine string, perf Performance, isScheduled bool) (
 			{
 				Tool: Tool{
 					Driver: Driver{
-						Name:    "INTERCEPT",
-						Version: buildVersion,
+						FullName:        "INTERCEPT",
+						Name:            "INTERCEPT",
+						Version:         buildVersion,
+						SemanticVersion: buildVersion,
 					},
 				},
 				Results: []Result{},
@@ -777,8 +790,10 @@ func createSARIFReport(results []Result) SARIFReport {
 			{
 				Tool: Tool{
 					Driver: Driver{
-						Name:    "INTERCEPT",
-						Version: buildVersion,
+						FullName:        "INTERCEPT",
+						Name:            "INTERCEPT",
+						Version:         buildVersion,
+						SemanticVersion: buildVersion,
 					},
 				},
 				Results:     results,
@@ -804,8 +819,10 @@ func GenerateAPISARIFReport(policy Policy, endpoint string, matchFound bool, iss
 			{
 				Tool: Tool{
 					Driver: Driver{
-						Name:    "INTERCEPT",
-						Version: buildVersion,
+						FullName:        "INTERCEPT",
+						Name:            "INTERCEPT",
+						Version:         buildVersion,
+						SemanticVersion: buildVersion,
 					},
 				},
 				Results:     []Result{},

@@ -134,8 +134,10 @@ func generateRuntimeSARIFReport(policy Policy, gossResult GossResult) (SARIFRepo
 			{
 				Tool: Tool{
 					Driver: Driver{
-						Name:    "INTERCEPT",
-						Version: buildVersion,
+						FullName:        "INTERCEPT",
+						Name:            "INTERCEPT",
+						Version:         buildVersion,
+						SemanticVersion: buildVersion,
 					},
 				},
 				Results: []Result{},

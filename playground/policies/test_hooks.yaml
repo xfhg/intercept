@@ -4,10 +4,7 @@ Config:
     policy_schedule: "*/20 * * * * *"
     report_schedule:  "*/50 * * * * *"
     target: "targets_extra/"
-  Observe:
-    max_report_size:
-    compression_age:
-    deletion_age:
+    webhook_secret_env: "WHSECRET" # place the env variable here , secret format : whsec_uobPSTBp/p+90AEpk3q5W0h1VI9K1oE6
   Hooks:
     # - name: "Test Webhook Report"
     #   endpoint: "https://webhook.site/ea939de5-d1bc-4078-8f6e-8873103e77bd"
@@ -24,7 +21,7 @@ Config:
     #   event_types:
     #     - "report"
     - name: "Test Webhook Results"
-      endpoint: "https://hkdk.events/y1whk6u99kbekd"
+      endpoint: "https://hooks.intercept.cc/nxyzqsfk2p5dcu"
       insecure: false
       method: "POST"
       auth: 
@@ -35,10 +32,9 @@ Config:
       timeout_seconds: 30
       event_types:
         - "results"
-        - "log"
 
     - name: "XXX Test Webhook Results"
-      endpoint: "https://hkdk.events/y1whk6u99kbekd"
+      endpoint: "https://hooks.intercept.cc/nxyzqsfk2p5dcu"
       insecure: false
       method: "POST"
       auth: 
@@ -49,7 +45,7 @@ Config:
       timeout_seconds: 30
       event_types:
         - "report"
-        - "log"
+
     # - name: "Test ES BULK"
     #   endpoint: https://f7380f223b634b07b67cc9075b4929ea.us-central1.gcp.cloud.es.io:443/_bulk
     #   insecure: false
