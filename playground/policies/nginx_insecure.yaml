@@ -1,5 +1,5 @@
 Policies:
-  - id: "SCAN-001 Server Tokens"
+  - id: "I SCAN-001 Server Tokens"
     type: "scan"
     filepattern: "nginx.conf"
     enforcement:
@@ -19,7 +19,7 @@ Policies:
     _regex:
       - "server_tokens\\s+on;"
 
-  - id: "SCAN-002 SSL Protocols"
+  - id: "I SCAN-002 SSL Protocols"
     type: "scan"
     filepattern: "nginx.conf"
     enforcement:
@@ -85,7 +85,7 @@ Policies:
   #   _regex:
   #     - "^(?!.*ssl_certificate|ssl_certificate_key)"
 
-  - id: "SCAN-005 Weak SSL Ciphers"
+  - id: "I SCAN-005 Weak SSL Ciphers"
     type: "scan"
     filepattern: "nginx.conf"
     enforcement:
@@ -127,7 +127,7 @@ Policies:
   #     - "listen\\s+80;"
   #     - "server\\s*\\{[^\\{]*listen\\s+80[^\\{]*[^#]\\breturn\\s+301\\b.*https;"
 
-  - id: "SCAN-007 Access Logs Disabled"
+  - id: "I SCAN-007 Access Logs Disabled"
     type: "scan"
     filepattern: "nginx.conf"
     enforcement:
@@ -167,7 +167,7 @@ Policies:
     _regex:
       - "autoindex\\s+on;"
 
-  - id: "SCAN-009 Large Buffer Size"
+  - id: "I SCAN-009 Large Buffer Size"
     type: "scan"
     filepattern: "nginx.conf"
     enforcement:

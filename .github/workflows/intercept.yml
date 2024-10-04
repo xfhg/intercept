@@ -26,13 +26,11 @@ jobs:
 
     - name: compile intercept
       run: |
-        make build && cp release/intercept playground/intercept
+        make build && cp release/intercept .
 
-    - name: Run your analysis tool
+    - name: Run intercept tool
       run: |
-        cd playground/
-        ./intercept audit --policy policies/nginx_insecure.yaml --target targets/ -vvvv 
-        
+        ./intercept audit --policy playground/policies/nginx_insecure.yaml --target playground/targets/ -vvvv 
 
     - name: Find SARIF file
       id: find-sarif
