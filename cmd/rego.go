@@ -152,6 +152,14 @@ func ProcessRegoType(policy Policy, targetDir string, filePaths []string) error 
 							ArtifactLocation: ArtifactLocation{
 								URI: filepath.ToSlash(filePath),
 							},
+							Region: Region{
+								StartLine:   1,
+								StartColumn: 1,
+								EndColumn:   1,
+								Snippet: Snippet{
+									Text: "N/A",
+								},
+							},
 						},
 					},
 				},
