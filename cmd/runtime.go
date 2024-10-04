@@ -188,6 +188,14 @@ func generateRuntimeSARIFReport(policy Policy, gossResult GossResult) (SARIFRepo
 				{
 					PhysicalLocation: PhysicalLocation{
 						ArtifactLocation: ArtifactLocation{URI: res.ResourceID},
+						Region: Region{
+							StartLine:   1,
+							StartColumn: 1,
+							EndColumn:   1,
+							Snippet: Snippet{
+								Text: "N/A",
+							},
+						},
 					},
 				},
 			},

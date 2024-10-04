@@ -595,6 +595,14 @@ func GenerateSchemaSARIFReport(policy Policy, filePath string, valid bool, issue
 							ArtifactLocation: ArtifactLocation{
 								URI: filepath.ToSlash(filePath),
 							},
+							Region: Region{
+								StartLine:   1,
+								StartColumn: 1,
+								EndColumn:   1,
+								Snippet: Snippet{
+									Text: "N/A",
+								},
+							},
 						},
 					},
 				},
@@ -635,6 +643,14 @@ func GenerateSchemaSARIFReport(policy Policy, filePath string, valid bool, issue
 				PhysicalLocation: PhysicalLocation{
 					ArtifactLocation: ArtifactLocation{
 						URI: filepath.ToSlash(filePath),
+					},
+					Region: Region{
+						StartLine:   1,
+						StartColumn: 1,
+						EndColumn:   1,
+						Snippet: Snippet{
+							Text: "N/A",
+						},
 					},
 				},
 			},
@@ -971,6 +987,14 @@ func GenerateAPISARIFReport(policy Policy, endpoint string, matchFound bool, iss
 					PhysicalLocation: PhysicalLocation{
 						ArtifactLocation: ArtifactLocation{
 							URI: endpoint,
+						},
+						Region: Region{
+							StartLine:   1,
+							StartColumn: 1,
+							EndColumn:   1,
+							Snippet: Snippet{
+								Text: "N/A",
+							},
 						},
 					},
 				},
