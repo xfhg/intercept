@@ -1,4 +1,4 @@
-name: "INTERCEPT Mock Code Scanning - Integration"
+name: "Intercept Mock Code Scanning - Integration"
 
 on:
   workflow_dispatch:
