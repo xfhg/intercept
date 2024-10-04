@@ -70,18 +70,24 @@ export default defineConfig({
         ]
       },
       {
+        text: 'INTERCEPT',
+        items: [
+          { text: 'Global Feature Flags', link: '/docs/global-flags' },
+        ]
+      },
+      {
         text: 'INTERCEPT AUDIT',
         items: [
-          { text: 'Feature Flags', link: '/docs/tbd' },
-          { text: 'Compliance Reporting', link: '/docs/tbd' },
+          { text: 'Feature Flags', link: '/docs/audit-flags' },
+          // { text: 'Compliance Reporting', link: '/docs/tbd' },
         ]
       },
       {
         text: 'INTERCEPT OBSERVE',
         items: [
-          { text: 'Feature Flags', link: '/docs/tbd' },
-          { text: 'Runtime Modes', link: '/docs/tbd' },
-          { text: 'Integration Webhooks', link: '/docs/tbd' }
+          { text: 'Feature Flags', link: '/docs/observe-flags' },
+          // { text: 'Runtime Modes', link: '/docs/tbd' },
+          // { text: 'Integration Webhooks', link: '/docs/tbd' }
         ]
       },
       {
