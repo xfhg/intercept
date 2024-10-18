@@ -32,8 +32,8 @@ var filteredPolicies []Policy
 
 var remoteCmd = &cobra.Command{
 	Use:   "remote",
-	Short: "(not final) Start the SSH server",
-	Long:  `(not final) Start the SSH server with interactive interface for policy actions`,
+	Short: "(not final) Start the Remote Policy Execution endpoint",
+	Long:  `(not final) Start the Remote Policy Execution endpoint with interactive interface for policy actions`,
 	Run: func(cmd *cobra.Command, args []string) {
 		startSSHServer(filteredPolicies, outputDir)
 	},
@@ -75,7 +75,7 @@ type model struct {
 func newModel() model {
 	choices := make([]string, len(filteredPolicies))
 	for i, policy := range filteredPolicies {
-		choices[i] = "policy." + policy.ID
+		choices[i] = "policy: " + policy.ID
 	}
 	return model{
 		choices:  choices,
@@ -178,7 +178,14 @@ func (m model) runSelectedPolicies() tea.Msg {
 }
 
 func startSSHServer(policies []Policy, outputDir string) error {
-	filteredPolicies = policies
+	// Filter policies to include only those with Type == "runtime"
+	var runtimePolicies []Policy
+	for _, policy := range policies {
+		if policy.Type == "runtime" {
+			runtimePolicies = append(runtimePolicies, policy)
+		}
+	}
+	filteredPolicies = runtimePolicies
 
 	hostKeyPath := filepath.Join(outputDir, "_rpe/id_ed25519")
 

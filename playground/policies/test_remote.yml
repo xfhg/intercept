@@ -48,3 +48,23 @@ Policies:
       score: "8"
     _runtime:
       config: runtime/simple_https.yaml
+
+  - id: "NOT-FOR-REMOTE-003"
+    type: "WRONG TYPE"
+    enforcement:
+      - environment: "all"
+        fatal: "false"
+        exceptions: "development"
+        confidence: "high"
+    metadata:
+      name: "RUNTIME System Compliance"
+      description: "Enforce system compliance at runtime"
+      msg_solution: ""
+      msg_error: ""
+      tags:
+        - "config"
+        - "runtime"
+        - "enforce"
+      score: "8"
+    _runtime:
+      config: runtime/simple_https.yaml
