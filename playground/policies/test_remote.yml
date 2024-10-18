@@ -1,0 +1,50 @@
+
+Config: 
+  Flags:
+    report_schedule:  "5 * * * * *"
+  Remote:
+    authorized_keys:
+      - "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAILxWe2rXKoiO6W14LYPVfJKzRfJ1f3Jhzxrgjc/D4tU7"
+
+Policies:
+
+  - id: "RUNTIM-001-NGINX"
+    type: "runtime"
+    enforcement:
+      - environment: "all"
+        fatal: "false"
+        exceptions: "development"
+        confidence: "high"
+    metadata:
+      name: "RUNTIME System Compliance"
+      description: "Enforce system compliance at runtime"
+      msg_solution: ""
+      msg_error: ""
+      tags:
+        - "config"
+        - "runtime"
+        - "enforce"
+      score: "8"
+    _runtime:
+      config: runtime/nginx.yaml
+      observe: targets/scan/nginx.conf
+
+  - id: "RUNTIM-002"
+    type: "runtime"
+    enforcement:
+      - environment: "all"
+        fatal: "false"
+        exceptions: "development"
+        confidence: "high"
+    metadata:
+      name: "RUNTIME System Compliance"
+      description: "Enforce system compliance at runtime"
+      msg_solution: ""
+      msg_error: ""
+      tags:
+        - "config"
+        - "runtime"
+        - "enforce"
+      score: "8"
+    _runtime:
+      config: runtime/simple_https.yaml

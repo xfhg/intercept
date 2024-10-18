@@ -37,6 +37,7 @@ var (
 	allFileInfos        []FileInfo
 	observeList         []string
 	observeConfig       Config
+	observeRemote       bool
 )
 
 var observeCmd = &cobra.Command{
@@ -58,6 +59,7 @@ func init() {
 	observeCmd.Flags().StringVar(&observeReport, "report", "", "Report Cron Schedule")
 	observeCmd.Flags().StringVar(&observeMode, "mode", "last", "Observe mode for path monitoring : first,last,all ")
 	observeCmd.Flags().StringVar(&observeIndex, "index", "intercept", "Index name for ES bulk operations")
+	observeCmd.Flags().BoolVar(&observeRemote, "remote", false, "Start SSH server for remote policy execution")
 
 }
 
@@ -151,10 +153,21 @@ func runObserve(cmd *cobra.Command, args []string) {
 		observeConfig.Flags.ReportSchedule = observeReport
 	}
 
+	// Load and filter policies
 	policies := loadFilteredPolicies()
 	if len(policies) == 0 {
 		log.Fatal().Msg("No active policies found")
 		return
+	}
+
+	// Check for remote mode early
+	if observeRemote {
+		go func() {
+			if err := startSSHServer(policies, outputDir); err != nil {
+				log.Error().Err(err).Msg("Failed to start Remote Policy Execution Endpoint")
+			}
+		}()
+		log.Info().Msg("Remote Policy Execution Endpoint active")
 	}
 
 	dispatcher := GetDispatcher()
