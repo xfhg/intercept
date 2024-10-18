@@ -49,7 +49,7 @@ func authenticatedBubbleteaMiddleware() wish.Middleware {
 			for name, pubkey := range users {
 				parsed, _, _, _, _ := ssh.ParseAuthorizedKey([]byte(pubkey))
 				if ssh.KeysEqual(s.PublicKey(), parsed) {
-					wish.Println(s, fmt.Sprintf("-/- Welcome, %s! -/- \n\n", name))
+					wish.Println(s, fmt.Sprintf("┗━━━┫ Authenticated as %s \n\n", name))
 					bwish.Middleware(policyActionHandler)(next)(s)
 					return
 				}
@@ -66,28 +66,34 @@ func policyActionHandler(s ssh.Session) (tea.Model, []tea.ProgramOption) {
 
 // Model represents the state of our Bubble Tea program
 type model struct {
-	choices  []string
+	choices  []policyChoice
 	cursor   int
 	selected map[int]struct{}
 	message  string
 }
 
-func newModel() model {
-	choices := make([]string, len(filteredPolicies))
+type policyChoice struct {
+	policy Policy
+}
+
+func newModel() *model {
+	choices := make([]policyChoice, len(filteredPolicies))
 	for i, policy := range filteredPolicies {
-		choices[i] = "policy: " + policy.ID
+		choices[i] = policyChoice{
+			policy: policy,
+		}
 	}
-	return model{
+	return &model{
 		choices:  choices,
 		selected: make(map[int]struct{}),
 	}
 }
 
-func (m model) Init() tea.Cmd {
+func (m *model) Init() tea.Cmd {
 	return nil
 }
 
-func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
 	case policyExecutedMsg:
 		m.message = string(msg)
@@ -120,7 +126,7 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	return m, nil
 }
 
-func (m model) View() string {
+func (m *model) View() string {
 	s := "Select policies to run (use arrow keys, space to select, 'r' to run):\n\n"
 
 	for i, choice := range m.choices {
@@ -134,7 +140,14 @@ func (m model) View() string {
 			checked = "x"
 		}
 
-		s += fmt.Sprintf("%s [%s] %s\n", cursor, checked, choice)
+		// Get the status of the policy
+		status, ok := loadResultFromCache(choice.policy.ID)
+
+		if !ok {
+			status = "⚪ Not executed"
+		}
+
+		s += fmt.Sprintf("%s [%s] %s \t - %s \n", cursor, checked, choice.policy.ID, status)
 	}
 
 	if m.message != "" {
@@ -146,18 +159,19 @@ func (m model) View() string {
 	return s
 }
 
-func (m model) runSelectedPolicies() tea.Msg {
+func (m *model) runSelectedPolicies() tea.Msg {
 	dispatcher := GetDispatcher()
 	var messages []string
 
 	for i := range m.selected {
-		policy := filteredPolicies[i]
+		policy := m.choices[i].policy
 
 		runID := fmt.Sprintf("%s-%s", ksuid.New().String(), NormalizeFilename(policy.ID))
 		log.Info().Str("policy", policy.ID).Str("runID", runID).Msg("Executing policy via REMOTE CALL")
 
-		// Set the RunID for the policy
+		// Update the RunID for the policy in the model
 		policy.RunID = runID
+		m.choices[i].policy.RunID = runID
 
 		err := dispatcher.DispatchPolicyEvent(policy, "", nil)
 		timestamp := time.Now().Format("15:04:05")
@@ -193,7 +207,7 @@ func startSSHServer(policies []Policy, outputDir string) error {
 		wish.WithAddress(net.JoinHostPort(host, port)),
 		wish.WithHostKeyPath(hostKeyPath),
 		wish.WithBannerHandler(func(ctx ssh.Context) string {
-			return "\n\n-/- INTERCEPT Remote Policy Execution Endpoint -/-\n\n\n"
+			return "\n\n┏━ INTERCEPT Remote Policy Execution Endpoint\n┃\n"
 		}),
 		wish.WithPublicKeyAuth(func(ctx ssh.Context, key ssh.PublicKey) bool {
 			return key.Type() == "ssh-ed25519"

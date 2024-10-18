@@ -160,6 +160,9 @@ func runObserve(cmd *cobra.Command, args []string) {
 		return
 	}
 
+	// Results cache
+	initialiseCache()
+
 	// Check for remote mode early
 	if observeRemote {
 		go func() {
@@ -168,6 +171,7 @@ func runObserve(cmd *cobra.Command, args []string) {
 			}
 		}()
 		log.Info().Msg("Remote Policy Execution Endpoint active")
+
 	}
 
 	dispatcher := GetDispatcher()
