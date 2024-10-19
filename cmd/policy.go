@@ -34,6 +34,7 @@ type Config struct {
 		PolicySchedule string   `yaml:"policy_schedule,omitempty"`
 		ReportSchedule string   `yaml:"report_schedule,omitempty"`
 		WebhookSecret  string   `yaml:"webhook_secret_env,omitempty"`
+		RemoteAuth     []string `yaml:"remote_auth,omitempty"`
 	} `yaml:"Flags,omitempty"`
 	Metadata struct {
 		HostOS          string `yaml:"host_os,omitempty"`

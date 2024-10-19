@@ -107,6 +107,21 @@ func ProcessRuntimeType(policy Policy, gossPath string, targetDir string, filePa
 	}
 	if isObserve {
 
+		// if remote cache the results
+		if policy.RunID != "" {
+			var resultMsg string
+
+			if sarifReport.Runs[0].Invocations[0].Properties.ReportCompliant {
+
+				resultMsg = fmt.Sprintf("🟢 %s : %s", "Compliant", gossResult.Summary.SummaryLine)
+
+			} else {
+				resultMsg = fmt.Sprintf("🔴 %s : %s", "Non Compliant", gossResult.Summary.SummaryLine)
+			}
+			storeResultInCache(policy.ID, resultMsg)
+
+		}
+
 		if len(sarifReport.Runs) == 0 {
 			log.Warn().Msg("Runtime SARIF contains no runs")
 		} else {
