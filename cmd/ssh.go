@@ -27,10 +27,10 @@ var filteredPolicies []Policy
 
 var remoteCmd = &cobra.Command{
 	Use:   "remote",
-	Short: "(not final) Start the Remote Policy Execution endpoint",
-	Long:  `(not final) Start the Remote Policy Execution endpoint with interactive interface for policy actions`,
+	Short: "(not final) Load the Remote Policy Execution",
+	Long:  `(not final) Load the Remote Policy Execution endpoint with interactive interface for policy actions`,
 	Run: func(cmd *cobra.Command, args []string) {
-		//startSSHServer(filteredPolicies, outputDir)
+		log.Fatal().Msg("Not yet implemented, use `observe --remote` to start the remote policy execution interface")
 	},
 }
 
