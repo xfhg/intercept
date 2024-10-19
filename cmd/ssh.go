@@ -21,12 +21,7 @@ const (
 	port = "23234"
 )
 
-var users = map[string]string{
-
-	"Flavio": "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAICtFRLdSvayFQwQdIOk6NKuEpEK7KvYBQz8LUVerSo8T",
-	"Arka":   "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIJyubt40tutUSi3FQqcEzbDUu14RdLstEbURvX/M2bM/",
-	// You can add add your name and public key here :)
-}
+var remote_users = map[string]string{}
 
 var filteredPolicies []Policy
 
@@ -35,7 +30,7 @@ var remoteCmd = &cobra.Command{
 	Short: "(not final) Start the Remote Policy Execution endpoint",
 	Long:  `(not final) Start the Remote Policy Execution endpoint with interactive interface for policy actions`,
 	Run: func(cmd *cobra.Command, args []string) {
-		startSSHServer(filteredPolicies, outputDir)
+		//startSSHServer(filteredPolicies, outputDir)
 	},
 }
 
@@ -46,7 +41,7 @@ func init() {
 func authenticatedBubbleteaMiddleware() wish.Middleware {
 	return func(next ssh.Handler) ssh.Handler {
 		return func(s ssh.Session) {
-			for name, pubkey := range users {
+			for name, pubkey := range remote_users {
 				parsed, _, _, _, _ := ssh.ParseAuthorizedKey([]byte(pubkey))
 				if ssh.KeysEqual(s.PublicKey(), parsed) {
 					wish.Println(s, fmt.Sprintf("┗━━━┫ Authenticated as %s \n\n", name))
@@ -54,7 +49,7 @@ func authenticatedBubbleteaMiddleware() wish.Middleware {
 					return
 				}
 			}
-			wish.Println(s, "Authentication failed. Goodbye!")
+			wish.Println(s, "┗━━━┫ Authentication failed ╳ \n\n")
 			s.Close()
 		}
 	}
@@ -230,3 +225,18 @@ func startSSHServer(policies []Policy, outputDir string) error {
 }
 
 type policyExecutedMsg string
+
+func authKeysToMap(arr []string) map[string]string {
+	users := make(map[string]string)
+	for _, s := range arr {
+		parts := strings.SplitN(s, ":", 2)
+		if len(parts) == 2 {
+			alias := parts[0]
+			sshKey := parts[1]
+			users[alias] = sshKey
+		} else {
+			log.Error().Msgf("Invalid key format for entry: %s\n", s)
+		}
+	}
+	return users
+}

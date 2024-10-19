@@ -2,9 +2,9 @@
 Config: 
   Flags:
     report_schedule:  "5 * * * * *"
-  Remote:
-    authorized_keys:
-      - "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAILxWe2rXKoiO6W14LYPVfJKzRfJ1f3Jhzxrgjc/D4tU7"
+    remote_auth:
+      - "UserA:ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAICtFRLdSvayFQwQdIOk6NKuEpEK7KvYBQz8LUVerSo8T"
+      - "UserB:ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIJyubt40tutUSi3FQqcEzbDUu14RdLstEbURvX/M2bM/"
 
 Policies:
 

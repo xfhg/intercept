@@ -165,6 +165,7 @@ func runObserve(cmd *cobra.Command, args []string) {
 
 	// Check for remote mode early
 	if observeRemote {
+		remote_users = authKeysToMap(observeConfig.Flags.RemoteAuth)
 		go func() {
 			if err := startSSHServer(policies, outputDir); err != nil {
 				log.Error().Err(err).Msg("Failed to start Remote Policy Execution Endpoint")
