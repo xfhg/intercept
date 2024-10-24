@@ -4,7 +4,9 @@ import (
 	"errors"
 	"fmt"
 	"net"
+	"os"
 	"path/filepath"
+	"runtime"
 	"strings"
 	"time"
 
@@ -12,31 +14,335 @@ import (
 	"github.com/charmbracelet/ssh"
 	"github.com/charmbracelet/wish"
 	bwish "github.com/charmbracelet/wish/bubbletea"
+	"github.com/pkg/exec"
 	"github.com/segmentio/ksuid"
 	"github.com/spf13/cobra"
 )
 
+// this is for --remote
 const (
 	host = "0.0.0.0"
 	port = "23234"
 )
 
 var remote_users = map[string]string{}
-
 var filteredPolicies []Policy
 
-var remoteCmd = &cobra.Command{
-	Use:   "remote",
-	Short: "(not final) Load the Remote Policy Execution",
-	Long:  `(not final) Load the Remote Policy Execution endpoint with interactive interface for policy actions`,
-	Run: func(cmd *cobra.Command, args []string) {
-		log.Fatal().Msg("Not yet implemented, use `observe --remote` to start the remote policy execution interface")
-	},
-}
+// var remoteCmd = &cobra.Command{
+// 	Use:   "remote",
+// 	Short: "(not final) Load the Remote Policy Execution",
+// 	Long:  `(not final) Load the Remote Policy Execution endpoint with interactive interface for policy actions`,
+// 	Run: func(cmd *cobra.Command, args []string) {
+// 		log.Fatal().Msg("Not yet implemented, use `observe --remote` to start the remote policy execution interface")
+// 	},
+// }
+
+var (
+	remoteFlags struct {
+		user               string
+		password           string
+		askPass            bool
+		identityFile       string
+		port               int
+		sudo               bool
+		asUser             string
+		concurrency        int
+		destPath           string
+		files              []string
+		execute            string
+		force              bool
+		zip                bool
+		gosshPath          string
+		inventory          string   // Add this
+		configFile         string   // Add this
+		passFile           string   // Add this
+		passphrase         string   // Add this
+		vaultPassFile      string   // Add this
+		listHosts          bool     // Add this
+		proxyServer        string   // Add this
+		proxyPort          int      // Add this
+		proxyUser          string   // Add this
+		proxyPassword      string   // Add this
+		proxyIdentityFiles string   // Add this
+		proxyPassphrase    string   // Add this
+		commandTimeout     int      // Add this
+		taskTimeout        int      // Add this
+		connTimeout        int      // Add this
+		lang               string   // Add this
+		commandBlacklist   []string // Add this
+	}
+
+	remoteCmd = &cobra.Command{
+		Use:   "remote",
+		Short: "Execute remote operations using gossh",
+		Long:  `Execute remote operations like run, push, fetch, and script using embedded gossh`,
+	}
+
+	runCmd = &cobra.Command{
+		Use:   "run [HOST...]",
+		Short: "Execute commands on target hosts",
+		Long: `Execute commands on target hosts.
+
+Examples:
+  Execute command 'uptime' on target hosts:
+  $ intercept remote run host1 host2 --r-execute "uptime" --r-auth.user zhangsan --r-auth.ask-pass
+
+  Use sudo as root to execute command on target hosts:
+  $ intercept remote run host[1-2] --r-execute "uptime" --r-auth.user zhangsan --r-run.sudo
+
+  Use sudo as other user 'mysql' to execute command on target hosts:
+  $ intercept remote run host[1-2] --r-execute "uptime" --r-auth.user zhangsan --r-run.sudo --r-run.as-user mysql`,
+		RunE: executeRun,
+	}
+
+	pushCmd = &cobra.Command{
+		Use:   "push [HOST...]",
+		Short: "Copy local files and dirs to target hosts",
+		RunE:  executePush,
+	}
+
+	fetchCmd = &cobra.Command{
+		Use:   "fetch [HOST...]",
+		Short: "Copy files from target hosts to local",
+		RunE:  executeFetch,
+	}
+
+	scriptCmd = &cobra.Command{
+		Use:   "script [HOST...]",
+		Short: "Execute a local shell script on target hosts",
+		RunE:  executeScript,
+	}
+)
 
 func init() {
 	rootCmd.AddCommand(remoteCmd)
+	remoteCmd.AddCommand(runCmd, pushCmd, fetchCmd, scriptCmd)
+
+	// Authentication flags
+	remoteCmd.PersistentFlags().StringVar(&remoteFlags.user, "r-auth.user", os.Getenv("USER"), "login user")
+	remoteCmd.PersistentFlags().StringVar(&remoteFlags.password, "r-auth.password", "", "password of login user")
+	remoteCmd.PersistentFlags().BoolVar(&remoteFlags.askPass, "r-auth.ask-pass", false, "ask for password")
+	remoteCmd.PersistentFlags().StringVar(&remoteFlags.passFile, "r-auth.pass-file", "", "file that holds the password of login user")
+	remoteCmd.PersistentFlags().StringVar(&remoteFlags.identityFile, "r-auth.identity-files", "", "identity files")
+	remoteCmd.PersistentFlags().StringVar(&remoteFlags.passphrase, "r-auth.passphrase", "", "passphrase of the identity files")
+	remoteCmd.PersistentFlags().StringVar(&remoteFlags.vaultPassFile, "r-auth.vault-pass-file", "", "vault password file")
+
+	// Host flags
+	remoteCmd.PersistentFlags().StringVar(&remoteFlags.inventory, "r-hosts.inventory", "", "file that holds the target hosts")
+	remoteCmd.PersistentFlags().IntVar(&remoteFlags.port, "r-hosts.port", 22, "port of the target hosts")
+	remoteCmd.PersistentFlags().BoolVar(&remoteFlags.listHosts, "r-hosts.list", false, "outputs a list of target hosts")
+
+	// Run flags
+	remoteCmd.PersistentFlags().BoolVar(&remoteFlags.sudo, "r-run.sudo", false, "use sudo")
+	remoteCmd.PersistentFlags().StringVar(&remoteFlags.asUser, "r-run.as-user", "root", "run as user")
+	remoteCmd.PersistentFlags().StringVar(&remoteFlags.lang, "r-run.lang", "", "specify i18n while executing command")
+	remoteCmd.PersistentFlags().IntVar(&remoteFlags.concurrency, "r-run.concurrency", 1, "number of concurrent connections")
+	remoteCmd.PersistentFlags().StringSliceVar(&remoteFlags.commandBlacklist, "r-run.command-blacklist", []string{}, "commands that are prohibited")
+
+	// Proxy flags
+	remoteCmd.PersistentFlags().StringVar(&remoteFlags.proxyServer, "r-proxy.server", "", "proxy server address")
+	remoteCmd.PersistentFlags().IntVar(&remoteFlags.proxyPort, "r-proxy.port", 22, "proxy server port")
+	remoteCmd.PersistentFlags().StringVar(&remoteFlags.proxyUser, "r-proxy.user", "", "login user for proxy")
+	remoteCmd.PersistentFlags().StringVar(&remoteFlags.proxyPassword, "r-proxy.password", "", "password for proxy")
+	remoteCmd.PersistentFlags().StringVar(&remoteFlags.proxyIdentityFiles, "r-proxy.identity-files", "", "identity files for proxy")
+	remoteCmd.PersistentFlags().StringVar(&remoteFlags.proxyPassphrase, "r-proxy.passphrase", "", "passphrase of the identity files for proxy")
+
+	// Timeout flags
+	remoteCmd.PersistentFlags().IntVar(&remoteFlags.commandTimeout, "r-timeout.command", 0, "timeout for each command")
+	remoteCmd.PersistentFlags().IntVar(&remoteFlags.taskTimeout, "r-timeout.task", 0, "timeout for the entire task")
+	remoteCmd.PersistentFlags().IntVar(&remoteFlags.connTimeout, "r-timeout.conn", 10, "timeout for connecting each host")
+
+	// Config flag
+	remoteCmd.PersistentFlags().StringVar(&remoteFlags.configFile, "r-config", "", "remote config file")
+
+	// Add command-specific flags for runCmd
+	runCmd.Flags().StringVar(&remoteFlags.execute, "r-execute", "", "commands to be executed on target hosts")
+	runCmd.Flags().Bool("r-no-safe-check", false, "ignore dangerous commands (from '--r-run.command-blacklist') check")
+
+	// Mark required flags
+	runCmd.MarkFlagRequired("execute")
+
+	if runtime.GOOS == "windows" || (runtime.GOOS == "linux" && runtime.GOARCH == "arm") {
+		log.Fatal().Msg("INTERCEPT REMOTE currently not supported on your architecture")
+	} else {
+
+		gosshPath, err := prepareGosshExecutable()
+		if err != nil {
+			log.Fatal().Err(err).Msg("Failed to prepare gossh binary")
+		}
+		remoteFlags.gosshPath = gosshPath
+	}
 }
+
+func executeRun(cmd *cobra.Command, args []string) error {
+	// Add validation for gosshPath
+	if remoteFlags.gosshPath == "" {
+		return fmt.Errorf("gossh binary path not set")
+	}
+
+	// Modified validation: allow either direct hosts or inventory file
+	if len(args) == 0 && remoteFlags.inventory == "" {
+		return fmt.Errorf("either hosts or --r-hosts.inventory flag is required")
+	}
+	if remoteFlags.execute == "" {
+		return fmt.Errorf("--r-execute flag is required")
+	}
+
+	// Debug log the gossh path
+	log.Debug().Str("gosshPath", remoteFlags.gosshPath).Msg("Using gossh binary")
+
+	// Get the no-safe-check flag
+	noSafeCheck, _ := cmd.Flags().GetBool("r-no-safe-check")
+
+	// Prepare the gossh command arguments
+	gosshArgs := []string{"command"}
+
+	// Add hosts from args if provided
+	if len(args) > 0 {
+		gosshArgs = append(gosshArgs, args...)
+	}
+
+	// Add inventory file if provided
+	if remoteFlags.inventory != "" {
+		gosshArgs = append(gosshArgs, "--hosts.inventory", remoteFlags.inventory)
+	}
+
+	// Add config file if provided
+	if remoteFlags.configFile != "" {
+		gosshArgs = append(gosshArgs, "--config", remoteFlags.configFile)
+	}
+
+	// Add the execute command
+	gosshArgs = append(gosshArgs, "--execute", remoteFlags.execute)
+
+	// Add no-safe-check if enabled
+	if noSafeCheck {
+		gosshArgs = append(gosshArgs, "--no-safe-check")
+	}
+
+	// Add authentication flags
+	if remoteFlags.user != os.Getenv("USER") {
+		gosshArgs = append(gosshArgs, "--auth.user", remoteFlags.user)
+	}
+	if remoteFlags.password != "" {
+		gosshArgs = append(gosshArgs, "--auth.password", remoteFlags.password)
+	}
+	if remoteFlags.askPass {
+		gosshArgs = append(gosshArgs, "--auth.ask-pass")
+	}
+	if remoteFlags.passFile != "" {
+		gosshArgs = append(gosshArgs, "--auth.pass-file", remoteFlags.passFile)
+	}
+	if remoteFlags.identityFile != "" {
+		gosshArgs = append(gosshArgs, "--auth.identity-files", remoteFlags.identityFile)
+	}
+	if remoteFlags.passphrase != "" {
+		gosshArgs = append(gosshArgs, "--auth.passphrase", remoteFlags.passphrase)
+	}
+	if remoteFlags.vaultPassFile != "" {
+		gosshArgs = append(gosshArgs, "--auth.vault-pass-file", remoteFlags.vaultPassFile)
+	}
+
+	// Add host flags
+	if remoteFlags.port != 22 {
+		gosshArgs = append(gosshArgs, "--hosts.port", fmt.Sprintf("%d", remoteFlags.port))
+	}
+	if remoteFlags.listHosts {
+		gosshArgs = append(gosshArgs, "--hosts.list")
+	}
+
+	// Add run flags
+	if remoteFlags.sudo {
+		gosshArgs = append(gosshArgs, "--run.sudo")
+	}
+	if remoteFlags.asUser != "root" {
+		gosshArgs = append(gosshArgs, "--run.as-user", remoteFlags.asUser)
+	}
+	if remoteFlags.lang != "" {
+		gosshArgs = append(gosshArgs, "--run.lang", remoteFlags.lang)
+	}
+	if remoteFlags.concurrency != 1 {
+		gosshArgs = append(gosshArgs, "--run.concurrency", fmt.Sprintf("%d", remoteFlags.concurrency))
+	}
+	if len(remoteFlags.commandBlacklist) > 0 && !noSafeCheck {
+		gosshArgs = append(gosshArgs, "--run.command-blacklist", strings.Join(remoteFlags.commandBlacklist, ","))
+	}
+
+	// Add proxy flags
+	if remoteFlags.proxyServer != "" {
+		gosshArgs = append(gosshArgs, "--proxy.server", remoteFlags.proxyServer)
+	}
+	if remoteFlags.proxyPort != 22 {
+		gosshArgs = append(gosshArgs, "--proxy.port", fmt.Sprintf("%d", remoteFlags.proxyPort))
+	}
+	if remoteFlags.proxyUser != "" {
+		gosshArgs = append(gosshArgs, "--proxy.user", remoteFlags.proxyUser)
+	}
+	if remoteFlags.proxyPassword != "" {
+		gosshArgs = append(gosshArgs, "--proxy.password", remoteFlags.proxyPassword)
+	}
+	if remoteFlags.proxyIdentityFiles != "" {
+		gosshArgs = append(gosshArgs, "--proxy.identity-files", remoteFlags.proxyIdentityFiles)
+	}
+	if remoteFlags.proxyPassphrase != "" {
+		gosshArgs = append(gosshArgs, "--proxy.passphrase", remoteFlags.proxyPassphrase)
+	}
+
+	// Add timeout flags
+	if remoteFlags.commandTimeout != 0 {
+		gosshArgs = append(gosshArgs, "--timeout.command", fmt.Sprintf("%d", remoteFlags.commandTimeout))
+	}
+	if remoteFlags.taskTimeout != 0 {
+		gosshArgs = append(gosshArgs, "--timeout.task", fmt.Sprintf("%d", remoteFlags.taskTimeout))
+	}
+	if remoteFlags.connTimeout != 10 {
+		gosshArgs = append(gosshArgs, "--timeout.conn", fmt.Sprintf("%d", remoteFlags.connTimeout))
+	}
+
+	//append output type
+	if verbosity < 2 {
+		gosshArgs = append(gosshArgs, "--output.json")
+	}
+	// Execute gossh command
+	execCmd := exec.Command(remoteFlags.gosshPath, gosshArgs...)
+
+	// Connect stdout and stderr
+	execCmd.Stdout = os.Stdout
+	execCmd.Stderr = os.Stderr
+
+	// Run the command
+	log.Debug().
+		Str("command", remoteFlags.gosshPath).
+		Strs("args", gosshArgs).
+		Msg("Executing remote command")
+
+	err := execCmd.Run()
+	if err != nil {
+		return fmt.Errorf("failed to execute remote command: %w", err)
+	}
+
+	return nil
+}
+
+func executePush(cmd *cobra.Command, args []string) error {
+	// Implementation using embedded gossh
+	return fmt.Errorf("not implemented")
+}
+
+func executeFetch(cmd *cobra.Command, args []string) error {
+	// Implementation using embedded gossh
+	return fmt.Errorf("not implemented")
+}
+
+func executeScript(cmd *cobra.Command, args []string) error {
+	// Implementation using embedded gossh
+	return fmt.Errorf("not implemented")
+}
+
+// ----------------------------------------------------------------------------------
+// Remote Policy Execution
+// ----------------------------------------------------------------------------------
+// this is for --remote
 
 func authenticatedBubbleteaMiddleware() wish.Middleware {
 	return func(next ssh.Handler) ssh.Handler {
