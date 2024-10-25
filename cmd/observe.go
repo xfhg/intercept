@@ -38,6 +38,8 @@ var (
 	observeList         []string
 	observeConfig       Config
 	observeRemote       bool
+	observeRemotePort   string = "23234"
+	observeRemoteHost   string = "0.0.0.0"
 )
 
 var observeCmd = &cobra.Command{
@@ -60,6 +62,8 @@ func init() {
 	observeCmd.Flags().StringVar(&observeMode, "mode", "last", "Observe mode for path monitoring : first,last,all ")
 	observeCmd.Flags().StringVar(&observeIndex, "index", "intercept", "Index name for ES bulk operations")
 	observeCmd.Flags().BoolVar(&observeRemote, "remote", false, "Start SSH server for remote policy execution")
+	observeCmd.Flags().StringVar(&observeRemotePort, "remote-port", "23234", "Network port for remote policy execution")
+	observeCmd.Flags().StringVar(&observeRemoteHost, "remote-host", "0.0.0.0", "Network host bind for remote policy execution")
 
 }
 
