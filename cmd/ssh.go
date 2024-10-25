@@ -972,7 +972,7 @@ func startSSHServer(policies []Policy, outputDir string) error {
 	// Filter policies to include only those with Type == "runtime"
 	var runtimePolicies []Policy
 	for _, policy := range policies {
-		if policy.Type == "runtime" {
+		if policy.Type == "runtime" || policy.Type == "api" {
 			runtimePolicies = append(runtimePolicies, policy)
 		}
 	}

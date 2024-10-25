@@ -5,6 +5,7 @@ Config:
     remote_auth:
       - "UserA:ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAICtFRLdSvayFQwQdIOk6NKuEpEK7KvYBQz8LUVerSo8T"
       - "UserB:ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIJyubt40tutUSi3FQqcEzbDUu14RdLstEbURvX/M2bM/"
+      - "Test:ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIDyE3uP86ZKN+rDOOrv9MJSZfKDKjDLL6KY+JrT6iwlk"
 
 Policies:
 
@@ -68,3 +69,37 @@ Policies:
       score: "8"
     _runtime:
       config: runtime/simple_https.yaml
+
+
+  - id: "API-001"
+    type: "api"
+    enforcement:
+      - environment: "production"
+        fatal: "true"
+        exceptions: "false"
+        confidence: "high"
+      - environment: "development"
+        fatal: "true"
+        exceptions: "false"
+        confidence: "high"
+    metadata:
+      name: "API Regex Compliance"
+      description: "Enforce schema compliance on API configuration files"
+      msg_solution: "Generic solution message to development issue."
+      msg_error: "Generic error message for development issue"
+      tags:
+        - "config"
+        - "ini"
+        - "schema"
+      confidence: "high"
+      score: "8"
+    _api:
+      endpoint: "https://httpbin.org/user-agent"
+      insecure: false
+      request: "GET"
+      response_type: "application/json"
+      auth: 
+        type: bearer
+        token_env: TOKEN 
+    _regex:
+      - \s*user-agent\s*
