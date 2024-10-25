@@ -10,7 +10,7 @@ import (
 	"github.com/go-resty/resty/v2"
 )
 
-func ProcessAPIType(policy Policy, rgPath string) error {
+func ProcessAPIType(policy Policy, rgPath string, isObserve bool) error {
 	client := resty.New()
 	client.SetDebug(debugOutput)
 
@@ -46,9 +46,9 @@ func ProcessAPIType(policy Policy, rgPath string) error {
 
 	// Process the response based on policy type
 	if policy.Schema.Structure != "" {
-		return processWithCUE(policy, resp.Body())
+		return processWithCUE(policy, resp.Body(), isObserve)
 	} else if len(policy.Regex) > 0 {
-		return processWithRegex(policy, resp.Body(), rgPath)
+		return processWithRegex(policy, resp.Body(), rgPath, isObserve)
 	}
 
 	return handlePolicyError(policy, fmt.Errorf("no processing method specified for policy %s", policy.ID))
@@ -81,7 +81,7 @@ func applyAuth(req *resty.Request, auth map[string]string) error {
 	return nil
 }
 
-func processWithCUE(policy Policy, data []byte) error {
+func processWithCUE(policy Policy, data []byte, isObserve bool) error {
 	valid, issues := validateContentAndCUE(data, policy.Schema.Structure, "json", policy.Schema.Strict, policy.ID)
 
 	// Generate SARIF report
@@ -109,6 +109,25 @@ func processWithCUE(policy Policy, data []byte) error {
 
 	}
 
+	if isObserve {
+
+		// if remote cache the results
+		if policy.RunID != "" {
+			var resultMsg string
+
+			if sarifReport.Runs[0].Invocations[0].Properties.ReportCompliant {
+
+				resultMsg = fmt.Sprintf("🟢 %s : %s", "Compliant")
+
+			} else {
+				resultMsg = fmt.Sprintf("🔴 %s : %s", "Non Compliant")
+			}
+			storeResultInCache(policy.ID, resultMsg)
+
+		}
+
+	}
+
 	log.Debug().Msgf("Policy %s processed. SARIF report written to: %s ", policy.ID, sarifOutputFile)
 
 	if !valid {
@@ -121,7 +140,7 @@ func processWithCUE(policy Policy, data []byte) error {
 	log.Debug().Msgf("Policy %s validation passed for API response ", policy.ID)
 	return nil
 }
-func processWithRegex(policy Policy, data []byte, rgPath string) error {
+func processWithRegex(policy Policy, data []byte, rgPath string, isObserve bool) error {
 	// Create a temporary file with the API response
 	tempFile, err := os.CreateTemp("", "api_response_*.json")
 	if err != nil {
@@ -170,6 +189,25 @@ func processWithRegex(policy Policy, data []byte, rgPath string) error {
 			return fmt.Errorf("error writing SARIF report: %w", err)
 		}
 		sarifOutputFile = fmt.Sprintf("%s.sarif", NormalizeFilename(policy.ID))
+
+	}
+
+	if isObserve {
+
+		// if remote cache the results
+		if policy.RunID != "" {
+			var resultMsg string
+
+			if sarifReport.Runs[0].Invocations[0].Properties.ReportCompliant {
+
+				resultMsg = fmt.Sprintf("🟢 %s", "Compliant")
+
+			} else {
+				resultMsg = fmt.Sprintf("🔴 %s", "Non Compliant")
+			}
+			storeResultInCache(policy.ID, resultMsg)
+
+		}
 
 	}
 

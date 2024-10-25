@@ -259,7 +259,7 @@ func processPolicyByType(policy Policy, rgPath, gossPath, targetDir string, file
 	case "runtime":
 		err = ProcessRuntimeType(policy, gossPath, targetDir, filePaths, false)
 	case "api":
-		err = ProcessAPIType(policy, rgPath)
+		err = ProcessAPIType(policy, rgPath, false)
 	case "yml":
 		if policy.Schema.Patch {
 			err = processGenericType(policy, filePaths, "yaml")

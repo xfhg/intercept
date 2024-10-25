@@ -42,7 +42,7 @@ func processPolicyInWorker(e event.Event, policyType string) error {
 	case "runtime":
 		return ProcessRuntimeType(policy, gossPath, targetDir, filePaths, true)
 	case "api":
-		return ProcessAPIType(policy, rgPath)
+		return ProcessAPIType(policy, rgPath, true)
 	case "yml":
 		if policy.Schema.Patch {
 			return processGenericType(policy, filePaths, "yaml")
