@@ -19,12 +19,6 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// this is for --remote
-const (
-	host = "0.0.0.0"
-	port = "23234"
-)
-
 var remote_users = map[string]string{}
 var filteredPolicies []Policy
 
@@ -981,7 +975,7 @@ func startSSHServer(policies []Policy, outputDir string) error {
 	hostKeyPath := filepath.Join(outputDir, "_rpe/id_ed25519")
 
 	s, err := wish.NewServer(
-		wish.WithAddress(net.JoinHostPort(host, port)),
+		wish.WithAddress(net.JoinHostPort(observeRemoteHost, observeRemotePort)),
 		wish.WithHostKeyPath(hostKeyPath),
 		wish.WithBannerHandler(func(ctx ssh.Context) string {
 			return "\n\n┏━ INTERCEPT Remote Policy Execution Endpoint\n┃\n"
@@ -998,7 +992,7 @@ func startSSHServer(policies []Policy, outputDir string) error {
 		return fmt.Errorf("could not create server: %w", err)
 	}
 
-	log.Info().Str("host", host).Str("port", port).Msg("INTERCEPT Remote Policy Execution Endpoint")
+	log.Info().Str("host", observeRemoteHost).Str("port", observeRemotePort).Msg("INTERCEPT Remote Policy Execution Endpoint")
 	if err = s.ListenAndServe(); err != nil && !errors.Is(err, ssh.ErrServerClosed) {
 		return fmt.Errorf("could not start server: %w", err)
 	}
