@@ -41,29 +41,29 @@ Policies:
       - "ssl_protocols.*(SSLv3|TLSv1(\\.1)?);"
       - "ssl_protocols.*SSLv2;"
 
-  # - id: "SCAN-003 Missing HTTP Security Headers"
-  #   type: "scan"
-  #   filepattern: "nginx.conf"
-  #   enforcement:
-  #     - environment: "all"
-  #       fatal: "true"
-  #       exceptions: "false"
-  #       confidence: "high"
-  #   metadata:
-  #     name: "Detect missing HTTP security headers"
-  #     description: "Ensure that critical HTTP security headers are set in the nginx configuration."
-  #     msg_solution: "Add missing HTTP security headers (Strict-Transport-Security, Content-Security-Policy, etc.)."
-  #     msg_error: "Missing HTTP security headers."
-  #     tags:
-  #       - "security"
-  #       - "headers"
-  #     score: "8"
-  #   _regex:
-  #     - "^(?!.*add_header\\s+Strict-Transport-Security)"
-  #     - "^(?!.*add_header\\s+Content-Security-Policy)"
-  #     - "^(?!.*add_header\\s+X-Frame-Options)"
-  #     - "^(?!.*add_header\\s+X-Content-Type-Options)"
-  #     - "^(?!.*add_header\\s+Referrer-Policy)"
+  - id: "SCAN-003 Missing HTTP Security Headers"
+    type: "scan"
+    filepattern: "nginx.conf"
+    enforcement:
+      - environment: "all"
+        fatal: "true"
+        exceptions: "false"
+        confidence: "high"
+    metadata:
+      name: "Detect missing HTTP security headers"
+      description: "Ensure that critical HTTP security headers are set in the nginx configuration."
+      msg_solution: "Add missing HTTP security headers (Strict-Transport-Security, Content-Security-Policy, etc.)."
+      msg_error: "Missing HTTP security headers."
+      tags:
+        - "security"
+        - "headers"
+      score: "8"
+    _regex:
+      - "^(?!.*add_header\\s+Strict-Transport-Security)"
+      - "^(?!.*add_header\\s+Content-Security-Policy)"
+      - "^(?!.*add_header\\s+X-Frame-Options)"
+      - "^(?!.*add_header\\s+X-Content-Type-Options)"
+      - "^(?!.*add_header\\s+Referrer-Policy)"
 
   # - id: "SCAN-004 Missing SSL Certificates"
   #   type: "scan"

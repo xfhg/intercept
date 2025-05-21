@@ -1,0 +1,145 @@
+Policies:
+  - id: "LLM01-PROMPT-INJECTION-001"
+    type: "scan"
+    filepattern: "*.txt"  # Assuming prompts are in .txt files for now
+    searchpath: "playground/targets/prompts/" # Target directory for these examples
+    enforcement:
+      - environment: "all"
+        fatal: "false" # Non-fatal, as these are heuristic
+        exceptions: "true"
+        confidence: "medium"
+    metadata:
+      name: "Detect Common Prompt Injection Keywords"
+      description: "Identifies common keywords and phrases associated with prompt injection attempts (OWASP LLM01). These patterns may indicate an attempt to manipulate the LLM."
+      msg_solution: "Review the prompt for manipulative language. Sanitize or reject prompts containing suspicious phrases. Implement strict input validation and context-aware filtering."
+      msg_error: "Potential prompt injection keyword(s) detected."
+      tags:
+        - "llm"
+        - "owasp-llm-01"
+        - "prompt-injection"
+        - "security"
+      score: "7" # Severity can be adjusted
+    _regex:
+      # Basic "ignore" or "disregard" instructions
+      - "(?i)ignore\s+(your\s+)?previous\s+instructions"
+      - "(?i)disregard\s+(your\s+)?previous\s+instructions"
+      # Role play / impersonation
+      - "(?i)act\s+as\s+if\s+you\s+were"
+      - "(?i)you\s+are\s+now\s+a\s+"
+      - "(?i)pretend\s+to\s+be"
+      # Confidentiality markers / "leaking" instructions
+      - "(?i)reveal\s+your\s+prompt"
+      - "(?i)what\s+are\s+your\s+instructions"
+      - "(?i)system\s+prompt\s*:" # If a prompt tries to mimic system messages
+      - "(?i)developer\s+mode"
+      # Common attack payloads (very basic examples)
+      - "(?i)payload\s+activated"
+      - "(?i)security\s+override"
+      # Attempts to get verbatim instructions or system context
+      - "(?i)repeat\s+the\s+above\s+text\s+verbatim"
+      - "(?i)print\s+your\s+instructions"
+      - "(?i)system\s+instructions\s*:"
+
+  - id: "LLM06-SENSITIVE-DATA-CREDIT-CARD-001"
+    type: "scan"
+    filepattern: "*.txt"
+    searchpath: "playground/targets/prompts/"
+    enforcement:
+      - environment: "all"
+        fatal: "false"
+        exceptions: "true"
+        confidence: "high" # High confidence for well-defined patterns
+    metadata:
+      name: "Detect Potential Credit Card Numbers in Prompts"
+      description: "Identifies patterns resembling credit card numbers in prompts (OWASP LLM06). Submitting sensitive data to LLMs can lead to disclosure."
+      msg_solution: "Remove or redact sensitive data like credit card numbers from prompts. Use placeholder data if specific formats are needed for testing."
+      msg_error: "Potential credit card number detected in prompt."
+      tags:
+        - "llm"
+        - "owasp-llm-06"
+        - "sensitive-data"
+        - "security"
+      score: "9"
+    _regex:
+      # Basic regex for common credit card number formats (Visa, Mastercard, Amex, Discover)
+      # This is a simplified regex and might have false positives/negatives.
+      - "\b(?:4[0-9]{12}(?:[0-9]{3})?|5[1-5][0-9]{14}|3[47][0-9]{13}|6(?:011|5[0-9]{2})[0-9]{12})\b"
+
+  - id: "LLM06-SENSITIVE-DATA-AWS-KEYS-001"
+    type: "scan"
+    filepattern: "*.txt"
+    searchpath: "playground/targets/prompts/"
+    enforcement:
+      - environment: "all"
+        fatal: "false"
+        exceptions: "true"
+        confidence: "medium" # AWS keys are specific but can be mimicked
+    metadata:
+      name: "Detect Potential AWS Access Keys in Prompts"
+      description: "Identifies patterns resembling AWS Access Key IDs and Secret Access Keys in prompts (OWASP LLM06)."
+      msg_solution: "Remove or redact AWS keys from prompts. Use IAM roles or temporary credentials where possible when interacting with AWS services, not via LLM prompts."
+      msg_error: "Potential AWS access key detected in prompt."
+      tags:
+        - "llm"
+        - "owasp-llm-06"
+        - "sensitive-data"
+        - "aws"
+        - "security"
+      score: "8"
+    _regex:
+      # AWS Access Key ID (e.g., AKIAIOSFODNN7EXAMPLE)
+      - "\b(AKIA|ASIA)[0-9A-Z]{16}\b"
+      # AWS Secret Access Key (base64, 40 chars long) - this is a generic base64 check and might be noisy
+      # - "\b[A-Za-z0-9/+=]{40}\b" # Commented out due to high potential for false positives without more context
+      # A more specific regex might be needed if common prefixes/contexts for secret keys are known.
+
+  - id: "LLM06-SENSITIVE-DATA-PRIVATE-KEY-001"
+    type: "scan"
+    filepattern: "*.txt"
+    searchpath: "playground/targets/prompts/"
+    enforcement:
+      - environment: "all"
+        fatal: "false"
+        exceptions: "true"
+        confidence: "medium"
+    metadata:
+      name: "Detect Potential Private Key Headers in Prompts"
+      description: "Identifies common private key block headers (e.g., RSA, EC, OPENSSH) in prompts (OWASP LLM06)."
+      msg_solution: "Remove or redact private keys from prompts. LLMs should not be handling private key data."
+      msg_error: "Potential private key header detected in prompt."
+      tags:
+        - "llm"
+        - "owasp-llm-06"
+        - "sensitive-data"
+        - "pki"
+        - "security"
+      score: "9"
+    _regex:
+      - "-----BEGIN ((RSA|EC|OPENSSH|PGP) )?PRIVATE KEY-----"
+
+  - id: "LLM04-DOS-PROMPT-LENGTH-001"
+    type: "scan"
+    filepattern: "*.txt"
+    searchpath: "playground/targets/prompts/"
+    enforcement:
+      - environment: "all"
+        fatal: "false"
+        exceptions: "true"
+        confidence: "low" # Length is a very basic heuristic
+    metadata:
+      name: "Detect Overly Long Prompts"
+      description: "Identifies prompts that exceed a defined character length (e.g., 4000 characters), which could be a factor in Model Denial of Service (OWASP LLM04) or hitting token limits."
+      msg_solution: "Keep prompts concise and within reasonable length limits. Consider breaking down very long prompts into smaller parts if possible."
+      msg_error: "Prompt exceeds maximum recommended character length."
+      tags:
+        - "llm"
+        - "owasp-llm-04"
+        - "denial-of-service"
+        - "performance"
+        - "security"
+      score: "3" # Lower severity as it's more of a usage guideline
+    _regex:
+      # This regex matches the entire file content if it's longer than 4000 characters.
+      # The (?s) flag allows . to match newlines.
+      # The .{4001,} matches 4001 or more characters.
+      - "(?s).{4001,}"

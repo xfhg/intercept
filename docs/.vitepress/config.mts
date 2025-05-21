@@ -95,6 +95,8 @@ export default defineConfig({
         items: [
           { text: 'Overview', link: '/docs/use-cases' },
           { text: 'Features', link: '/docs/features' },
+          { text: 'Example: NGINX Headers', link: '/docs/policy_example_nginx_security_headers' },
+          { text: 'Example: OWASP LLM Top 10', link: '/docs/policy_owasp_llm_top_10' }
         ]
       }
     ],
