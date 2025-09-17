@@ -12,6 +12,9 @@ import (
 // ProcessAssureType handles the assurance process for policies of type "assure"
 func ProcessAssureType(policy Policy, rgPath string, targetDir string, filePaths []string) error {
 	if policy.Type == "assure" {
+		if !featureRgReady || rgPath == "" {
+			return fmt.Errorf("rg executable unavailable: assure policies cannot be processed")
+		}
 		err := executeAssure(policy, rgPath, targetDir, filePaths)
 		if err != nil {
 			log.Error().Err(err).Msgf("error assuring for policy %s", policy.ID)

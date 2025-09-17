@@ -709,6 +709,29 @@ func writeSARIFReport(policyID string, report SARIFReport) error {
 
 	return nil
 }
+func newBaseSARIFReport(results []Result) SARIFReport {
+	return SARIFReport{
+		Version: "2.1.0",
+		Schema:  "https://raw.githubusercontent.com/oasis-tcs/sarif-spec/master/Schemata/sarif-schema-2.1.0.json",
+		Runs: []Run{
+			{
+				Tool: Tool{
+					Driver: Driver{
+						FullName:        fmt.Sprintf("%s %s", "INTERCEPT", buildVersion),
+						Name:            "INTERCEPT",
+						Version:         smVersion,
+						SemanticVersion: smVersion,
+						InformationURI:  "https://intercept.cc",
+						Rules:           policyData.SARIFRules,
+					},
+				},
+				Results:     results,
+				Invocations: []Invocation{{ExecutionSuccessful: true, Properties: InvocationProperties{}}},
+			},
+		},
+	}
+}
+
 func MergeSARIFReports(commandLine string, perf Performance, isScheduled bool) (SARIFReport, error) {
 	searchDir := "_sarif"
 	if outputDir != "" {
@@ -728,42 +751,19 @@ func MergeSARIFReports(commandLine string, perf Performance, isScheduled bool) (
 
 	timestamp := time.Now().Format(time.RFC3339)
 
-	mergedReport := SARIFReport{
-		Version: "2.1.0",
-		Schema:  "https://raw.githubusercontent.com/oasis-tcs/sarif-spec/master/Schemata/sarif-schema-2.1.0.json",
-		Runs: []Run{
-			{
-				Tool: Tool{
-					Driver: Driver{
-						FullName:        fmt.Sprintf("%s %s", "INTERCEPT", buildVersion),
-						Name:            "INTERCEPT",
-						Version:         smVersion,
-						SemanticVersion: smVersion,
-						InformationURI:  "https://intercept.cc",
-						Rules:           policyData.SARIFRules,
-					},
-				},
-
-				Results: []Result{},
-				Invocations: []Invocation{
-					{
-						ExecutionSuccessful: true,
-						CommandLine:         commandLine,
-						Properties: InvocationProperties{
-							RunId:             intercept_run_id,
-							StartTime:         perf.StartTime.Format(time.RFC3339),
-							EndTime:           perf.EndTime.Format(time.RFC3339),
-							ExecutionTimeInMs: fmt.Sprintf("%d", perf.Delta.Milliseconds()),
-							Environment:       environment,
-							Debug:             fmt.Sprintf("%v", debugOutput),
-							ReportTimestamp:   timestamp,
-							HostData:          hostData,
-							HostFingerprint:   hostFingerprint,
-						},
-					},
-				},
-			},
-		},
+	mergedReport := newBaseSARIFReport(nil)
+	mergedInvocation := &mergedReport.Runs[0].Invocations[0]
+	mergedInvocation.CommandLine = commandLine
+	mergedInvocation.Properties = InvocationProperties{
+		RunId:             intercept_run_id,
+		StartTime:         perf.StartTime.Format(time.RFC3339),
+		EndTime:           perf.EndTime.Format(time.RFC3339),
+		ExecutionTimeInMs: fmt.Sprintf("%d", perf.Delta.Milliseconds()),
+		Environment:       environment,
+		Debug:             fmt.Sprintf("%v", debugOutput),
+		ReportTimestamp:   timestamp,
+		HostData:          hostData,
+		HostFingerprint:   hostFingerprint,
 	}
 
 	isCompliant := true
@@ -863,27 +863,7 @@ func cleanupSARIFFolder() error {
 }
 
 func createSARIFReport(results []Result) SARIFReport {
-	sarifReport := SARIFReport{
-		Version: "2.1.0",
-		Schema:  "https://raw.githubusercontent.com/oasis-tcs/sarif-spec/master/Schemata/sarif-schema-2.1.0.json",
-		Runs: []Run{
-			{
-				Tool: Tool{
-					Driver: Driver{
-						FullName:        fmt.Sprintf("%s %s", "INTERCEPT", buildVersion),
-						Name:            "INTERCEPT",
-						Version:         smVersion,
-						SemanticVersion: smVersion,
-						InformationURI:  "https://intercept.cc",
-						Rules:           policyData.SARIFRules,
-					},
-				},
-
-				Results:     results,
-				Invocations: []Invocation{{ExecutionSuccessful: true, Properties: InvocationProperties{}}},
-			},
-		},
-	}
+	sarifReport := newBaseSARIFReport(results)
 
 	sarifReport.Runs[0].Invocations[0].Properties.ReportCompliant = ComplianceStatus(sarifReport)
 
@@ -895,27 +875,7 @@ func createSARIFReport(results []Result) SARIFReport {
 
 }
 func GenerateAPISARIFReport(policy Policy, endpoint string, matchFound bool, issues []string) (SARIFReport, error) {
-	sarifReport := SARIFReport{
-		Version: "2.1.0",
-		Schema:  "https://raw.githubusercontent.com/oasis-tcs/sarif-spec/master/Schemata/sarif-schema-2.1.0.json",
-		Runs: []Run{
-			{
-				Tool: Tool{
-					Driver: Driver{
-						FullName:        fmt.Sprintf("%s %s", "INTERCEPT", buildVersion),
-						Name:            "INTERCEPT",
-						Version:         smVersion,
-						SemanticVersion: smVersion,
-						InformationURI:  "https://intercept.cc",
-						Rules:           policyData.SARIFRules,
-					},
-				},
-
-				Results:     []Result{},
-				Invocations: []Invocation{{ExecutionSuccessful: true, Properties: InvocationProperties{}}},
-			},
-		},
-	}
+	sarifReport := newBaseSARIFReport(nil)
 
 	sarifLevel := calculateSARIFLevel(policy, environment)
 

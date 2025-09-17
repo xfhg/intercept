@@ -65,6 +65,17 @@ func init() {
 	observeCmd.Flags().StringVar(&observeRemotePort, "remote-port", "23234", "Network port for remote policy execution")
 	observeCmd.Flags().StringVar(&observeRemoteHost, "remote-host", "0.0.0.0", "Network host bind for remote policy execution")
 
+	observeCmd.PreRunE = func(cmd *cobra.Command, args []string) error {
+		if !featureRgReady {
+			return fmt.Errorf("observe command disabled: rg executable unavailable")
+		}
+		if !featureGossReady {
+			return fmt.Errorf("observe command disabled: goss executable unavailable")
+		}
+		return nil
+	}
+	observeCmd.SilenceUsage = true
+
 }
 
 func runObserve(cmd *cobra.Command, args []string) {
@@ -169,14 +180,17 @@ func runObserve(cmd *cobra.Command, args []string) {
 
 	// Check for remote mode early
 	if observeRemote {
-		remote_users = authKeysToMap(observeConfig.Flags.RemoteAuth)
-		go func() {
-			if err := startSSHServer(policies, outputDir); err != nil {
-				log.Error().Err(err).Msg("Failed to start Remote Policy Execution Endpoint")
-			}
-		}()
-		log.Info().Msg("Remote Policy Execution Endpoint active")
-
+		if !featureGosshReady {
+			log.Error().Msg("Remote mode is disabled because the gossh executable is unavailable")
+		} else {
+			remote_users = authKeysToMap(observeConfig.Flags.RemoteAuth)
+			go func() {
+				if err := startSSHServer(policies, outputDir); err != nil {
+					log.Error().Err(err).Msg("Failed to start Remote Policy Execution Endpoint")
+				}
+			}()
+			log.Info().Msg("Remote Policy Execution Endpoint active")
+		}
 	}
 
 	dispatcher := GetDispatcher()

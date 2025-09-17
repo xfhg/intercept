@@ -13,6 +13,9 @@ import (
 // ProcessScanType handles the scanning process for policies of type "scan"
 func ProcessScanType(policy Policy, rgPath string, targetDir string, filePaths []string) error {
 	if policy.Type == "scan" {
+		if !featureRgReady || rgPath == "" {
+			return fmt.Errorf("rg executable unavailable: scan policies cannot be processed")
+		}
 		err := executeScan(policy, rgPath, targetDir, filePaths)
 		if err != nil {
 			log.Error().Str("Policy: ", policy.ID).Msg("Error Scanning Policy")
