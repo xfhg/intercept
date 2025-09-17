@@ -55,54 +55,59 @@ var testEmbeddedCmd = &cobra.Command{
 		}
 
 		log.Debug().Msg("Core binaries:")
-		log.Debug().Msgf("rg path: %s", rgPath)
-		log.Debug().Msgf("goss path: %s", gossPath)
 
-		files, err := os.ReadDir(filepath.Dir(rgPath))
-		if err != nil {
-			log.Debug().Msgf("Error reading directory %s: %v", filepath.Dir(rgPath), err)
-			return
-		}
-		for _, file := range files {
-			info, err := file.Info()
-			if err != nil {
-				log.Debug().Msgf("Error getting info for file %s: %v", file.Name(), err)
-				continue
+		if featureRgReady && rgPath != "" {
+			log.Debug().Msgf("rg path: %s", rgPath)
+
+			if files, err := os.ReadDir(filepath.Dir(rgPath)); err != nil {
+				log.Debug().Msgf("Error reading directory %s: %v", filepath.Dir(rgPath), err)
+			} else {
+				for _, file := range files {
+					info, err := file.Info()
+					if err != nil {
+						log.Debug().Msgf("Error getting info for file %s: %v", file.Name(), err)
+						continue
+					}
+					log.Debug().Msgf("File: %s, Permissions: %s", info.Name(), info.Mode().Perm())
+				}
 			}
-			log.Debug().Msgf("File: %s, Permissions: %s", info.Name(), info.Mode().Perm())
-		}
 
-		files, err = os.ReadDir(filepath.Dir(gossPath))
-		if err != nil {
-			log.Debug().Msgf("Error reading directory %s: %v", filepath.Dir(rgPath), err)
-			return
-		}
-
-		for _, file := range files {
-			info, err := file.Info()
-			if err != nil {
-				log.Debug().Msgf("Error getting info for file %s: %v", file.Name(), err)
-				continue
+			log.Debug().Msg("Testing rg:")
+			rgCmd := exec.Command(rgPath, "--version")
+			rgCmd.Stdout = os.Stdout
+			rgCmd.Stderr = os.Stderr
+			if err := rgCmd.Run(); err != nil {
+				log.Debug().Msgf("Error running rg: %v", err)
 			}
-			log.Debug().Msgf("File: %s, Permissions: %s", info.Name(), info.Mode().Perm())
+		} else {
+			log.Warn().Msg("rg executable unavailable; skipping rg diagnostics")
 		}
 
-		// Test rg
-		log.Debug().Msg("Testing rg:")
-		rgCmd := exec.Command(rgPath, "--version")
-		rgCmd.Stdout = os.Stdout
-		rgCmd.Stderr = os.Stderr
-		if err := rgCmd.Run(); err != nil {
-			log.Debug().Msgf("Error running rg: %v", err)
-		}
+		if featureGossReady && gossPath != "" {
+			log.Debug().Msgf("goss path: %s", gossPath)
 
-		// Test goss
-		log.Debug().Msg("Testing goss:")
-		gossCmd := exec.Command(gossPath, "--version")
-		gossCmd.Stdout = os.Stdout
-		gossCmd.Stderr = os.Stderr
-		if err := gossCmd.Run(); err != nil {
-			log.Debug().Msgf("Error running goss: %v", err)
+			if files, err := os.ReadDir(filepath.Dir(gossPath)); err != nil {
+				log.Debug().Msgf("Error reading directory %s: %v", filepath.Dir(gossPath), err)
+			} else {
+				for _, file := range files {
+					info, err := file.Info()
+					if err != nil {
+						log.Debug().Msgf("Error getting info for file %s: %v", file.Name(), err)
+						continue
+					}
+					log.Debug().Msgf("File: %s, Permissions: %s", info.Name(), info.Mode().Perm())
+				}
+			}
+
+			log.Debug().Msg("Testing goss:")
+			gossCmd := exec.Command(gossPath, "--version")
+			gossCmd.Stdout = os.Stdout
+			gossCmd.Stderr = os.Stderr
+			if err := gossCmd.Run(); err != nil {
+				log.Debug().Msgf("Error running goss: %v", err)
+			}
+		} else {
+			log.Warn().Msg("goss executable unavailable; skipping goss diagnostics")
 		}
 	},
 }

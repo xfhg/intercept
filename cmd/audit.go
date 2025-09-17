@@ -47,6 +47,17 @@ func init() {
 
 	runAuditPerfCmd.Flags().StringVarP(&policyFile, "policy", "p", "", "Policy <FILEPATH> or <URL>")
 	runAuditPerfCmd.Flags().StringVar(&policyFileSHA256, "checksum", "", "Policy SHA256 expected checksum")
+
+	runAuditPerfCmd.PreRunE = func(cmd *cobra.Command, args []string) error {
+		if !featureRgReady {
+			return fmt.Errorf("audit command disabled: rg executable unavailable")
+		}
+		if !featureGossReady {
+			return fmt.Errorf("audit command disabled: goss executable unavailable")
+		}
+		return nil
+	}
+	runAuditPerfCmd.SilenceUsage = true
 }
 
 func runAuditPerf(cmd *cobra.Command, args []string) {

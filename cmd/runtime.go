@@ -38,6 +38,10 @@ func ProcessRuntimeType(policy Policy, gossPath string, targetDir string, filePa
 		return fmt.Errorf("invalid policy type for runtime processing: %s", policy.Type)
 	}
 
+	if !featureGossReady || gossPath == "" {
+		return fmt.Errorf("goss executable unavailable: runtime policies cannot be processed")
+	}
+
 	gossConfigPath := policy.Runtime.Config
 	if gossConfigPath == "" {
 		return fmt.Errorf("goss runtime config path is not specified in the policy")
@@ -142,34 +146,8 @@ func generateRuntimeSARIFReport(policy Policy, gossResult GossResult) (SARIFRepo
 
 	timestamp := time.Now().Format(time.RFC3339)
 
-	sarifReport := SARIFReport{
-		Version: "2.1.0",
-		Schema:  "https://raw.githubusercontent.com/oasis-tcs/sarif-spec/master/Schemata/sarif-schema-2.1.0.json",
-		Runs: []Run{
-			{
-				Tool: Tool{
-					Driver: Driver{
-						FullName:        fmt.Sprintf("%s %s", "INTERCEPT", buildVersion),
-						Name:            "INTERCEPT",
-						Version:         smVersion,
-						SemanticVersion: smVersion,
-						InformationURI:  "https://intercept.cc",
-						Rules:           policyData.SARIFRules,
-					},
-				},
-
-				Results: []Result{},
-				Invocations: []Invocation{
-					{
-						ExecutionSuccessful: true,
-						Properties: InvocationProperties{
-							ReportCompliant: true,
-						},
-					},
-				},
-			},
-		},
-	}
+	sarifReport := newBaseSARIFReport(nil)
+	sarifReport.Runs[0].Invocations[0].Properties.ReportCompliant = true
 
 	policyLevel := getPolicyLevel(policy)
 

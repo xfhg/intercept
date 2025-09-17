@@ -49,6 +49,10 @@ var (
 	flog zerolog.Logger
 	plog zerolog.Logger
 	rlog zerolog.Logger
+
+	featureRgReady    bool
+	featureGossReady  bool
+	featureGosshReady bool
 )
 
 type logTypeMatrix struct {
@@ -347,32 +351,33 @@ func setupOutputDir() error {
 
 func initConfig() {
 
-	var err error
+	rgPath, gossPath, prepErr := prepareEmbeddedExecutables()
+	if prepErr != nil {
+		log.Warn().Err(prepErr).Msg("Failed to prepare embedded executables; dependent commands will be disabled")
+	}
 
-	rgPath, gossPath, err = prepareEmbeddedExecutables()
-	if err != nil {
-		log.Fatal().Err(err).Msg("Failed to prepare embedded executables")
+	featureRgReady = ensureExecutableReady("rg", rgPath)
+	featureGossReady = ensureExecutableReady("goss", gossPath)
 
-	} else {
-
-		// Validate the binaries are on the specified paths
-		if _, err := os.Stat(rgPath); os.IsNotExist(err) {
-			log.Fatal().Msgf("rg executable not found at path: %s", rgPath)
-		}
-		if _, err := os.Stat(gossPath); os.IsNotExist(err) {
-			log.Fatal().Msgf("goss executable not found at path: %s", gossPath)
-		}
-
-		// Set the executable permission for the rg binary
-		if err := os.Chmod(rgPath, 0755); err != nil {
-			log.Debug().Msgf("Failed to set executable permission for rg: %v", err)
-			return
-		}
-		// Set the executable permission for the goss binary
-		if err := os.Chmod(gossPath, 0755); err != nil {
-			log.Debug().Msgf("Failed to set executable permission for goss: %v", err)
-			return
-		}
+	if featureRgReady || featureGossReady {
 		log.Debug().Msgf("Paths : %s %s", rgPath, gossPath)
 	}
+}
+
+func ensureExecutableReady(command, path string) bool {
+	if path == "" {
+		log.Warn().Str("command", command).Msg("embedded executable not available")
+		return false
+	}
+
+	if _, err := os.Stat(path); err != nil {
+		log.Warn().Err(err).Str("command", command).Str("path", path).Msg("embedded executable unavailable")
+		return false
+	}
+
+	if err := os.Chmod(path, 0755); err != nil {
+		log.Warn().Err(err).Str("command", command).Str("path", path).Msg("failed to set executable permission")
+	}
+
+	return true
 }

@@ -117,10 +117,10 @@ func processWithCUE(policy Policy, data []byte, isObserve bool) error {
 
 			if sarifReport.Runs[0].Invocations[0].Properties.ReportCompliant {
 
-				resultMsg = fmt.Sprintf("🟢 %s : %s", "Compliant")
+				resultMsg = "🟢 Compliant"
 
 			} else {
-				resultMsg = fmt.Sprintf("🔴 %s : %s", "Non Compliant")
+				resultMsg = "🔴 Non Compliant"
 			}
 			storeResultInCache(policy.ID, resultMsg)
 
@@ -141,6 +141,9 @@ func processWithCUE(policy Policy, data []byte, isObserve bool) error {
 	return nil
 }
 func processWithRegex(policy Policy, data []byte, rgPath string, isObserve bool) error {
+	if !featureRgReady || rgPath == "" {
+		return fmt.Errorf("rg executable unavailable: cannot evaluate regex for policy %s", policy.ID)
+	}
 	// Create a temporary file with the API response
 	tempFile, err := os.CreateTemp("", "api_response_*.json")
 	if err != nil {

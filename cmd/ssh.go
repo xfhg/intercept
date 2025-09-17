@@ -117,6 +117,14 @@ func init() {
 	rootCmd.AddCommand(remoteCmd)
 	remoteCmd.AddCommand(runCmd, pushCmd, fetchCmd, scriptCmd)
 
+	remoteCmd.PersistentPreRunE = func(cmd *cobra.Command, args []string) error {
+		if !featureGosshReady {
+			return fmt.Errorf("remote commands are disabled because the gossh executable is unavailable")
+		}
+		return nil
+	}
+	remoteCmd.SilenceUsage = true
+
 	// Authentication flags
 	remoteCmd.PersistentFlags().StringVar(&remoteFlags.user, "r-auth.user", os.Getenv("USER"), "login user")
 	remoteCmd.PersistentFlags().StringVar(&remoteFlags.password, "r-auth.password", "", "password of login user")
@@ -187,15 +195,27 @@ func init() {
 	fetchCmd.MarkFlagRequired("r-files")
 	fetchCmd.MarkFlagRequired("r-dest-path")
 
+	var gosshInitErr error
 	if runtime.GOOS == "windows" || (runtime.GOOS == "linux" && runtime.GOARCH == "arm") {
-		log.Fatal().Msg("INTERCEPT REMOTE currently not supported on your architecture")
+		gosshInitErr = fmt.Errorf("INTERCEPT REMOTE currently not supported on your architecture")
 	} else {
-
-		gosshPath, err := prepareGosshExecutable()
-		if err != nil {
-			log.Fatal().Err(err).Msg("Failed to prepare gossh binary")
+		var gosshExecutable string
+		gosshExecutable, gosshInitErr = prepareGosshExecutable()
+		if gosshInitErr == nil {
+			remoteFlags.gosshPath = gosshExecutable
 		}
-		remoteFlags.gosshPath = gosshPath
+	}
+
+	if gosshInitErr != nil {
+		log.Warn().Err(gosshInitErr).Msg("Disabling remote commands")
+	} else if remoteFlags.gosshPath == "" {
+		log.Warn().Msg("Disabling remote commands: gossh executable path not available")
+	}
+
+	featureGosshReady = remoteFlags.gosshPath != "" && gosshInitErr == nil
+
+	if !featureGosshReady {
+		remoteCmd.Hidden = true
 	}
 }
 
@@ -823,12 +843,14 @@ func authenticatedBubbleteaMiddleware() wish.Middleware {
 			for name, pubkey := range remote_users {
 				parsed, _, _, _, _ := ssh.ParseAuthorizedKey([]byte(pubkey))
 				if ssh.KeysEqual(s.PublicKey(), parsed) {
-					wish.Println(s, fmt.Sprintf("┗━━━┫ Authenticated as %s \n\n", name))
+					wish.Println(s, fmt.Sprintf("┗━━━┫ Authenticated as %s", name))
+					wish.Println(s, "")
 					bwish.Middleware(policyActionHandler)(next)(s)
 					return
 				}
 			}
-			wish.Println(s, "┗━━━┫ Authentication failed ╳ \n\n")
+			wish.Println(s, "┗━━━┫ Authentication failed ╳")
+			wish.Println(s, "")
 			s.Close()
 		}
 	}
