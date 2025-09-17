@@ -75,7 +75,7 @@ func executeAssure(policy Policy, rgPath string, targetDir string, filesToAssure
 	if policy.FilePattern == "" {
 		log.Warn().Str("policy", policy.ID).Msg("ASSURE Policy without a filepattern is suboptimal")
 	}
-	if len(filesToAssure) > 25 {
+	if len(filesToAssure) > parallelBatchSize {
 		matchesFound, err = executeParallelAssure(rgPath, codePatternAssureJSON, filesToAssure, writer)
 	} else {
 		matchesFound, err = executeSingleAssure(rgPath, codePatternAssureJSON, filesToAssure, targetDir, policy, writer)
@@ -86,6 +86,8 @@ func executeAssure(policy Policy, rgPath string, targetDir string, filesToAssure
 		log.Error().Err(err).Msg("error executing ripgrep batch")
 
 	}
+
+	reportPolicyStatus(policy, matchesFound)
 
 	// Patch the JSON output file
 	err = patchJSONOutputFile(jsonOutputFile)
@@ -135,67 +137,22 @@ func executeAssure(policy Policy, rgPath string, targetDir string, filesToAssure
 
 func executeParallelAssure(rgPath string, baseArgs []string, filesToScan []string, writer *bufio.Writer) (bool, error) {
 
-	const batchSize = 25
-	matched := true
-	var wg sync.WaitGroup
-	errChan := make(chan error, len(filesToScan)/batchSize+1)
 	var mu sync.Mutex
 
-	for i := 0; i < len(filesToScan); i += batchSize {
-		end := i + batchSize
-		if end > len(filesToScan) {
-			end = len(filesToScan)
+	return runParallelRipgrep(rgPath, baseArgs, filesToScan, func(output []byte) error {
+		mu.Lock()
+		defer mu.Unlock()
+
+		if _, err := writer.Write(output); err != nil {
+			return fmt.Errorf("error writing output: %w", err)
 		}
-		batch := filesToScan[i:end]
 
-		// log.Debug().Msgf("RGM: %v", batch)
-
-		wg.Add(1)
-		go func(batch []string) {
-			defer wg.Done()
-			args := append(baseArgs, batch...)
-			cmd := exec.Command(rgPath, args...)
-			output, err := cmd.Output()
-
-			if err != nil {
-
-				if exitError, ok := err.(*exec.ExitError); ok {
-					// Exit code 1 in ripgrep means "no matches found"
-					if exitError.ExitCode() == 1 {
-						matched = false
-						err = nil // Reset error as this is the expected outcome for assure
-					}
-				}
-
-				if exitError, ok := err.(*exec.ExitError); ok && exitError.ExitCode() != 1 {
-					errChan <- fmt.Errorf("error executing ripgrep: %w", err)
-					return
-				}
-			}
-
-			mu.Lock()
-			_, writeErr := writer.Write(output)
-			if writeErr == nil {
-				writeErr = writer.Flush()
-			}
-			mu.Unlock()
-
-			if writeErr != nil {
-				errChan <- fmt.Errorf("error writing output: %w", writeErr)
-			}
-		}(batch)
-	}
-
-	wg.Wait()
-	close(errChan)
-
-	for err := range errChan {
-		if err != nil {
-			return matched, err
+		if err := writer.Flush(); err != nil {
+			return fmt.Errorf("error writing output: %w", err)
 		}
-	}
 
-	return matched, nil
+		return nil
+	})
 }
 
 func executeSingleAssure(rgPath string, baseArgs []string, filesToScan []string, targetDir string, policy Policy, writer *bufio.Writer) (bool, error) {
