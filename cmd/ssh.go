@@ -823,12 +823,12 @@ func authenticatedBubbleteaMiddleware() wish.Middleware {
 			for name, pubkey := range remote_users {
 				parsed, _, _, _, _ := ssh.ParseAuthorizedKey([]byte(pubkey))
 				if ssh.KeysEqual(s.PublicKey(), parsed) {
-					wish.Println(s, fmt.Sprintf("┗━━━┫ Authenticated as %s \n\n", name))
+					wish.Println(s, fmt.Sprintf("┗━━━┫ Authenticated as %s", name))
 					bwish.Middleware(policyActionHandler)(next)(s)
 					return
 				}
 			}
-			wish.Println(s, "┗━━━┫ Authentication failed ╳ \n\n")
+			wish.Println(s, "┗━━━┫ Authentication failed ╳")
 			s.Close()
 		}
 	}

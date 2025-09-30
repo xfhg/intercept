@@ -117,10 +117,10 @@ func processWithCUE(policy Policy, data []byte, isObserve bool) error {
 
 			if sarifReport.Runs[0].Invocations[0].Properties.ReportCompliant {
 
-				resultMsg = fmt.Sprintf("🟢 %s : %s", "Compliant")
+				resultMsg = fmt.Sprintf("🟢 %s", "Compliant")
 
 			} else {
-				resultMsg = fmt.Sprintf("🔴 %s : %s", "Non Compliant")
+				resultMsg = fmt.Sprintf("🔴 %s", "Non Compliant")
 			}
 			storeResultInCache(policy.ID, resultMsg)
 

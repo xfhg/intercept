@@ -1,5 +1,5 @@
-//go:build linux && arm
-// +build linux,arm
+//go:build linux && arm && !container
+// +build linux,arm,!container
 
 package cmd
 
@@ -7,7 +7,6 @@ import (
 	"embed"
 	"fmt"
 	"os"
-	"path/filepath"
 )
 
 //go:embed rg/rg-linux-arm goss/goss-linux-arm
@@ -19,37 +18,15 @@ func prepareEmbeddedExecutables() (string, string, error) {
 		return "", "", fmt.Errorf("failed to create temp dir: %w", err)
 	}
 
-	rgPath, err = extractExecutable(tempDir, "rg/rg-linux-arm")
+	rgPath, err = extractExecutable(embeddedFiles, tempDir, "rg/rg-linux-arm")
 	if err != nil {
 		return "", "", err
 	}
 
-	gossPath, err = extractExecutable(tempDir, "goss/goss-linux-arm")
+	gossPath, err = extractExecutable(embeddedFiles, tempDir, "goss/goss-linux-arm")
 	if err != nil {
 		return "", "", err
 	}
 
 	return rgPath, gossPath, nil
-}
-
-func extractExecutable(tempDir, executableName string) (string, error) {
-	executableFolder := filepath.Dir(executableName)
-	err := os.MkdirAll(filepath.Join(tempDir, executableFolder), 0755)
-	if err != nil {
-		return "", fmt.Errorf("failed to create folder structure: %w", err)
-	}
-
-	executablePath := filepath.Join(tempDir, executableName)
-
-	data, err := embeddedFiles.ReadFile(executableName)
-	if err != nil {
-		return "", fmt.Errorf("failed to read embedded file: %w", err)
-	}
-
-	err = os.WriteFile(executablePath, data, 0755)
-	if err != nil {
-		return "", fmt.Errorf("failed to write executable to temp path: %w", err)
-	}
-
-	return executablePath, nil
 }

@@ -14,7 +14,3 @@ var gosshPath string
 func prepareGosshExecutable() (string, error) {
 	return "", nil
 }
-
-func extractGosshExecutable(_, _ string) (string, error) {
-	return "", nil
-}

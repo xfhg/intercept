@@ -212,6 +212,55 @@ func contains(slice []string, item string) bool {
 	return false
 }
 
+func iniToJSONLike(cfg *ini.File) string {
+	result := make(map[string]interface{})
+
+	for _, section := range cfg.Sections() {
+		if section.Name() == "DEFAULT" {
+			// Flatten DEFAULT section
+			for _, key := range section.Keys() {
+				result[key.Name()] = key.Value()
+			}
+		} else {
+			sectionMap := make(map[string]interface{})
+			for _, key := range section.Keys() {
+				sectionMap[key.Name()] = parseValue(key.Value())
+			}
+			result[section.Name()] = sectionMap
+		}
+	}
+
+	jsonBytes, err := json.MarshalIndent(result, "", "  ")
+	if err != nil {
+		log.Debug().Msgf("Error marshalling JSON: %v ", err)
+		return ""
+	}
+	return string(jsonBytes)
+}
+
+func parseValue(value string) interface{} {
+	// Try to parse as bool
+	if strings.ToLower(value) == "true" {
+		return true
+	}
+	if strings.ToLower(value) == "false" {
+		return false
+	}
+
+	// Try to parse as int
+	if intValue, err := json.Number(value).Int64(); err == nil {
+		return intValue
+	}
+
+	// Try to parse as float
+	if floatValue, err := json.Number(value).Float64(); err == nil {
+		return floatValue
+	}
+
+	// Return as string if all else fails
+	return value
+}
+
 func convertToJSON(content []byte, contentType string) ([]byte, error) {
 	switch contentType {
 	case "json":
