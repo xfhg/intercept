@@ -114,13 +114,18 @@ func runObserve(cmd *cobra.Command, args []string) {
 
 	observeConfig = GetConfig()
 
-	// Nil out hooks and webhook-related options on Windows to explicitly disable webhook delivery.
-	// This ensures observe won't attempt to generate secrets or post reports from Windows builds.
-	observeConfig.Hooks = nil
-	if observeConfig.Flags.WebhookSecret != "" {
-		observeConfig.Flags.WebhookSecret = ""
+	if len(observeConfig.Hooks) > 0 {
+		if observeConfig.Flags.WebhookSecret != "" {
+			webhookSecret = os.Getenv(observeConfig.Flags.WebhookSecret)
+		} else {
+			webhookSecret, err = GenerateWebhookSecret()
+
+			if err != nil {
+				log.Fatal().Err(err).Msg("Failed to generate webhook secret")
+			}
+		}
+		log.Info().Str("webhook_secret", webhookSecret).Msg("Webhook Secret for X-Signature")
 	}
-	webhookSecret = ""
 
 	// Needed for scan/assure/schema policies
 	if observeConfig.Flags.Target != "" {
@@ -400,8 +405,10 @@ func observeCleanup(perf Performance) {
 	if len(mergedReport.Runs) == 0 {
 		log.Warn().Msg("Merged SARIF report contains no runs")
 	} else {
-		// Webhooks disabled on Windows builds — skip posting merged SARIF report.
-		log.Debug().Msg("PostReportToWebhooks is disabled on Windows amd64 builds; skipping webhook delivery")
+		// Post merged SARIF report to webhooks
+		if err := PostReportToWebhooks(mergedReport); err != nil {
+			log.Error().Err(err).Msg("Failed to post merged SARIF report to webhooks")
+		}
 	}
 
 	if err := manageStatusReports(); err != nil {
@@ -446,8 +453,10 @@ func scheduledReport() {
 	if len(mergedReport.Runs) == 0 {
 		log.Warn().Msg("Merged SARIF report contains no runs")
 	} else {
-		// Webhooks disabled on Windows builds — skip posting merged SARIF report.
-		log.Debug().Msg("PostReportToWebhooks is disabled on Windows amd64 builds; skipping webhook delivery")
+		// Post merged SARIF report to webhooks
+		if err := PostReportToWebhooks(mergedReport); err != nil {
+			log.Error().Err(err).Msg("Failed to post merged SARIF report to webhooks")
+		}
 	}
 
 	if err := manageStatusReports(); err != nil {
