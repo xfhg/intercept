@@ -1,5 +1,5 @@
-//go:build !windows
-// +build !windows
+//go:build windows && amd64
+// +build windows,amd64
 
 package cmd
 
@@ -12,7 +12,6 @@ import (
 	"path/filepath"
 	"strings"
 	"sync"
-	"syscall"
 	"time"
 
 	"github.com/adhocore/gronx"
@@ -61,10 +60,9 @@ func init() {
 	observeCmd.Flags().StringVar(&observeReport, "report", "", "Report Cron Schedule")
 	observeCmd.Flags().StringVar(&observeMode, "mode", "last", "Observe mode for path monitoring : first,last,all ")
 	observeCmd.Flags().StringVar(&observeIndex, "index", "intercept", "Index name for ES bulk operations")
-	observeCmd.Flags().BoolVar(&observeRemote, "remote", false, "Start SSH server for remote policy execution")
+	observeCmd.Flags().BoolVar(&observeRemote, "remote", false, "Start SSH server for remote policy execution (NOT SUPPORTED ON WINDOWS)")
 	observeCmd.Flags().StringVar(&observeRemotePort, "remote-port", "23234", "Network port for remote policy execution")
 	observeCmd.Flags().StringVar(&observeRemoteHost, "remote-host", "0.0.0.0", "Network host bind for remote policy execution")
-
 }
 
 func runObserve(cmd *cobra.Command, args []string) {
@@ -92,18 +90,15 @@ func runObserve(cmd *cobra.Command, args []string) {
 	// Clean up output directories
 	if err := cleanupOutputDirectories(); err != nil {
 		log.Fatal().Err(err).Msg("Failed to clean up output directories")
-
 	}
 
 	if err := initSARIFProcessing(); err != nil {
 		log.Fatal().Err(err).Msg("Failed to initialize SARIF processing")
-
 	}
 	defer cleanupSARIFProcessing()
 
 	if err := createOutputDirectories(true); err != nil {
 		log.Fatal().Err(err).Msg("Failed to create output directories")
-
 	}
 	if outputDir != "" {
 		reportDir = filepath.Join(outputDir, reportDir)
@@ -119,18 +114,13 @@ func runObserve(cmd *cobra.Command, args []string) {
 
 	observeConfig = GetConfig()
 
-	if len(observeConfig.Hooks) > 0 {
-		if observeConfig.Flags.WebhookSecret != "" {
-			webhookSecret = os.Getenv(observeConfig.Flags.WebhookSecret)
-		} else {
-			webhookSecret, err = GenerateWebhookSecret()
-
-			if err != nil {
-				log.Fatal().Err(err).Msg("Failed to generate webhook secret")
-			}
-		}
-		log.Info().Str("webhook_secret", webhookSecret).Msg("Webhook Secret for X-Signature")
+	// Nil out hooks and webhook-related options on Windows to explicitly disable webhook delivery.
+	// This ensures observe won't attempt to generate secrets or post reports from Windows builds.
+	observeConfig.Hooks = nil
+	if observeConfig.Flags.WebhookSecret != "" {
+		observeConfig.Flags.WebhookSecret = ""
 	}
+	webhookSecret = ""
 
 	// Needed for scan/assure/schema policies
 	if observeConfig.Flags.Target != "" {
@@ -169,14 +159,10 @@ func runObserve(cmd *cobra.Command, args []string) {
 
 	// Check for remote mode early
 	if observeRemote {
-		remote_users = authKeysToMap(observeConfig.Flags.RemoteAuth)
-		go func() {
-			if err := startSSHServer(policies, outputDir); err != nil {
-				log.Error().Err(err).Msg("Failed to start Remote Policy Execution Endpoint")
-			}
-		}()
-		log.Info().Msg("Remote Policy Execution Endpoint active")
-
+		// On Windows we intentionally do not support the embedded SSH server for remote policy execution.
+		// Inform the user and continue with local observe behavior only.
+		log.Warn().Msg("Remote Policy Execution (--remote) is not supported on Windows builds. Ignoring --remote flag.")
+		observeRemote = false
 	}
 
 	dispatcher := GetDispatcher()
@@ -184,7 +170,6 @@ func runObserve(cmd *cobra.Command, args []string) {
 	taskr := tasker.New(tasker.Option{
 		Verbose: debugOutput,
 		Tz:      "UTC", // You can change this to your preferred timezone
-
 	})
 
 	run := false
@@ -312,7 +297,8 @@ func runObserve(cmd *cobra.Command, args []string) {
 	// Setup signal handling for graceful shutdown
 	ctx, cancel := context.WithCancel(context.Background())
 	signalChan := make(chan os.Signal, 1)
-	signal.Notify(signalChan, os.Interrupt, syscall.SIGTERM)
+	// On Windows, use os.Interrupt only
+	signal.Notify(signalChan, os.Interrupt)
 
 	go func() {
 		<-signalChan
@@ -414,10 +400,8 @@ func observeCleanup(perf Performance) {
 	if len(mergedReport.Runs) == 0 {
 		log.Warn().Msg("Merged SARIF report contains no runs")
 	} else {
-		// Post merged SARIF report to webhooks
-		if err := PostReportToWebhooks(mergedReport); err != nil {
-			log.Error().Err(err).Msg("Failed to post merged SARIF report to webhooks")
-		}
+		// Webhooks disabled on Windows builds — skip posting merged SARIF report.
+		log.Debug().Msg("PostReportToWebhooks is disabled on Windows amd64 builds; skipping webhook delivery")
 	}
 
 	if err := manageStatusReports(); err != nil {
@@ -462,10 +446,8 @@ func scheduledReport() {
 	if len(mergedReport.Runs) == 0 {
 		log.Warn().Msg("Merged SARIF report contains no runs")
 	} else {
-		// Post merged SARIF report to webhooks
-		if err := PostReportToWebhooks(mergedReport); err != nil {
-			log.Error().Err(err).Msg("Failed to post merged SARIF report to webhooks")
-		}
+		// Webhooks disabled on Windows builds — skip posting merged SARIF report.
+		log.Debug().Msg("PostReportToWebhooks is disabled on Windows amd64 builds; skipping webhook delivery")
 	}
 
 	if err := manageStatusReports(); err != nil {

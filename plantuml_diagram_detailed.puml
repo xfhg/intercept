@@ -1,0 +1,239 @@
+
+@startuml
+!theme vibrant
+title Intercept Application Architecture (Detailed)
+
+package "Main" {
+  [main]
+}
+
+package "Commands" {
+  package "root" {
+    [rootCmd]
+    [initConfig]
+    [setupLogging]
+    [setupOutputDir]
+  }
+
+  package "audit" {
+    [runAuditPerfCmd]
+    [runAuditPerf]
+    [filterPolicies]
+    [processPoliciesInParallel]
+    [processPolicy]
+    [filterFiles]
+    [processPolicyByType]
+  }
+
+  package "observe" {
+    [observeCmd]
+    [runObserve]
+    [loadFilteredPolicies]
+    [createPolicyTask]
+    [createReportTask]
+    [watchPaths]
+    [observeCleanup]
+  }
+}
+
+package "Core" {
+  package "policy" {
+    [LoadPolicyFile]
+    [LoadRemotePolicy]
+    [DeterminePolicySource]
+    [StorePolicyInCache]
+    [LoadPolicyFromCache]
+  }
+
+  package "dispatcher" {
+    [GetDispatcher]
+    [DispatchPolicyEvent]
+    [handlePolicyScan]
+    [handlePolicyAssure]
+    [handlePolicyRuntime]
+    [handlePolicyAPI]
+    [handlePolicyYML]
+    [handlePolicyTOML]
+    [handlePolicyJSON]
+    [handlePolicyINI]
+    [handlePolicyRego]
+  }
+
+  package "worker" {
+    [processPolicyInWorker]
+    [preparePolicyPaths]
+  }
+
+  package "report" {
+    [MergeSARIFReports]
+    [manageStatusReports]
+    [compressFile]
+    [writeSARIFReport]
+  }
+}
+
+package "Policy Types" {
+  package "scan" {
+    [ProcessScanType]
+    [executeScan]
+    [executeParallelScans]
+    [executeSingleScan]
+    [createSearchPatternFile]
+    [GenerateSARIFReport]
+  }
+
+  package "assure" {
+    [ProcessAssureType]
+    [executeAssure]
+    [executeParallelAssure]
+    [executeSingleAssure]
+    [GenerateAssureSARIFReport]
+  }
+
+  package "runtime" {
+    [ProcessRuntimeType]
+    [generateRuntimeSARIFReport]
+  }
+
+  package "api" {
+    [ProcessAPIType]
+    [applyAuth]
+    [processWithCUE]
+    [processWithRegex]
+    [executeAssureForAPI]
+    [GenerateAPISARIFReport]
+  }
+
+  package "schema" {
+    [ProcessJSONType]
+    [ProcessYAMLType]
+    [ProcessTOMLType]
+    [ProcessINIType]
+    [validateContentAndCUE]
+    [generateSchemaResults]
+  }
+
+  package "rego" {
+    [ProcessRegoType]
+    [checkCompliance]
+    [parseBlocks]
+  }
+}
+
+' Connections
+main --> rootCmd
+
+rootCmd --> initConfig
+rootCmd --> setupLogging
+rootCmd --> setupOutputDir
+rootCmd --> runAuditPerfCmd
+rootCmd --> observeCmd
+
+' Audit Command Flow
+runAuditPerfCmd --> runAuditPerf
+runAuditPerf --> DeterminePolicySource
+DeterminePolicySource --> LoadPolicyFile
+DeterminePolicySource --> LoadRemotePolicy
+runAuditPerf --> filterPolicies
+runAuditPerf --> processPoliciesInParallel
+processPoliciesInParallel --> processPolicy
+processPolicy --> filterFiles
+processPolicy --> processPolicyByType
+processPolicyByType --> ProcessScanType
+processPolicyByType --> ProcessAssureType
+processPolicyByType --> ProcessRuntimeType
+processPolicyByType --> ProcessAPIType
+processPolicyByType --> ProcessJSONType
+processPolicyByType --> ProcessYAMLType
+processPolicyByType --> ProcessTOMLType
+processPolicyByType --> ProcessINIType
+processPolicyByType --> ProcessRegoType
+runAuditPerf --> MergeSARIFReports
+
+' Observe Command Flow
+observeCmd --> runObserve
+runObserve --> DeterminePolicySource
+runObserve --> loadFilteredPolicies
+runObserve --> GetDispatcher
+runObserve --> createPolicyTask
+runObserve --> createReportTask
+runObserve --> watchPaths
+runObserve --> observeCleanup
+observeCleanup --> MergeSARIFReports
+
+' Dispatcher Flow
+createPolicyTask --> DispatchPolicyEvent
+watchPaths --> DispatchPolicyEvent
+DispatchPolicyEvent --> handlePolicyScan
+DispatchPolicyEvent --> handlePolicyAssure
+DispatchPolicyEvent --> handlePolicyRuntime
+Dispatch-PolicyEvent --> handlePolicyAPI
+DispatchPolicyEvent --> handlePolicyYML
+DispatchPolicyEvent --> handlePolicyTOML
+DispatchPolicyEvent --> handlePolicyJSON
+DispatchPolicyEvent --> handlePolicyINI
+DispatchPolicyEvent --> handlePolicyRego
+
+' Worker Flow
+handlePolicyScan --> processPolicyInWorker
+handlePolicyAssure --> processPolicyInWorker
+handlePolicyRuntime --> processPolicyInWorker
+handlePolicyAPI --> processPolicyInWorker
+handlePolicyYML --> processPolicyInWorker
+handlePolicyTOML --> processPolicyInWorker
+handlePolicyJSON --> processPolicyInWorker
+handlePolicyINI --> processPolicyInWorker
+handlePolicyRego --> processPolicyInWorker
+processPolicyInWorker --> ProcessScanType
+processPolicyInWorker --> ProcessAssureType
+processPolicyInWorker --> ProcessRuntimeType
+processPolicyInWorker --> ProcessAPIType
+processPolicyInWorker --> ProcessJSONType
+processPolicyInWorker --> ProcessYAMLType
+processPolicyInWorker --> ProcessTOMLType
+processPolicyInWorker --> ProcessINIType
+processPolicyInWorker --> ProcessRegoType
+
+' Policy Type Flows
+ProcessScanType --> executeScan
+executeScan --> executeParallelScans
+executeScan --> executeSingleScan
+executeScan --> createSearchPatternFile
+executeScan --> GenerateSARIFReport
+
+ProcessAssureType --> executeAssure
+executeAssure --> executeParallelAssure
+executeAssure --> executeSingleAssure
+executeAssure --> GenerateAssureSARIFReport
+
+ProcessRuntimeType --> generateRuntimeSARIFReport
+
+ProcessAPIType --> applyAuth
+ProcessAPIType --> processWithCUE
+ProcessAPIType --> processWithRegex
+processWithRegex --> executeAssureForAPI
+ProcessAPIType --> GenerateAPISARIFReport
+
+ProcessJSONType --> validateContentAndCUE
+ProcessJSONType --> generateSchemaResults
+ProcessYAMLType --> validateContentAndCUE
+ProcessYAMLType --> generateSchemaResults
+ProcessTOMLType --> validateContentAndCUE
+ProcessTOMLType --> generateSchemaResults
+ProcessINIType --> validateContentAndCUE
+ProcessINIType --> generateSchemaResults
+
+ProcessRegoType --> checkCompliance
+ProcessRegoType --> parseBlocks
+
+' Reporting Flow
+GenerateSARIFReport --> writeSARIFReport
+GenerateAssureSARIFReport --> writeSARIFReport
+generateRuntimeSARIFReport --> writeSARIFReport
+GenerateAPISARIFReport --> writeSARIFReport
+generateSchemaResults --> createSARIFReport
+createSARIFReport --> writeSARIFReport
+MergeSARIFReports --> writeSARIFReport
+manageStatusReports --> compressFile
+
+@enduml

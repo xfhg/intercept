@@ -1,0 +1,59 @@
+
+Config: 
+  Flags:
+    policy_schedule: "*/15 * * * * *"
+    report_schedule:  "*/50 * * * * *"
+  Hooks:
+    # - name: "Test Webhook Report"
+    #   endpoint: "https://webhook.site/ea939de5-d1bc-4078-8f6e-8873103e77bd"
+    #   insecure: false
+    #   method: "POST"
+    #   auth: 
+    #     type: bearer
+    #     token_env: TOKEN 
+    #   headers:
+    #     Content-Type: "application/json"
+    #   retry_attempts: 3
+    #   retry_delay: "5s"
+    #   timeout_seconds: 30
+    #   event_types:
+    #     - "report"
+    
+    # - name: "Test Webhook Policy"
+    #   endpoint: "https://webhook-test.com/f62a2b3c4905f0ceefd802eb17aeeb73"
+    #   insecure: false
+    #   method: "POST"
+    #   auth: 
+    #     type: bearer
+    #     token_env: TOKEN 
+    #   headers:
+    #     Content-Type: "application/json"
+    #   retry_attempts: 3
+    #   retry_delay: "5s"
+    #   timeout_seconds: 30
+    #   event_types:
+    #     - "policy"
+
+Policies:
+
+  - id: "RUNTIM-001-FIM"
+    type: "runtime"
+    enforcement:
+      - environment: "all"
+        fatal: "false"
+        exceptions: "development"
+        confidence: "high"
+    metadata:
+      name: "RUNTIME System Compliance"
+      description: "Enforce system compliance at runtime"
+      msg_solution: ""
+      msg_error: ""
+      tags:
+        - "config"
+        - "runtime"
+        - "enforce"
+      score: "8"
+    _runtime:
+      config: runtime/fim.yaml
+      schedule: "*/30 * * * * *"
+

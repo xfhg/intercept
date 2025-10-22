@@ -71,7 +71,7 @@ Policies:
       config: runtime/simple_https.yaml
 
 
-  - id: "API-001"
+  - id: "REMOTE-API-001"
     type: "api"
     enforcement:
       - environment: "production"

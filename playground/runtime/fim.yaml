@@ -1,0 +1,15 @@
+
+
+file:
+  ~/Workspace/Code/Lab/intercept-lab/fim/target.conf:
+    exists: true
+    # mode: "0440"
+    # owner: root
+    # group: root
+    contents:
+      # - "%sudo ALL=(ALL) ALL"
+      # - "!NOPASSWD:ALL"
+      - pattern: "role=admin"
+        invert: true
+      - pattern: "authorized=true"
+        invert: true

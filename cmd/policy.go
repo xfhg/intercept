@@ -5,7 +5,6 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
-	"sync"
 
 	"github.com/go-resty/resty/v2"
 	"gopkg.in/yaml.v3"
@@ -255,83 +254,29 @@ func DeterminePolicySource(input string) (PolicySourceType, string, error) {
 	return LocalFile, absPath, nil
 }
 
-// Policy store
+// Deprecated: the real cache implementation lives in cmd/cache.go
+// These forwarders maintain API compatibility if other files call them with the old signatures.
 
-var (
-	policyStore = sync.Map{}
-)
-
-// StorePolicyInCache saves a Policy struct in the global store with the given key
-func StorePolicyInCache(key string, policy Policy) {
-	policyStore.Store(key, policy)
+// StorePolicyInCacheLegacy saves a Policy struct in the global store with the given key
+// Deprecated: Use StorePolicyInCache(path, policy, isDirectory) from cmd/cache.go instead
+func StorePolicyInCacheLegacy(key string, policy Policy) {
+	// default: treat as file. callers that know it's a directory should call StorePolicyInCacheDir
+	StorePolicyInCacheDir(key, policy)
 }
 
-// LoadPolicyFromCache retrieves a Policy struct from the global store by key
-func LoadPolicyFromCache(key string) (Policy, bool) {
-	value, ok := policyStore.Load(key)
-	if !ok {
-		return Policy{}, false
-	}
-	policy, ok := value.(Policy)
-	return policy, ok
+// StorePolicyInCacheDir stores policy for a directory key
+// Deprecated: Use StorePolicyInCache(path, policy, true) from cmd/cache.go instead
+func StorePolicyInCacheDir(key string, policy Policy) {
+	StorePolicyInCache(key, policy, true)
 }
 
-// DeletePolicyFromCache removes a Policy struct from the global store by key
-func DeletePolicyFromCache(key string) {
-	policyStore.Delete(key)
-}
-
-// ClearAllPoliciesFromCache removes all Policy structs from the global store
-func ClearAllPoliciesFromCache() {
-	policyStore.Range(func(key, value interface{}) bool {
-		policyStore.Delete(key)
-		return true
-	})
-}
-
-// ListAllPolicyCacheKeys returns a slice of all policy keys in the store
-func ListAllPolicyCacheKeys() []string {
-	var keys []string
-	policyStore.Range(func(key, value interface{}) bool {
-		if k, ok := key.(string); ok {
-			keys = append(keys, k)
-		}
-		return true
-	})
-	return keys
-}
-
-// LoadAllPoliciesFromCache returns a map of all policies in the store
-func LoadAllPoliciesFromCache() map[string]Policy {
-	policies := make(map[string]Policy)
-	policyStore.Range(func(key, value interface{}) bool {
-		if k, ok := key.(string); ok {
-			if p, ok := value.(Policy); ok {
-				policies[k] = p
-			}
-		}
-		return true
-	})
-	return policies
-}
-
-// UpdatePolicyInCache updates an existing Policy in the store or adds it if it doesn't exist
-func UpdatePolicyInCache(key string, policy Policy) {
-	policyStore.Store(key, policy)
-}
-
-// PolicyExistsInCache checks if a Policy with the given key exists in the store
-func PolicyExistsInCache(key string) bool {
-	_, exists := policyStore.Load(key)
-	return exists
+// StorePolicyInCacheFile stores policy for a file key
+// Deprecated: Use StorePolicyInCache(path, policy, false) from cmd/cache.go instead
+func StorePolicyInCacheFile(key string, policy Policy) {
+	StorePolicyInCache(key, policy, false)
 }
 
 // GetPolicyCacheCount returns the number of policies in the store
 func GetPolicyCacheCount() int {
-	count := 0
-	policyStore.Range(func(key, value interface{}) bool {
-		count++
-		return true
-	})
-	return count
+	return len(ListAllPolicyCacheKeys())
 }

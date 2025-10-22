@@ -1,0 +1,60 @@
+
+@startuml
+!theme vibrant
+title Intercept Application Architecture
+
+package "Main" {
+  [main]
+}
+
+package "Commands" {
+  [root]
+  [audit]
+  [observe]
+}
+
+package "Core" {
+  [policy]
+  [dispatcher]
+  [worker]
+  [report]
+}
+
+package "Policy Types" {
+  [scan]
+  [assure]
+  [runtime]
+  [api]
+  [json]
+  [yaml]
+  [toml]
+  [ini]
+  [rego]
+}
+
+main --> root
+
+root --> audit
+root --> observe
+
+audit --> policy
+audit --> worker
+audit --> report
+
+observe --> policy
+observe --> dispatcher
+observe --> report
+
+dispatcher --> worker
+
+worker --> scan
+worker --> assure
+worker --> runtime
+worker --> api
+worker --> json
+worker --> yaml
+worker --> toml
+worker --> ini
+worker --> rego
+
+@enduml

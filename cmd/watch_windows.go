@@ -1,10 +1,9 @@
-//go:build !windows
-// +build !windows
+//go:build windows && amd64
+// +build windows,amd64
 
 package cmd
 
 import (
-	"fmt"
 	"sync"
 	"time"
 
@@ -206,12 +205,6 @@ func watchLoopLastEvent(w *fsnotify.Watcher, watchedPaths []string) {
 	}
 }
 
-// For a configurable interval:
-// var eventCacheDuration time.Duration = 1000 * time.Millisecond
-// func SetEventCacheDuration(milliseconds int) {
-// 	eventCacheDuration = time.Duration(milliseconds) * time.Millisecond
-// }
-
 func processLastEvent(path string, cache *map[string]*cachedEvent, mutex *sync.Mutex) {
 	mutex.Lock()
 	defer mutex.Unlock()
@@ -221,6 +214,18 @@ func processLastEvent(path string, cache *map[string]*cachedEvent, mutex *sync.M
 		processEvent(cached.event)
 		// Remove the event from the cache
 		delete(*cache, path)
+	}
+}
+
+func cleanEventCache(cache *map[string]time.Time, mutex *sync.Mutex) {
+	mutex.Lock()
+	defer mutex.Unlock()
+
+	now := time.Now()
+	for k, v := range *cache {
+		if now.Sub(v) > eventCacheDuration {
+			delete(*cache, k)
+		}
 	}
 }
 
@@ -234,7 +239,7 @@ func processEvent(e fsnotify.Event) {
 
 	log.Info().Msgf("Processing event [%s] on [%s]", e.Op.String(), e.Name)
 
-	// Check if the watcher is targeting the directory
+	// If we didn't find a policy for the exact file, try the directory key
 	if !ok {
 		directoryCheck := GetDirectory(e.Name)
 		dirKey := normalizeDirectoryKey(directoryCheck)
@@ -242,24 +247,34 @@ func processEvent(e fsnotify.Event) {
 		policy, ok = LoadPolicyFromCache(dirKey)
 	}
 
-	if ok {
-		runID := fmt.Sprintf("%s-%s", ksuid.New().String(), NormalizeFilename(policy.ID))
-		policy.RunID = runID
-		log.Info().Str("policy", policy.ID).Str("runID", policy.RunID).Msgf("Triggered Policy run from watcher event [%s] ", e.Op.String())
-		dispatcher.DispatchPolicyEvent(policy, targetDir, policy.Metadata.TargetInfo)
-	} else {
-		log.Error().Msgf("Policy not found in cache, watcher event [%s] didn't trigger policy process for: %s", e.Op.String(), e.Name)
+	if !ok {
+		log.Debug().Str("path", e.Name).Msg("No policy found in cache for event")
+		return
 	}
-}
 
-func cleanEventCache(cache *map[string]time.Time, mutex *sync.Mutex) {
-	mutex.Lock()
-	defer mutex.Unlock()
+	// If this is a runtime policy, run goss-based processing
+	if policy.Type == "runtime" {
+		// Generate a run id for this observe action
+		policy.RunID = ksuid.New().String()
 
-	now := time.Now()
-	for path, lastEventTime := range *cache {
-		if now.Sub(lastEventTime) > eventCacheDuration {
-			delete(*cache, path)
-		}
+		// Prepare file list (the event file)
+		filePaths := []string{e.Name}
+
+		// Launch runtime processing in a goroutine so the watcher stays responsive
+		go func(pol Policy, paths []string) {
+			log.Info().Str("policy", pol.ID).Msgf("Triggering runtime policy for paths: %v", paths)
+			if err := ProcessRuntimeType(pol, gossPath, "", paths, true); err != nil {
+				log.Error().Err(err).Str("policy", pol.ID).Msg("Runtime processing failed")
+			} else {
+				log.Info().Str("policy", pol.ID).Msg("Runtime processing completed")
+			}
+		}(policy, filePaths)
+
+		return
 	}
+
+	// For non-runtime types, leave existing behavior unchanged (no-op here).
+	// If you want to trigger audit/action for other policy types on Windows,
+	// add the logic here.
+	log.Debug().Str("policy", policy.ID).Str("type", policy.Type).Msg("Non-runtime observe event — no action taken on Windows by default")
 }
